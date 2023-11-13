@@ -1,0 +1,14 @@
+{
+  "include": ["src/*", "src/**/*.d.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES6",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": false,
+    "strict": true,
+    "resolveJsonModule": true
+  }
+}

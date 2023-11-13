@@ -1,0 +1,25 @@
+{
+  "name": "silent-follower",
+  "author": "chadli",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/core/setting.ts",
+    "replay": "ts-node-dev --respawn --transpile-only src/play.ts",
+    "watch": "npx webpack -w",
+    "build": "bash ./scripts/build.sh"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "ts-loader": "^9.4.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.2",
+    "webpack": "^5.77.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "puppeteer-core": "^21.3.8",
+    "uuid": "^9.0.0"
+  }
+}

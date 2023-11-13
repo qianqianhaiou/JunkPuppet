@@ -1,0 +1,53 @@
+name: Node.js CI
+
+on:
+  push:
+    tags:
+      - "v*"
+    
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm i
+      
+    - name: Build
+      run: npm run build
+      
+    - name: 7z the Build
+      run: 7z a ${{ secrets.ReleaseZipName }} ./out/JunkPuppet-win32-x64/ 
+      
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: TODO New Release.
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ secrets.ReleaseZipName }}.7z
+        asset_name: ${{ secrets.ReleaseZipName }}.7z
+        asset_content_type: application/x-7z-compressed
