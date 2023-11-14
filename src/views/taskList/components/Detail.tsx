@@ -56,7 +56,9 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                         bordered={false}
                       >
                         <div className="flex items-center">
-                          <div>{item.value}</div>
+                          <div className="whitespace-pre-wrap">
+                            {item.value}
+                          </div>
                         </div>
                       </Card>
                     </Col>

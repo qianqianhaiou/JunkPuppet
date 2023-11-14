@@ -12,7 +12,7 @@ function App() {
     fetchData();
   }, []);
   return (
-    <div>
+    <div className="w-full h-full flex items-center justify-center">
       <DistInfo data={info}></DistInfo>
     </div>
   );

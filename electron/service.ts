@@ -1,6 +1,6 @@
 import { fork } from "child_process";
 import path, { join } from "node:path";
-import { fswriteFile, fsreadFile } from "./file";
+import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "./file";
 import { BrowserWindow, dialog } from "electron";
 import { getDiskDetail, relaunchElectron } from "./util";
 import { taskDataDb, taskListDb } from "./db";
@@ -9,7 +9,6 @@ import crypto from "crypto";
 // 新增任务
 export const addTask = async (params: any) => {
   const database = await taskListDb();
-
   if (database.chain.get("list").find({ name: params.name }).value()) {
     throw new Error("名称重复");
   }
@@ -52,6 +51,23 @@ export const deleteTask = async (params: any) => {
   const database = await taskListDb();
   if (!params._id) {
     throw new Error("缺少任务ID");
+  }
+  // 删除定时任务
+  const cron = global.cronList.get(params._id);
+  if (cron) {
+    cron.stop();
+    global.cronList.delete(params._id);
+  }
+  const target = database.chain.get("list").find({ _id: params._id }).value();
+  if (target.mockDataId) {
+    // 删除截图文件夹
+    await deleteDir(join(process.env.DATA_PATH_SNAPSHOT, params._id));
+    // 删除JSON文件
+    await deleteFile(
+      join(process.env.DATA_PATH_JSON, `${target.mockDataId}.json`)
+    );
+    // 删除任务数据
+    await deleteTaskDataDb({ taskId: params._id });
   }
   const datanow = Date.now();
   database.chain.get("list").remove({ _id: params._id }).value();

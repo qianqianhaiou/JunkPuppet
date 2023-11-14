@@ -22,7 +22,9 @@ function createWindow() {
     height: 800,
     titleBarStyle: "hidden",
   });
-  win.webContents.openDevTools();
+  if (!app.isPackaged) {
+    win.webContents.openDevTools();
+  }
   if (process.env["VITE_DEV_SERVER_URL"]) {
     win.loadURL(process.env["VITE_DEV_SERVER_URL"]);
   } else {
