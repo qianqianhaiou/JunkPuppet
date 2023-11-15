@@ -23,18 +23,17 @@ function App(props: any) {
     } else {
       await unMaxWindow({});
     }
+    judgeFullScreen();
   };
   const handleCloseApp = async () => {
     await closeApp({});
   };
+  const judgeFullScreen = () => {
+    setFullScreen(window.innerWidth === window.screen.width);
+  };
   useEffect(() => {
-    window.onresize = () => {
-      if (window.innerWidth === window.screen.width) {
-        setFullScreen(true);
-      } else {
-        setFullScreen(false);
-      }
-    };
+    judgeFullScreen();
+    window.onresize = judgeFullScreen;
     return () => {
       window.onresize = null;
     };

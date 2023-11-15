@@ -39,6 +39,13 @@ function createWindow() {
       },
     },
     {
+      label: "relaunch",
+      click: function () {
+        app.relaunch();
+        app.exit();
+      },
+    },
+    {
       label: "Exit",
       click: function () {
         app.quit();

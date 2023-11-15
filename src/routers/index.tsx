@@ -6,6 +6,7 @@ import { Navigate } from "react-router-dom";
 const InitRouter = lazy(() => import("@/views/init"));
 const SettingRouter = lazy(() => import("@/views/setting"));
 const TaskListRouter = lazy(() => import("@/views/taskList"));
+const LogRouter = lazy(() => import("@/views/log"));
 
 function LodingPage(props: any) {
   document.title = props.title;
@@ -61,7 +62,7 @@ export const optionalRouter: any[] = [
     path: "/logs",
     element: (
       <LodingPage title="服务日志">
-        <div>服务日志</div>
+        <LogRouter></LogRouter>
       </LodingPage>
     ),
   },
