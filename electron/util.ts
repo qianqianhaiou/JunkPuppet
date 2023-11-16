@@ -49,7 +49,6 @@ export const tranlateDate = (date: any) => {
     ":" +
     String(data.getMinutes()).padStart(2, "0") +
     ":" +
-    String(data.getSeconds()).padStart(2, "0") +
-    ".000"
+    String(data.getSeconds()).padStart(2, "0")
   );
 };

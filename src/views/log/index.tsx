@@ -1,6 +1,7 @@
 import { getRecentLogs } from "@/service";
 import VirtualList from "rc-virtual-list";
 import { useEffect, useRef, useState } from "react";
+import style from "./style.module.scss";
 
 function App() {
   const [list, setList] = useState<any[]>([]);
@@ -65,7 +66,7 @@ function App() {
         <div></div>
       </div>
       <VirtualList
-        className="px-[20px] pb-[20px] mx-[20px] bg-[#000]"
+        className={style.VList + " px-[20px] pb-[20px] mx-[20px] bg-[#000]"}
         ref={vListRef}
         data={list}
         height={height}
@@ -87,7 +88,9 @@ function App() {
                 color: ColorMap[item.type],
               }}
             >
-              <div className="flex-shrink-0 mr-[10px]">{item.time}</div>
+              <div className="flex-shrink-0 mr-[10px] text-[#52c41a]">
+                {item.time}
+              </div>
               <div className="flex-shrink-0 mr-[10px]">{item.type}</div>
               <div className="line-clamp-2">{item.message}</div>
             </div>
