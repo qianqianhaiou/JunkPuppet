@@ -191,10 +191,7 @@ async function startTask(props: any) {
   // 初始化截图文件夹
   await initDir(props.parent);
   await asyncFor(JSON.parse(props.data), async (item, index) => {
-    if (item.type === 'click') {
-      await playClick(page, item.data);
-      await waitTime(1);
-    } else if (item.type === 'mouse') {
+    if (item.type === 'mouse') {
       await playMouse(client, item.data);
     } else if (item.type === 'keyevent') {
       await playKeyDown(client, item.data);
