@@ -1,8 +1,13 @@
+@font-face {
+  font-family: "PuHui55Regular";
+  src: url("@/assets/font/PuHui55Regular.ttf") format("truetype");
+}
 html,
 body {
   width: 100%;
   height: 100%;
   margin: 0px;
+  font-family: "PuHui55Regular";
   -webkit-app-region: no-drag;
   // overflow: hidden;
   #root {
