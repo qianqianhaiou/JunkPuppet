@@ -1,9 +1,9 @@
-const log4js = require("log4js");
-const events = require("events");
-const fs = require("fs");
-const readline = require("readline");
+import log4js from "log4js";
+import { once } from "events";
+import { createInterface } from "readline";
+import { createReadStream, statSync } from "fs";
 
-function initLogger(path: string) {
+export const initLogger = (path: string) => {
   log4js.configure({
     appenders: {
       // console: {
@@ -19,47 +19,20 @@ function initLogger(path: string) {
     categories: { default: { appenders: ["file"], level: "info" } },
   });
   const logger = log4js.getLogger("system");
-  console.log = (...data) => {
-    data.map((item) => {
-      logger.info(item);
-    });
-  };
-  console.warn = (...data) => {
-    data.map((item) => {
-      logger.warn(item);
-    });
-  };
-  console.error = (...data) => {
-    data.map((item) => {
-      logger.error(item);
-    });
-  };
-}
-initLogger("logs/system.log");
-console.log("asdfs");
-console.warn("asdfs");
-console.error("asdfs");
-console.log("asdfs");
-console.warn("asdfs");
-console.error("asdfs");
-console.log("asdfs");
-console.warn("asdfs");
-console.error("asdfs");
-console.log("asdfs");
-console.warn("asdfs");
-console.error("asdfs");
-console.log("asdfs");
-console.warn("asdfsasdddsasda");
-console.error("asdfs");
-console.error(new Error("hahsjlskkld"));
+  return logger;
+};
 
-async function readFileByLine(path: string, bufferSize = 1024 * 24) {
+interface LogItem {
+  time: string;
+  type: string;
+  message: string;
+}
+export const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
   // 默认拿 24KB 数据  应该在300-500条
-  const target: any = [];
-  const rl = readline.createInterface({
-    input: fs.createReadStream(path, {
-      start:
-        fs.statSync(path).size - Math.min(fs.statSync(path).size, bufferSize),
+  const target: LogItem[] = [];
+  const rl = createInterface({
+    input: createReadStream(path, {
+      start: statSync(path).size - Math.min(statSync(path).size, bufferSize),
     }),
     crlfDelay: Infinity,
   });
@@ -75,10 +48,6 @@ async function readFileByLine(path: string, bufferSize = 1024 * 24) {
       });
     }
   });
-  await events.once(rl, "close");
+  await once(rl, "close");
   return target;
-}
-const filePath1 = "logs/system.log";
-readFileByLine(filePath1).then((res) => {
-  console.debug(res);
-});
+};

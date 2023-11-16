@@ -5,6 +5,7 @@ import { BrowserWindow, dialog } from "electron";
 import { getDiskDetail, relaunchElectron } from "./util";
 import { taskDataDb, taskListDb } from "./db";
 import crypto from "crypto";
+import { readLogByLine } from "./logger";
 
 // 新增任务
 export const addTask = async (params: any) => {
@@ -257,6 +258,7 @@ export const startplayServer = async (params: any) => {
     const data = await fsreadFile(
       join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`)
     );
+    console.log(params.name + " - 任务开始");
     ChildProcess.send({
       type: "StartRunning",
       params: {
@@ -295,7 +297,7 @@ export const startplayServer = async (params: any) => {
           await database.write();
           resolve("sucess");
         } else if (msg.type === "log") {
-          console.log(JSON.stringify(msg.data));
+          console.log("task: " + JSON.stringify(msg.data));
         }
       });
       ChildProcess.on("error", function (code) {
@@ -308,6 +310,11 @@ export const startplayServer = async (params: any) => {
   } catch (error: any) {
     console.log(`runner start error：${error.message}`);
   }
+};
+
+// 读取最近的几条日志
+export const getLogByLine = async () => {
+  return readLogByLine(join(process.env.DATA_PATH_LOG, "system.log"));
 };
 
 // 选择一个文件夹
@@ -347,6 +354,7 @@ export const setGobalSetting = async (params: any) => {
     "ChromeData",
     "Default"
   );
+  target["DATA_PATH_LOG"] = join(target["DATA_PATH"], "Logs");
   await fswriteFile(
     process.env.GLOBAL_SETTING_CONFIG_PATH,
     JSON.stringify(target)

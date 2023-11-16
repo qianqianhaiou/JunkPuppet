@@ -17,7 +17,6 @@ function App() {
   const handleGetGlobalSetting = async () => {
     const result = await getGlobalSetting({});
     const setting = JSON.parse(result);
-    console.log(JSON.parse(result));
     setSetting(setting);
     setBasePath(setting.DATA_PATH);
     setChromePath(setting.CHROME_PATH);

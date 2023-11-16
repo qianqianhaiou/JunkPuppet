@@ -19,7 +19,8 @@ import {
   maxWindow,
   unmaxWindow,
   getDataDistInfo,
-  deleteTaskDataDb
+  deleteTaskDataDb,
+  getLogByLine
 } from "./service";
 
 export interface Route {
@@ -83,6 +84,9 @@ const handleUnMaxWindow: Route["callBack"] = async (event, arg) => {
 };
 const handleGetDataDistInfo: Route["callBack"] = async (event, arg) => {
   return getDataDistInfo();
+};
+const handleGetLogsByLine: Route["callBack"] = async (event, arg) => {
+  return getLogByLine();
 };
 const handleCloseApp: Route["callBack"] = async (event, arg) => {
   return closeApp();
@@ -163,6 +167,10 @@ export const routes: Route[] = [
   {
     path: "getDataDistInfo",
     callBack: handleGetDataDistInfo,
+  },
+  {
+    path: "getRecentLogs",
+    callBack: handleGetLogsByLine,
   },
   {
     path: "closeApp",

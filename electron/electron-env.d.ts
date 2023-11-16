@@ -26,8 +26,10 @@ declare namespace NodeJS {
     DATA_PATH_DB: string;
     /** Chrome用户数据存放位置 */
     DATA_PATH_CHROME_DATA: string;
-    /**chrome浏览器存放位置 */
+    /** Chrome浏览器存放位置 */
     CHROME_PATH: string;
+    /** 日志文件夹 */
+    DATA_PATH_LOG: string;
   }
 }
 
