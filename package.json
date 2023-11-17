@@ -12,7 +12,7 @@
     "install:plugin": "cd puppteer-plugin/setter-extension && npm i",
     "dev": "vite",
     "core": "bash ./scripts/build.sh",
-    "build": "bash ./scripts/build.sh && vite build && npm run make && bash ./scripts/moveCore.sh",
+    "build": "bash ./scripts/build.sh && vite build && npm run package && bash ./scripts/moveCore.sh",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
