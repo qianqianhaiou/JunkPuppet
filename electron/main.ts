@@ -27,9 +27,7 @@ function createWindow() {
   });
   if (!app.isPackaged) {
     win.webContents.openDevTools();
-  }
-  if (process.env["VITE_DEV_SERVER_URL"]) {
-    win.loadURL(process.env["VITE_DEV_SERVER_URL"]);
+    win.loadURL("http://localhost:7777");
   } else {
     win.loadFile(join(process.env.DIST, "index.html"));
   }

@@ -1,28 +1,19 @@
 import { defineConfig } from "vite";
 import path from "node:path";
 import electron from "vite-plugin-electron/simple";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "tailwindcss";
-import autoprefixer from "autoprefixer";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  css: {
-    postcss: {
-      plugins: [tailwindcss, autoprefixer],
-    },
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "src"),
-    },
-  },
   plugins: [
-    react(),
     electron({
       main: {
         // Shortcut of `build.lib.entry`.
         entry: "electron/main.ts",
+        vite: {
+          build: {
+            outDir: "dist-electron",
+          },
+        },
       },
       preload: {
         // Shortcut of `build.rollupOptions.input`.
