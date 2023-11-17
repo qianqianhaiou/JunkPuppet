@@ -4,6 +4,27 @@ import { v4 as uuidv4 } from 'uuid';
 import { asyncFor, cb2Async } from '../util/tools';
 import fs from 'fs';
 
+// 初始化日志
+function initLogger() {
+  console.warn = (...data) => {
+    const string = data.join(' ');
+    process.send &&
+      process.send({
+        type: 'warn',
+        data: string,
+      });
+  };
+  console.error = (...data) => {
+    const string = data.join(' ');
+    process.send &&
+      process.send({
+        type: 'error',
+        data: string,
+      });
+  };
+}
+initLogger();
+
 async function waitTime(time: number) {
   return new Promise((res, rej) => {
     setTimeout(() => {
@@ -165,7 +186,10 @@ async function startTask(props: any) {
     ],
     userDataDir: props.chromeDataPath,
   });
-  if (!browser) return;
+  if (!browser) {
+    console.error('浏览器连接失败');
+    return;
+  }
   const [page] = await browser.pages();
   initExcScript(page);
   if (props.cookies.length) {
@@ -206,7 +230,7 @@ async function startTask(props: any) {
         }),
         playClick(page, item.data),
       ]).catch((e) => {
-        console.log(e);
+        console.error(e.message);
       });
       await waitTime(1);
     } else if (item.type === 'getElementSnapshot') {
@@ -248,13 +272,18 @@ async function startTask(props: any) {
 }
 
 process.on('message', async (args: any) => {
-  if (args.type === 'StartRunning') {
-    const result = await startTask(args.params);
-    process.send &&
-      process.send({
-        type: 'result',
-        data: result,
-      });
+  try {
+    if (args.type === 'StartRunning') {
+      const result = await startTask(args.params);
+      process.send &&
+        process.send({
+          type: 'result',
+          data: result,
+        });
+    }
+  } catch (e) {
+    console.error(e.message);
+  } finally {
+    process.exit();
   }
-  process.exit();
 });

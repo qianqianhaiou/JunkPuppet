@@ -251,7 +251,7 @@ export const startplayServer = async (params: any) => {
     const data = await fsreadFile(
       join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`)
     );
-    console.log(params.name + " - 任务开始执行");
+    console.log("任务：" + params.name + " - 开始执行");
     ChildProcess.send({
       type: "StartRunning",
       params: {
@@ -288,11 +288,15 @@ export const startplayServer = async (params: any) => {
             .value();
           database.chain.set("updatedAt", datanow).value();
           await database.write();
-          console.log(params.name + " - 任务执行结束");
+          console.log("任务：" + params.name + " - 执行完成");
           resolve("sucess");
-        } else if (msg.type === "log") {
-          console.log(
-            `任务: ${params.name} - 日志输出 - ` + JSON.stringify(msg.data)
+        } else if (msg.type === "warn") {
+          console.warn(
+            `任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data)
+          );
+        } else if (msg.type === "error") {
+          console.error(
+            `任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data)
           );
         }
       });
@@ -301,13 +305,12 @@ export const startplayServer = async (params: any) => {
         reject("exit error code: " + code);
       });
       ChildProcess.on("close", function (code) {
-        console.warn(`任务: ${params.name} - 任务结束， 退出码：` + code);
+        console.info(`任务: ${params.name} - 结束并退出， 退出码：` + code);
         resolve("exit close code: " + code);
       });
     });
   } catch (error: any) {
     console.error(`任务: ${params.name} - 执行出错 - ` + error.message);
-    console.log(`runner start error：${error.message}`);
   }
 };
 
