@@ -25,12 +25,27 @@ function createWindow() {
     height: 800,
     titleBarStyle: "hidden",
   });
+  // Electron窗口单例
+  const gotTheLock = app.requestSingleInstanceLock();
+  if (!gotTheLock) {
+    app.quit();
+  } else {
+    app.on("second-instance", () => {
+      if (win) {
+        if (win.isMinimized()) win.restore();
+        win.focus();
+        win.show();
+      }
+    });
+  }
+  // load 前端
   if (!app.isPackaged) {
     win.webContents.openDevTools();
     win.loadURL("http://localhost:7777");
   } else {
     win.loadFile(join(process.env.DIST, "index.html"));
   }
+  // init Menu
   const appTray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
     {

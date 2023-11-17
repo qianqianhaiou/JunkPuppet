@@ -141,7 +141,6 @@ export const deleteTaskDataDb = async (params: any) => {
   await database.write();
   return true;
 };
-
 // 开始设置模拟数据
 export const startSetting = async (params: any) => {
   try {
@@ -203,13 +202,7 @@ export const startDebugServer = async (params: any) => {
       params: {
         targetUrl: params.targetUrl,
         parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
-        cookies: [
-          // {
-          //   cookieName: "TrainingPlatform-sid",
-          //   cookieValue:
-          //     "s%3Aw9ATIUmSWzAU2q_hgkQXe2S2RJxGWx8m.kj4nh94Eo7wdjuVq6zDhApsLKFoIMKLHWzu3cyeK7wU",
-          // },
-        ],
+        cookies: [],
         chromePath: process.env.CHROME_PATH,
         headless: false,
         slowMo: 100,
@@ -258,7 +251,7 @@ export const startplayServer = async (params: any) => {
     const data = await fsreadFile(
       join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`)
     );
-    console.log(params.name + " - 任务开始");
+    console.log(params.name + " - 任务开始执行");
     ChildProcess.send({
       type: "StartRunning",
       params: {
@@ -295,19 +288,25 @@ export const startplayServer = async (params: any) => {
             .value();
           database.chain.set("updatedAt", datanow).value();
           await database.write();
+          console.log(params.name + " - 任务执行结束");
           resolve("sucess");
         } else if (msg.type === "log") {
-          console.log("task: " + JSON.stringify(msg.data));
+          console.log(
+            `任务: ${params.name} - 日志输出 - ` + JSON.stringify(msg.data)
+          );
         }
       });
       ChildProcess.on("error", function (code) {
+        console.error(`任务: ${params.name} - 执行出错， 退出码：` + code);
         reject("exit error code: " + code);
       });
       ChildProcess.on("close", function (code) {
+        console.warn(`任务: ${params.name} - 任务结束， 退出码：` + code);
         resolve("exit close code: " + code);
       });
     });
   } catch (error: any) {
+    console.error(`任务: ${params.name} - 执行出错 - ` + error.message);
     console.log(`runner start error：${error.message}`);
   }
 };
@@ -316,7 +315,6 @@ export const startplayServer = async (params: any) => {
 export const getLogByLine = async () => {
   return readLogByLine(join(process.env.DATA_PATH_LOG, "system.log"));
 };
-
 // 选择一个文件夹
 export const selectDir = async () => {
   const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
@@ -335,7 +333,6 @@ export const selectFile = async () => {
     return result.filePaths[0];
   }
 };
-
 // 获取数据盘信息
 export const getDataDistInfo = async () => {
   return getDiskDetail();
@@ -383,7 +380,6 @@ export const unmaxWindow = () => {
   const reuslt = BrowserWindow.getAllWindows();
   reuslt.length && reuslt[0].unmaximize();
 };
-
 // 隐藏electron应用程序
 export const closeApp = async () => {
   const reuslt = BrowserWindow.getAllWindows();

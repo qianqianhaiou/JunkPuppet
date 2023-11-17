@@ -8,7 +8,7 @@ export const hasGlobalSetting = () => {
   return existsSync(process.env.GLOBAL_SETTING_CONFIG_PATH);
 };
 // 重启electron应用程序
-export const relaunchElectron = async () => {
+export const relaunchElectron = () => {
   app.relaunch();
   app.exit();
 };
@@ -34,7 +34,6 @@ export async function getDiskDetail() {
     });
   });
 }
-
 // 转换时间
 export const tranlateDate = (date: any) => {
   let data = new Date(date);
