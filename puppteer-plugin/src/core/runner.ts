@@ -281,7 +281,7 @@ process.on('message', async (args: any) => {
           data: result,
         });
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(e.message);
   } finally {
     process.exit();
