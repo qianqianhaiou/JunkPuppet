@@ -9,6 +9,7 @@ module.exports = {
         url.startsWith("/dist") ||
         url.startsWith("/dist-eletron") ||
         url.startsWith("/node_modules") ||
+        url.startsWith("/public") ||
         url.startsWith("/package.json")
       ) {
         return false;

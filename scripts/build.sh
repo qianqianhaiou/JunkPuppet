@@ -5,7 +5,7 @@ cd puppteer-plugin
 npm run build
 
 cd ..
-cp -r ./puppteer-plugin/puppteer-plugin/ ./public
+# cp -r ./puppteer-plugin/puppteer-plugin/ ./public
 
 # 打包前端
 cd frontend
