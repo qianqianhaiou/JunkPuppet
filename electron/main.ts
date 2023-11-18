@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Menu, Tray } from "electron";
 import { join } from "node:path";
+import log4js from "log4js";
 import {
   initEnv,
   initDirectory,
@@ -8,6 +9,8 @@ import {
   initCronScripts,
 } from "./init";
 import { initRoutes } from "./routes";
+import { initLogger } from "./logger";
+import { tranlateDate } from "./util";
 
 function createWindow() {
   const iconPath = join(process.env.VITE_PUBLIC, "robot.png");
@@ -22,18 +25,40 @@ function createWindow() {
     height: 800,
     titleBarStyle: "hidden",
   });
-  win.webContents.openDevTools();
-  if (process.env["VITE_DEV_SERVER_URL"]) {
-    win.loadURL(process.env["VITE_DEV_SERVER_URL"]);
+  // Electron窗口单例
+  const gotTheLock = app.requestSingleInstanceLock();
+  if (!gotTheLock) {
+    app.quit();
+  } else {
+    app.on("second-instance", () => {
+      if (win) {
+        if (win.isMinimized()) win.restore();
+        win.focus();
+        win.show();
+      }
+    });
+  }
+  // load 前端
+  if (!app.isPackaged) {
+    win.webContents.openDevTools();
+    win.loadURL("http://localhost:7777");
   } else {
     win.loadFile(join(process.env.DIST, "index.html"));
   }
+  // init Menu
   const appTray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "JunkPuppet",
       click: function () {
         win.show();
+      },
+    },
+    {
+      label: "relaunch",
+      click: function () {
+        app.relaunch();
+        app.exit();
       },
     },
     {
@@ -48,8 +73,10 @@ function createWindow() {
   });
   appTray.setToolTip("拾荒木偶");
   appTray.setContextMenu(contextMenu);
+  return win;
 }
 app.whenReady().then(async () => {
+  let logger: log4js.Logger | null = null;
   // 初始化环境变量
   await initEnv();
   // 初始化全局设置
@@ -59,13 +86,49 @@ app.whenReady().then(async () => {
     await initDirectory();
     // 初始化文件
     await initFiles();
+    // 初始化日志记录
+    logger = await initLogger(join(process.env.DATA_PATH_LOG, "system.log"));
     // 初始化定时任务
     await initCronScripts();
   }
   // 初始化通信路由
   initRoutes();
 
-  createWindow();
+  const win = createWindow();
+
+  // 建立日志通道
+  if (logger) {
+    console.log = (...data) => {
+      const string = data.join(" ");
+      logger!.info(string);
+      const time = tranlateDate(Date.now());
+      win.webContents.send("onLog", {
+        time: `[${time}]`,
+        type: "[INFO]",
+        message: ` system - ${string}`,
+      });
+    };
+    console.warn = (...data) => {
+      const string = data.join(" ");
+      logger!.warn(string);
+      const time = tranlateDate(Date.now());
+      win.webContents.send("onLog", {
+        time: `[${time}]`,
+        type: "[WARN]",
+        message: ` system - ${string}`,
+      });
+    };
+    console.error = (...data) => {
+      const string = data.join(" ");
+      logger!.error(string);
+      const time = tranlateDate(Date.now());
+      win.webContents.send("onLog", {
+        time: `[${time}]`,
+        type: "[ERROR]",
+        message: ` system - ${string}`,
+      });
+    };
+  }
   app.on("activate", () => {
     // 在 macOS 系统内, 如果没有已开启的应用窗口
     // 点击托盘图标时通常会重新创建一个新窗口

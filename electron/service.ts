@@ -1,15 +1,15 @@
 import { fork } from "child_process";
 import path, { join } from "node:path";
-import { fswriteFile, fsreadFile } from "./file";
+import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "./file";
 import { BrowserWindow, dialog } from "electron";
 import { getDiskDetail, relaunchElectron } from "./util";
 import { taskDataDb, taskListDb } from "./db";
 import crypto from "crypto";
+import { readLogByLine } from "./logger";
 
 // 新增任务
 export const addTask = async (params: any) => {
   const database = await taskListDb();
-
   if (database.chain.get("list").find({ name: params.name }).value()) {
     throw new Error("名称重复");
   }
@@ -52,6 +52,23 @@ export const deleteTask = async (params: any) => {
   const database = await taskListDb();
   if (!params._id) {
     throw new Error("缺少任务ID");
+  }
+  // 删除定时任务
+  const cron = global.cronList.get(params._id);
+  if (cron) {
+    cron.stop();
+    global.cronList.delete(params._id);
+  }
+  const target = database.chain.get("list").find({ _id: params._id }).value();
+  if (target.mockDataId) {
+    // 删除截图文件夹
+    await deleteDir(join(process.env.DATA_PATH_SNAPSHOT, params._id));
+    // 删除JSON文件
+    await deleteFile(
+      join(process.env.DATA_PATH_JSON, `${target.mockDataId}.json`)
+    );
+    // 删除任务数据
+    await deleteTaskDataDb({ taskId: params._id });
   }
   const datanow = Date.now();
   database.chain.get("list").remove({ _id: params._id }).value();
@@ -124,7 +141,6 @@ export const deleteTaskDataDb = async (params: any) => {
   await database.write();
   return true;
 };
-
 // 开始设置模拟数据
 export const startSetting = async (params: any) => {
   try {
@@ -186,13 +202,7 @@ export const startDebugServer = async (params: any) => {
       params: {
         targetUrl: params.targetUrl,
         parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
-        cookies: [
-          // {
-          //   cookieName: "TrainingPlatform-sid",
-          //   cookieValue:
-          //     "s%3Aw9ATIUmSWzAU2q_hgkQXe2S2RJxGWx8m.kj4nh94Eo7wdjuVq6zDhApsLKFoIMKLHWzu3cyeK7wU",
-          // },
-        ],
+        cookies: [],
         chromePath: process.env.CHROME_PATH,
         headless: false,
         slowMo: 100,
@@ -241,6 +251,7 @@ export const startplayServer = async (params: any) => {
     const data = await fsreadFile(
       join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`)
     );
+    console.log("任务：" + params.name + " - 开始执行");
     ChildProcess.send({
       type: "StartRunning",
       params: {
@@ -277,23 +288,36 @@ export const startplayServer = async (params: any) => {
             .value();
           database.chain.set("updatedAt", datanow).value();
           await database.write();
+          console.log("任务：" + params.name + " - 执行完成");
           resolve("sucess");
-        } else if (msg.type === "log") {
-          console.log(JSON.stringify(msg.data));
+        } else if (msg.type === "warn") {
+          console.warn(
+            `任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data)
+          );
+        } else if (msg.type === "error") {
+          console.error(
+            `任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data)
+          );
         }
       });
       ChildProcess.on("error", function (code) {
+        console.error(`任务: ${params.name} - 执行出错， 退出码：` + code);
         reject("exit error code: " + code);
       });
       ChildProcess.on("close", function (code) {
+        console.info(`任务: ${params.name} - 结束并退出， 退出码：` + code);
         resolve("exit close code: " + code);
       });
     });
   } catch (error: any) {
-    console.log(`runner start error：${error.message}`);
+    console.error(`任务: ${params.name} - 执行出错 - ` + error.message);
   }
 };
 
+// 读取最近的几条日志
+export const getLogByLine = async () => {
+  return readLogByLine(join(process.env.DATA_PATH_LOG, "system.log"));
+};
 // 选择一个文件夹
 export const selectDir = async () => {
   const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
@@ -312,7 +336,6 @@ export const selectFile = async () => {
     return result.filePaths[0];
   }
 };
-
 // 获取数据盘信息
 export const getDataDistInfo = async () => {
   return getDiskDetail();
@@ -331,6 +354,7 @@ export const setGobalSetting = async (params: any) => {
     "ChromeData",
     "Default"
   );
+  target["DATA_PATH_LOG"] = join(target["DATA_PATH"], "Logs");
   await fswriteFile(
     process.env.GLOBAL_SETTING_CONFIG_PATH,
     JSON.stringify(target)
@@ -359,7 +383,6 @@ export const unmaxWindow = () => {
   const reuslt = BrowserWindow.getAllWindows();
   reuslt.length && reuslt[0].unmaximize();
 };
-
 // 隐藏electron应用程序
 export const closeApp = async () => {
   const reuslt = BrowserWindow.getAllWindows();

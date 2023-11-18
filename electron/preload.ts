@@ -11,6 +11,9 @@ const initSSAPI = () => {
     };
   });
   contextBridge.exposeInMainWorld("SSAPI", target);
+  contextBridge.exposeInMainWorld("onLog", (callBack: any) => {
+    ipcRenderer.on("onLog", callBack);
+  });
 };
 
 initSSAPI();

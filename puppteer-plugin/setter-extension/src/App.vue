@@ -365,28 +365,28 @@ const globalMouse = () => {
   document.body.addEventListener("mouseup", throttle(emitMouse, 200), false);
   document.body.addEventListener("mousemove", throttle(emitMouse, 200), false);
 }
-const globalClick = () => {
-  document.body.addEventListener('click', async (e: any) => {
-    if (e.pointerType !== 'mouse') return
-    currentIndex.value += 1
-    userDoData.value.push({
-      index: currentIndex.value,
-      type: 'click',
-      data: {
-        screenX: e.screenX,
-        screenY: e.screenY
-      }
-    });
-    sendMessage({
-      type: 'click',
-      index: currentIndex.value,
-      data: {
-        screenX: e.screenX,
-        screenY: e.screenY
-      }
-    })
-  }, true)
-}
+// const globalClick = () => {
+//   document.body.addEventListener('click', async (e: any) => {
+//     if (e.pointerType !== 'mouse') return
+//     currentIndex.value += 1
+//     userDoData.value.push({
+//       index: currentIndex.value,
+//       type: 'click',
+//       data: {
+//         screenX: e.screenX,
+//         screenY: e.screenY
+//       }
+//     });
+//     sendMessage({
+//       type: 'click',
+//       index: currentIndex.value,
+//       data: {
+//         screenX: e.screenX,
+//         screenY: e.screenY
+//       }
+//     })
+//   }, true)
+// }
 const globalWhell = () => {
   function scrollFunction(e: any) {
     currentIndex.value += 1
@@ -628,7 +628,7 @@ const init = () => {
 }
 const initGlobalListener = () => {
   rectBoxMove();
-  globalClick();
+  // globalClick();
   globalWhell();
   globalKeyDown();
   globalAListener();

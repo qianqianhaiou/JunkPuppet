@@ -36,6 +36,7 @@ export const initDirectory = async () => {
   await initDir(process.env.DATA_PATH_JSON);
   await initDir(process.env.DATA_PATH_DB);
   await initDir(process.env.DATA_PATH_CHROME_DATA);
+  await initDir(process.env.DATA_PATH_LOG);
 };
 export const initFiles = async () => {
   // 初始化任务列表
@@ -60,6 +61,7 @@ export const initCronScripts = async () => {
               targetUrl: script.targetUrl,
               _id: script._id,
               mockDataId: script.mockDataId,
+              name: script.name
             };
             await startplayServer(params);
           },
