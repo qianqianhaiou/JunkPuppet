@@ -64,7 +64,6 @@ const recordUserRect = async () => {
       rectDomEl.value
     );
   }
-  console.log('newSelector: ', newSelector);
   if (toolActive.value === 'text') {
     addClass(newSelector, 'puppeteer_sunsilent_light_text');
     emits('addUserDoData', {
@@ -93,8 +92,6 @@ const recordUserRect = async () => {
     });
     // 立即恢复rect的穿透性，防止pptr点在实心遮蔽层上
     rectBoxPointerVisible.value = false;
-  } else {
-    console.log('default');
   }
 };
 

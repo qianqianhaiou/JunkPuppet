@@ -95,5 +95,6 @@ const handleOpenModal = () => {
 const selectSimilar = ref(false);
 const handleChangeSelectSimilar = () => {
   selectSimilar.value = !selectSimilar.value;
+  emits('handleChangeSelectSimilar', selectSimilar.value);
 };
 </script>

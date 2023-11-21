@@ -47,6 +47,11 @@ const userDoDataLastType = computed(() =>
 );
 const addUserDoData = (item: any) => {
   userDoData.value.push(item);
+  if (item.slot) {
+    hiddenData.value.push({
+      type: 'slot',
+    });
+  }
 };
 
 // 无感知数据，比如鼠标移动
@@ -69,8 +74,21 @@ const handleChangeFnModalVisible = (visible: boolean) => {
 
 // 结束设置
 const finishSetting = () => {
+  console.log(userDoData.value, hiddenData.value);
+  const userDoDataArray = [...userDoData.value].filter((item) => item.slot);
+  const hiddenDataArray = [...hiddenData.value];
+  const length = hiddenDataArray.length;
+  // 会丢掉最后几个鼠标移动到结束按钮的数据，无所谓的，不影响
+  for (let i = 0; i < length; i++) {
+    const item = hiddenDataArray[i];
+    if (item.type === 'slot' && userDoDataArray.length) {
+      const target = userDoDataArray.shift();
+      hiddenDataArray[i] = target;
+    }
+  }
   sendMessage({
     type: 'finishSetting',
+    data: hiddenDataArray,
   });
 };
 
