@@ -1,24 +1,39 @@
 <template>
   <Modal
     v-model:open="modalVisible"
-    title="Basic"
+    title="内置工具箱"
     :footer="null"
     :getContainer="getModalContainer"
     :zIndex="2147483647"
     @cancel="emits('handleChangeFnModalVisible', false)"
   >
-    <Button @click="addBuiltInEvent('snapshotFullScreen')">截取全屏幕</Button>
-    <Button @click="addBuiltInEvent('snapshotCurrentScreen')"
-      >截取当前屏幕</Button
-    >
-    <Button @click="addBuiltInEvent('delay')">添加等待</Button>
+    <Space>
+      <Button @click="addBuiltInEvent('snapshotFullScreen')">
+        <template #icon>
+          <CameraOutlined></CameraOutlined>
+        </template>
+        截取全屏幕
+      </Button>
+      <Button @click="addBuiltInEvent('snapshotCurrentScreen')">
+        <template #icon>
+          <CameraOutlined></CameraOutlined>
+        </template>
+        截取当前屏幕</Button
+      >
+      <Button @click="addBuiltInEvent('delay')">
+        <template #icon>
+          <ClockCircleOutlined></ClockCircleOutlined>
+        </template>
+        添 加 等 待</Button
+      >
+    </Space>
   </Modal>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Button, Modal } from 'ant-design-vue';
-
+import { Button, Modal, Space } from 'ant-design-vue';
+import { CameraOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 const emits = defineEmits(['addUserDoData', 'handleChangeFnModalVisible']);
 
 const modalVisible = ref(true);

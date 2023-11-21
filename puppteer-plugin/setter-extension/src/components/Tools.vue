@@ -6,7 +6,7 @@
       :style="{ right: '36px', bottom: '36px' }"
     >
       <template #icon>
-        <CustomerServiceOutlined />
+        <CodeSandboxOutlined />
       </template>
       <FloatButton
         :type="toolsActive === 'text' ? 'primary' : 'default'"
@@ -46,7 +46,7 @@
       </FloatButton>
       <FloatButton tooltip="内置函数" :onClick="handleOpenModal">
         <template #icon>
-          <PlusSquareOutlined />
+          <ToolOutlined />
         </template>
       </FloatButton>
       <FloatButton tooltip="结束" :onClick="() => emits('finishSetting')">
@@ -63,14 +63,13 @@ import { computed, watch, ref } from 'vue';
 import { sendMessage } from '../util/service';
 import { FloatButtonGroup, FloatButton, Modal } from 'ant-design-vue';
 import {
-  CustomerServiceOutlined,
+  CodeSandboxOutlined,
   FontSizeOutlined,
   CameraOutlined,
   LinkOutlined,
-  ClockCircleOutlined,
   PoweroffOutlined,
   GroupOutlined,
-  PlusSquareOutlined,
+  ToolOutlined,
 } from '@ant-design/icons-vue';
 
 const emits = defineEmits([
