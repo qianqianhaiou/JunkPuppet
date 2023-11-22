@@ -155,29 +155,36 @@ export const startSetting = async (params: any) => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on("message", async (msg: string) => {
-        if (msg === "close") {
-          ChildProcess.kill();
-          return;
+      ChildProcess.on("message", async (msg: any) => {
+        if (msg.type === "finish") {
+          const uid = params?.mockDataId || crypto.randomUUID();
+          const fileName = `${uid}.json`;
+          await fswriteFile(
+            join(process.env.DATA_PATH_JSON, fileName),
+            JSON.stringify(msg.data)
+          );
+          const datanow = Date.now();
+          const database = await taskListDb();
+          database.chain
+            .get("list")
+            .find({ _id: params._id })
+            .assign({
+              mockDataId: uid,
+              updatedAt: datanow,
+            })
+            .value();
+          database.chain.set("updatedAt", datanow).value();
+          await database.write();
+          resolve(fileName);
+        } else if (msg.type === "warn") {
+          console.warn(
+            `任务: ${params.name} - 设置警告 - ` + JSON.stringify(msg.data)
+          );
+        } else if (msg.type === "error") {
+          console.error(
+            `任务: ${params.name} - 设置出错 - ` + JSON.stringify(msg.data)
+          );
         }
-        const data = JSON.stringify(msg);
-        const uid = params?.mockDataId || crypto.randomUUID();
-        const fileName = `${uid}.json`;
-        await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), data);
-        const datanow = Date.now();
-        const database = await taskListDb();
-        database.chain
-          .get("list")
-          .find({ _id: params._id })
-          .assign({
-            mockDataId: uid,
-            updatedAt: datanow,
-          })
-          .value();
-        database.chain.set("updatedAt", datanow).value();
-        await database.write();
-
-        resolve(fileName);
       });
       ChildProcess.on("error", function (code) {
         reject("exit error code: " + code);
@@ -229,8 +236,14 @@ export const startDebugServer = async (params: any) => {
           database.chain.set("updatedAt", datanow).value();
           await database.write();
           resolve("sucess");
-        } else if (msg.type === "log") {
-          console.log(JSON.stringify(msg.data));
+        } else if (msg.type === "warn") {
+          console.warn(
+            `任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data)
+          );
+        } else if (msg.type === "error") {
+          console.error(
+            `任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data)
+          );
         }
       });
       ChildProcess.on("error", function (code) {

@@ -32,10 +32,26 @@ async function waitTime(time: number) {
     }, time * 1000);
   });
 }
+
+const hookA = async (page: any) => {
+  await page.evaluate(() => {
+    // 遍历A标签更改 _blank -> self
+    Array.prototype.map.call(
+      document.querySelectorAll('a'),
+      ($el: HTMLAnchorElement) => {
+        if ($el.target === '_blank') {
+          $el.target = '_self';
+        }
+      }
+    );
+  });
+};
+
 async function playClick(
   page: Page,
   data: { screenX: number; screenY: number }
 ) {
+  await hookA(page);
   await page.mouse.click(data.screenX, data.screenY);
 }
 async function playScroll(
@@ -159,12 +175,6 @@ const initExcScript = (page: Page) => {
         location.href = url;
         return false;
       };
-      Array.prototype.map.call(
-        document.querySelectorAll('a'),
-        ($el: HTMLAnchorElement) => {
-          $el.target = '_self';
-        }
-      );
     });
   });
 };

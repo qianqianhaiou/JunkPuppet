@@ -16,9 +16,27 @@ interface ISetting {
   chromeDataPath: string;
 }
 
-// 设置时，需将Chrome正受到自定测试软件的控制关闭掉！
-// 设置时，需将Chrome正受到自定测试软件的控制关闭掉！
-// 设置时，需将Chrome正受到自定测试软件的控制关闭掉！
+// 初始化日志
+function initLogger() {
+  console.warn = (...data) => {
+    const string = data.join(' ');
+    process.send &&
+      process.send({
+        type: 'warn',
+        data: string,
+      });
+  };
+  console.error = (...data) => {
+    const string = data.join(' ');
+    process.send &&
+      process.send({
+        type: 'error',
+        data: string,
+      });
+  };
+}
+initLogger();
+
 const IS_DEV = process.argv[1].includes('setting.ts');
 const DEV_EXTENSION_PATH = path.resolve(
   __dirname,
@@ -26,6 +44,8 @@ const DEV_EXTENSION_PATH = path.resolve(
 );
 const PRO_EXTENSION_PATH = path.resolve(__dirname, './setter-dist');
 const EXTENSION_PATH = IS_DEV ? DEV_EXTENSION_PATH : PRO_EXTENSION_PATH;
+
+let userDoData: any[] = [];
 
 // 初始化通信通道
 const initExcScript = (page: any) => {
@@ -64,8 +84,12 @@ async function init(props: ISetting) {
   });
   if (!browser) return;
   browser.on('disconnected', (target) => {
-    // process.exit();
-    process.send && process.send('close');
+    process.send &&
+      process.send({
+        type: 'finish',
+        data: userDoData,
+      });
+    process.exit();
   });
   const [page] = await browser.pages();
   return new Promise(async (resolve, reject) => {
@@ -74,8 +98,11 @@ async function init(props: ISetting) {
         if (!data) return;
         const dataJson = JSON.parse(data);
         if (dataJson.type === 'finishSetting') {
-          resolve(dataJson.data);
+          userDoData = userDoData.concat(dataJson.data);
+          await browser.close();
+          resolve('');
         } else if (dataJson.type === 'clickAndWaitNavigator') {
+          userDoData = userDoData.concat(dataJson.userDoData);
           page.mouse.click(dataJson.data.screenX, dataJson.data.screenY);
         }
       });
@@ -91,9 +118,7 @@ process.on('message', async (args: any) => {
   try {
     if (args.type === 'StartSetting') {
       const result = await init(args.params);
-      process.send && process.send(result);
     }
-    process.exit();
   } catch (e) {
     process.send && process.send(e);
   }

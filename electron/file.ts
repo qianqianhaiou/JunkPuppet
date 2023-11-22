@@ -91,7 +91,7 @@ export async function deleteDir(url: string) {
       await cb2Async(rmdir, url);
       resolve(true);
     } else {
-      rejected("路径不存在");
+      resolve("路径不存在");
     }
   });
 }

@@ -10,6 +10,7 @@ import { Ref, computed, onMounted, ref } from 'vue';
 import { addClass } from '../util/dom';
 import { throttle } from 'lodash';
 import { DomService } from '../util/selector';
+import { sendMessage } from '@/util/service';
 
 const props = defineProps({
   tool: {
@@ -26,7 +27,11 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['addUserDoData', 'addHiddenData']);
+const emits = defineEmits([
+  'addUserDoData',
+  'addHiddenData',
+  'clickAndWaitNavigator',
+]);
 
 // 鼠标跟随框
 const rectBoxRef: any = ref(null);
@@ -38,6 +43,9 @@ const rectBoxMove = () => {
     (e: MouseEvent) => {
       const el = e.target as HTMLElement;
       rectDomEl.value = el;
+      if (el.tagName === 'A' && (el as HTMLAnchorElement).target === '_blank') {
+        (el as HTMLAnchorElement).target = '_self';
+      }
       const rectData = el.getBoundingClientRect();
       (rectBoxRef.value as HTMLElement).style.top = rectData.top + 'px';
       (rectBoxRef.value as HTMLElement).style.left = rectData.left + 'px';
@@ -92,6 +100,10 @@ const recordUserRect = async () => {
     });
     // 立即恢复rect的穿透性，防止pptr点在实心遮蔽层上
     rectBoxPointerVisible.value = false;
+    emits('clickAndWaitNavigator', {
+      screenX: rectDomElRect.left + rectDomElRect.width / 2,
+      screenY: rectDomElRect.top + rectDomElRect.height / 2,
+    });
   }
 };
 
@@ -259,6 +271,11 @@ const globalKeyDown = () => {
   document.body.addEventListener('keyup', emitKeyEvent, true);
   document.body.addEventListener('keypress', emitKeyEvent, true);
 };
+const globalWindow = () => {
+  window.open = (url: any): any => {
+    location.href = url;
+  };
+};
 // 自定义组合键 Shift+Q Shift+W Shift+A
 const combinationKey = (type: string, code: string, shiftKey: boolean) => {
   if (type === 'keydown' && code === 'KeyW' && shiftKey) {
@@ -293,6 +310,7 @@ const initGlobalListener = () => {
   globalWhell();
   globalKeyDown();
   globalMouse();
+  globalWindow();
 };
 onMounted(async () => {
   initGlobalListener();

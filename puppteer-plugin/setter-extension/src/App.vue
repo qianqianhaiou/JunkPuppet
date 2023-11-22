@@ -1,5 +1,5 @@
 <template>
-  <div v-if="currentDocument === 'top'">
+  <div class="container" v-if="currentDocument === 'top'">
     <Tools
       @addUserDoData="addUserDoData"
       @handleChangeSelectSimilar="handleChangeSelectSimilar"
@@ -14,6 +14,7 @@
     :userDoDataLastType="userDoDataLastType"
     @addUserDoData="addUserDoData"
     @addHiddenData="addHiddenData"
+    @clickAndWaitNavigator="clickAndWaitNavigator"
   ></GlobalListender>
   <Popup></Popup>
   <FnBoxModal
@@ -61,7 +62,7 @@ const addHiddenData = (item: any) => {
 };
 
 // 工具箱工具
-const tool = ref('');
+const tool = ref('link');
 const handleUpdateTool = (ctool: string) => {
   tool.value = ctool;
 };
@@ -72,9 +73,7 @@ const handleChangeFnModalVisible = (visible: boolean) => {
   fnModal.value = visible;
 };
 
-// 结束设置
-const finishSetting = () => {
-  console.log(userDoData.value, hiddenData.value);
+const computedUserDoData = () => {
   const userDoDataArray = [...userDoData.value].filter((item) => item.slot);
   const hiddenDataArray = [...hiddenData.value];
   const length = hiddenDataArray.length;
@@ -86,9 +85,29 @@ const finishSetting = () => {
       hiddenDataArray[i] = target;
     }
   }
+  return hiddenDataArray;
+};
+
+// 点击跳转  页面会刷新并出现数据断层，所有应该先保存之前的部分数据
+const clickAndWaitNavigator = (data: any) => {
+  const target = computedUserDoData();
+  sendMessage({
+    type: 'clickAndWaitNavigator',
+    data: {
+      ...data,
+    },
+    userDoData: target,
+  });
+  userDoData.value = [];
+  hiddenData.value = [];
+};
+
+// 结束设置
+const finishSetting = () => {
+  const target = computedUserDoData();
   sendMessage({
     type: 'finishSetting',
-    data: hiddenDataArray,
+    data: target,
   });
 };
 

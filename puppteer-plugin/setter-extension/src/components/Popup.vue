@@ -1,6 +1,6 @@
 <template>
   <div ref="popupRef" class="popup-box" v-show="popupVisible">
-    <div class="pop-item">设为下一层页面</div>
+    <!-- <div class="pop-item">设为下一层页面</div> -->
     <!-- <div class="pop-item">进入下一层页面</div> -->
   </div>
 </template>
