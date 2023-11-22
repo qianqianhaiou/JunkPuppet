@@ -19,6 +19,10 @@ export const setGlobalSetting = async (params: any) => {
 export const getTaskList = async (params: any) => {
   return FetchData("getTaskList", params);
 };
+export const getTaskTypes = async (params: any) => {
+  return FetchData("getTaskTypes", params);
+};
+
 export const getTaskDataDetail = async (params: any) => {
   return FetchData("getTaskDataDetail", params);
 };

@@ -3,7 +3,7 @@ import type { ColumnsType } from "antd/es/table";
 import { translateDate } from "@/utils/translator";
 import Edit from "./Edit";
 import { ExclamationCircleFilled } from "@ant-design/icons";
-import { deleteTask } from "@/service/index";
+import { deleteTask, updateTask } from "@/service/index";
 import Config from "./Config";
 import Detail from "./Detail";
 import { useState } from "react";
@@ -12,9 +12,10 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
   const [statusLoading, setStatusLoading] = useState(false);
-  const handleTaskStatusChange = async (status: boolean, _id: string) => {
+  const handleTaskStatusChange = async (status: boolean, recard: any) => {
     setStatusLoading(true);
-    console.log(status, _id);
+    recard.auto = status;
+    await updateTask(recard);
     setStatusLoading(false);
   };
   const columns: ColumnsType<any> = [
@@ -72,9 +73,9 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
                 checkedChildren="自动"
                 unCheckedChildren="手动"
                 loading={statusLoading}
-                defaultChecked={record.auto}
+                checked={record.auto}
                 onChange={(status: boolean) =>
-                  handleTaskStatusChange(status, record._id)
+                  handleTaskStatusChange(status, record)
                 }
               />
             </div>

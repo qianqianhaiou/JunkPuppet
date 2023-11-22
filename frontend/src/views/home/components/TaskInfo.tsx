@@ -8,7 +8,7 @@ import { PieChart } from "echarts/charts";
 import { LabelLayout } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 import { useEffect, useRef, useState } from "react";
-import { getDataDistInfo } from "@/service";
+import { getTaskTypes } from "@/service";
 
 echarts.use([
   TooltipComponent,
@@ -22,7 +22,7 @@ echarts.use([
 function App() {
   const [info, setInfo] = useState<any>();
   const fetchData = async () => {
-    const result = await getDataDistInfo({});
+    const result = await getTaskTypes({});
     setInfo(result);
   };
   const diskInfoRef = useRef<any>();
@@ -33,17 +33,9 @@ function App() {
     chartInstance.setOption({
       tooltip: {
         trigger: "item",
-        formatter: (parmas: any) => {
-          let gb =
-            info.system === "Windows_NT"
-              ? parmas.data.value / 1024 / 1024 / 1024
-              : parmas.data.value / 1024 / 1024;
-          const format = parmas.name + "：" + gb.toFixed(2) + "GB";
-          return format;
-        },
       },
       title: {
-        text: "数据盘使用情况",
+        text: "任务类型",
         left: "center",
         textStyle: {
           color: "#fff",
@@ -56,10 +48,10 @@ function App() {
           color: "#fff",
         },
       },
-      color: ["#389e0d", "#cf1322"],
+      color: ["#e2ebf0", "#66a6ff", "#d89614"],
       series: [
         {
-          name: "磁盘使用情况",
+          name: "任务类型",
           type: "pie",
           radius: ["40%", "70%"],
           avoidLabelOverlap: false,
@@ -86,8 +78,12 @@ function App() {
             show: false,
           },
           data: [
-            { value: info.available, name: "可用" },
-            { value: info.used, name: "已用" },
+            {
+              value: info.total - info.noConfigTaskLength - info.auto,
+              name: "手动执行",
+            },
+            { value: info.auto, name: "自动执行" },
+            { value: info.noConfigTaskLength, name: "未配置" },
           ],
         },
       ],

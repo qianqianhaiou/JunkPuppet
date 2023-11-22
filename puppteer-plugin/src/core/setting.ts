@@ -96,14 +96,18 @@ async function init(props: ISetting) {
     try {
       await page.exposeFunction('_silentSendData', async (data: any) => {
         if (!data) return;
-        const dataJson = JSON.parse(data);
-        if (dataJson.type === 'finishSetting') {
-          userDoData = userDoData.concat(dataJson.data);
-          await browser.close();
-          resolve('');
-        } else if (dataJson.type === 'clickAndWaitNavigator') {
-          userDoData = userDoData.concat(dataJson.userDoData);
-          page.mouse.click(dataJson.data.screenX, dataJson.data.screenY);
+        try {
+          const dataJson = JSON.parse(data);
+          if (dataJson.type === 'finishSetting') {
+            userDoData = userDoData.concat(dataJson.data);
+            await browser.close();
+            resolve('');
+          } else if (dataJson.type === 'clickAndWaitNavigator') {
+            userDoData = userDoData.concat(dataJson.userDoData);
+            page.mouse.click(dataJson.data.screenX, dataJson.data.screenY);
+          }
+        } catch (e) {
+          console.warn(e.message);
         }
       });
       initExcScript(page);
@@ -120,6 +124,6 @@ process.on('message', async (args: any) => {
       const result = await init(args.params);
     }
   } catch (e) {
-    process.send && process.send(e);
+    console.error(e.message);
   }
 });

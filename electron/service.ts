@@ -2,7 +2,7 @@ import { fork } from "child_process";
 import path, { join } from "node:path";
 import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "./file";
 import { BrowserWindow, dialog } from "electron";
-import { getDiskDetail, relaunchElectron } from "./util";
+import { getDiskDetail, relaunchElectron, triggerItemCron } from "./util";
 import { taskDataDb, taskListDb } from "./db";
 import crypto from "crypto";
 import { readLogByLine } from "./logger";
@@ -19,6 +19,7 @@ export const addTask = async (params: any) => {
     .get("list")
     .unshift({
       ...params,
+      mockDataId: "",
       _id: uid,
       createdAt: datanow,
       updatedAt: datanow,
@@ -34,6 +35,7 @@ export const updateTask = async (params: any) => {
   if (!params._id) {
     throw new Error("缺少任务ID");
   }
+  triggerItemCron(params);
   const datanow = Date.now();
   database.chain
     .get("list")
@@ -125,6 +127,23 @@ export const getTaskDataDetail = async (params: any) => {
     .filter({ taskId: params._id })
     .value();
   return result;
+};
+
+// 获取任务总数和自动执行数
+export const getTaskTypes = async (params: any) => {
+  const database = await taskListDb();
+  let allTaskLength = database.chain.get("list").size().value();
+  let noConfigTaskLength = database.chain
+    .get("list")
+    .filter({ mockDataId: "" })
+    .size()
+    .value();
+  let autoTaskLength = global.cronList.size;
+  return {
+    total: allTaskLength,
+    auto: autoTaskLength,
+    noConfigTaskLength: noConfigTaskLength,
+  };
 };
 
 // 删除任务所产生的数据

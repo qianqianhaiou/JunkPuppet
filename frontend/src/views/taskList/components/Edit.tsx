@@ -53,7 +53,6 @@ function App({
     let result = "";
     if (type === "create") {
       result = await addTask(values);
-      // console.log(result);
     } else {
       result = await updateTask({
         ...values,

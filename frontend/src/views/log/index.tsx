@@ -31,11 +31,14 @@ function App() {
   };
   const handleGetOneLog = (value: any) => {
     setList((c: any) => {
-      return c.concat({
-        time: value.time,
-        type: value.type,
-        message: value.message,
-      });
+      if (c.length > 1000) {
+        c.unshift();
+        return c.concat({
+          time: value.time,
+          type: value.type,
+          message: value.message,
+        });
+      }
     });
   };
   useEffect(() => {
