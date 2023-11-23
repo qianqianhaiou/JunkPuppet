@@ -213,7 +213,7 @@ async function startTask(props: any) {
   }
   await Promise.all([
     page.waitForNavigation({
-      waitUntil: ['networkidle0', 'load'],
+      waitUntil: ['load'],
     }),
     page.goto(props.targetUrl),
   ]);

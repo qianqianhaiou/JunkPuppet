@@ -49,7 +49,8 @@ let userDoData: any[] = [];
 
 // 初始化通信通道
 const initExcScript = (page: any) => {
-  page.on('load', async () => {
+  // 当页面domcontentloaded事件触发才可以接受到postMessage，与插件run_at: document_end配合
+  page.on('domcontentloaded', async () => {
     await page.evaluate(() => {
       if (!(window as Window)._silentListen) {
         (window as Window)._silentListen = true;
@@ -106,7 +107,7 @@ async function init(props: ISetting) {
             userDoData = userDoData.concat(dataJson.userDoData);
             page.mouse.click(dataJson.data.screenX, dataJson.data.screenY);
           }
-        } catch (e) {
+        } catch (e: any) {
           console.warn(e.message);
         }
       });
@@ -123,7 +124,7 @@ process.on('message', async (args: any) => {
     if (args.type === 'StartSetting') {
       const result = await init(args.params);
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(e.message);
   }
 });
