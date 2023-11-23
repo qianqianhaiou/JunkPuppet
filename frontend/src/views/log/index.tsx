@@ -33,16 +33,16 @@ function App() {
     setList((c: any) => {
       if (c.length > 1000) {
         c.unshift();
-        return c.concat({
-          time: value.time,
-          type: value.type,
-          message: value.message,
-        });
       }
+      return c.concat({
+        time: value.time,
+        type: value.type,
+        message: value.message,
+      });
     });
   };
   useEffect(() => {
-    if (autoScrollKey.current) {
+    if (autoScrollKey.current && list && list.length) {
       vListRef.current.scrollTo({
         index: list.length,
         align: "bottom",
