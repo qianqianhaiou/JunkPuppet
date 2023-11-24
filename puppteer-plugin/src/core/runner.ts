@@ -201,6 +201,20 @@ async function startTask(props: any) {
     return;
   }
   const [page] = await browser.pages();
+
+  await page.evaluateOnNewDocument(() => {
+    if (navigator.webdriver === false) {
+    } else if (navigator.webdriver === undefined) {
+    } else {
+      delete Object.getPrototypeOf(navigator).webdriver;
+    }
+  });
+  const fakeUA = (await browser.userAgent()).replace(
+    'HeadlessChrome/',
+    'Chrome/'
+  );
+  await page.setUserAgent(fakeUA);
+  
   initExcScript(page);
   if (props.cookies.length) {
     for (const cookie of props.cookies) {

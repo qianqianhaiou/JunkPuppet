@@ -5,6 +5,8 @@ import diskinfo from "diskinfo";
 import { CronJob } from "cron";
 import { startplayServer } from "./service";
 import { taskListDb } from "./db";
+import { join } from 'path'
+import { fsreadFile, fswriteFile } from "./file";
 
 // 获取全局设置文件
 export const hasGlobalSetting = () => {
@@ -93,3 +95,12 @@ export const triggerItemCron = async (script: any) => {
     }
   }
 };
+
+// 清理chrome用户数据异常退出
+export const clearUserDataDirExitType = async (path: string) => {
+  const preferencePath = join(path, '/Default/Preferences')
+  const fsContent = await fsreadFile(preferencePath)
+  const pConfig = JSON.parse(fsContent)
+  pConfig['profile']['exit_type'] = 'Normal'
+  await fswriteFile(preferencePath, JSON.stringify(pConfig))
+}
