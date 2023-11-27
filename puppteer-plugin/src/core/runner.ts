@@ -1,7 +1,7 @@
 import path from 'path';
 import puppeteer, { Page, CDPSession } from 'puppeteer-core';
 import { v4 as uuidv4 } from 'uuid';
-import { asyncFor, cb2Async } from '../util/tools';
+import { asyncFor, cb2Async, clearUserDataDirExitType } from '../util/tools';
 import fs from 'fs';
 
 // 初始化日志
@@ -180,6 +180,9 @@ const initExcScript = (page: Page) => {
 };
 
 async function startTask(props: any) {
+  if (props.chromeDataPath) {
+    await clearUserDataDirExitType(props.chromeDataPath);
+  }
   const browser = await puppeteer.launch({
     executablePath: props.chromePath,
     headless: props.headless,
@@ -214,7 +217,7 @@ async function startTask(props: any) {
     'Chrome/'
   );
   await page.setUserAgent(fakeUA);
-  
+
   initExcScript(page);
   if (props.cookies.length) {
     for (const cookie of props.cookies) {
@@ -254,7 +257,7 @@ async function startTask(props: any) {
         }),
         playClick(page, item.data),
       ]).catch((e) => {
-        console.error(e.message);
+        console.warn(e.message);
       });
       await waitTime(1);
     } else if (item.type === 'getElementSnapshot') {

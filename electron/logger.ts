@@ -2,6 +2,7 @@ import log4js from "log4js";
 import { once } from "events";
 import { createInterface } from "readline";
 import { createReadStream, statSync } from "fs";
+import { fsCheckFile } from "./file";
 
 export const initLogger = (path: string) => {
   log4js.configure({
@@ -28,6 +29,7 @@ interface LogItem {
   message: string;
 }
 export const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
+  await fsCheckFile(path);
   // 默认拿 24KB 数据  应该在300-500条
   const target: LogItem[] = [];
   const rl = createInterface({

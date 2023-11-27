@@ -1,5 +1,6 @@
 import path, { resolve } from 'path';
 import puppeteer from 'puppeteer-core';
+import { clearUserDataDirExitType } from '../util/tools';
 
 interface Window {
   open: Function;
@@ -68,6 +69,9 @@ const initExcScript = (page: any) => {
 };
 
 async function init(props: ISetting) {
+  if (props.chromeDataPath) {
+    await clearUserDataDirExitType(props.chromeDataPath);
+  }
   const browser = await puppeteer.launch({
     executablePath: props.chromePath,
     headless: props.headless,

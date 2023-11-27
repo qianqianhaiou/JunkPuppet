@@ -2,7 +2,7 @@ import { fork } from "child_process";
 import path, { join } from "node:path";
 import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "./file";
 import { BrowserWindow, dialog } from "electron";
-import { clearUserDataDirExitType, getDiskDetail, relaunchElectron, triggerItemCron } from "./util";
+import { getDiskDetail, relaunchElectron, triggerItemCron } from "./util";
 import { taskDataDb, taskListDb } from "./db";
 import crypto from "crypto";
 import { readLogByLine } from "./logger";
@@ -279,7 +279,6 @@ export const startDebugServer = async (params: any) => {
 // 开始模拟操作运行
 export const startplayServer = async (params: any) => {
   try {
-    await clearUserDataDirExitType(process.env.DATA_PATH_CHROME_DATA);
     const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
     const data = await fsreadFile(
       join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`)

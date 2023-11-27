@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, Tray } from "electron";
+import { app, BrowserWindow, Menu, Tray, Notification } from "electron";
 import { join } from "node:path";
 import log4js from "log4js";
 import {
@@ -75,66 +75,71 @@ function createWindow() {
   appTray.setContextMenu(contextMenu);
   return win;
 }
-app.whenReady().then(async () => {
-  let logger: log4js.Logger | null = null;
-  // 初始化环境变量
-  await initEnv();
-  // 初始化全局设置
-  await initGlobalSetting();
-  if (process.env.IS_SET !== "noset") {
-    // 初始化数据文件夹
-    await initDirectory();
-    // 初始化文件
-    await initFiles();
-    // 初始化日志记录
-    logger = await initLogger(join(process.env.DATA_PATH_LOG, "system.log"));
-    // 初始化定时任务
-    await initCronScripts();
-  }
-  // 初始化通信路由
-  initRoutes();
+app.setAppUserModelId("JunkPuppet-拾荒木偶");
+app
+  .whenReady()
+  .then(async () => {
+    let logger: log4js.Logger | null = null;
+    // 初始化环境变量
+    await initEnv();
+    // 初始化全局设置
+    await initGlobalSetting();
+    if (process.env.IS_SET !== "noset") {
+      // 初始化数据文件夹
+      await initDirectory();
+      // 初始化文件
+      await initFiles();
+      // 初始化日志记录
+      logger = await initLogger(join(process.env.DATA_PATH_LOG, "system.log"));
+      // 初始化定时任务
+      await initCronScripts();
+    }
+    // 初始化通信路由
+    initRoutes();
 
-  const win = createWindow();
-
-  // 建立日志通道
-  if (logger) {
-    console.log = (...data) => {
-      const string = data.join(" ");
-      logger!.info(string);
-      const time = tranlateDate(Date.now());
-      win.webContents.send("onLog", {
-        time: `[${time}]`,
-        type: "[INFO]",
-        message: ` system - ${string}`,
-      });
-    };
-    console.warn = (...data) => {
-      const string = data.join(" ");
-      logger!.warn(string);
-      const time = tranlateDate(Date.now());
-      win.webContents.send("onLog", {
-        time: `[${time}]`,
-        type: "[WARN]",
-        message: ` system - ${string}`,
-      });
-    };
-    console.error = (...data) => {
-      const string = data.join(" ");
-      logger!.error(string);
-      const time = tranlateDate(Date.now());
-      win.webContents.send("onLog", {
-        time: `[${time}]`,
-        type: "[ERROR]",
-        message: ` system - ${string}`,
-      });
-    };
-  }
-  app.on("activate", () => {
-    // 在 macOS 系统内, 如果没有已开启的应用窗口
-    // 点击托盘图标时通常会重新创建一个新窗口
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    const win = createWindow();
+    // 建立日志通道
+    if (logger) {
+      console.log = (...data) => {
+        const string = data.join(" ");
+        logger!.info(string);
+        const time = tranlateDate(Date.now());
+        win.webContents.send("onLog", {
+          time: `[${time}]`,
+          type: "[INFO]",
+          message: ` system - ${string}`,
+        });
+      };
+      console.warn = (...data) => {
+        const string = data.join(" ");
+        logger!.warn(string);
+        const time = tranlateDate(Date.now());
+        win.webContents.send("onLog", {
+          time: `[${time}]`,
+          type: "[WARN]",
+          message: ` system - ${string}`,
+        });
+      };
+      console.error = (...data) => {
+        const string = data.join(" ");
+        logger!.error(string);
+        const time = tranlateDate(Date.now());
+        win.webContents.send("onLog", {
+          time: `[${time}]`,
+          type: "[ERROR]",
+          message: ` system - ${string}`,
+        });
+      };
+    }
+    app.on("activate", () => {
+      // 在 macOS 系统内, 如果没有已开启的应用窗口
+      // 点击托盘图标时通常会重新创建一个新窗口
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  })
+  .catch((e) => {
+    new Notification({ body: e.message }).show();
   });
-});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
