@@ -76,6 +76,7 @@ const recordUserRect = async () => {
     addClass(newSelector, 'puppeteer_sunsilent_light_text');
     emits('addUserDoData', {
       type: 'getText',
+      getTextLabel: '',
       slot: true,
       data: newSelector,
     });
@@ -83,6 +84,7 @@ const recordUserRect = async () => {
     addClass(newSelector, 'puppeteer_sunsilent_light_element_snapshot');
     emits('addUserDoData', {
       type: 'getElementSnapshot',
+      snapshotName: '',
       slot: true,
       data: newSelector,
     });
