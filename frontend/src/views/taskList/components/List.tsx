@@ -15,7 +15,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const handleTaskStatusChange = async (status: boolean, recard: any) => {
     if (status && !recard.cron) {
       messageApi.warning("请先点击编辑设置任务周期");
-      return;
+      return false;
     }
     setStatusLoading(true);
     recard.auto = status;

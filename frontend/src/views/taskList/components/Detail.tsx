@@ -55,7 +55,7 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                         }
                         bordered={false}
                       >
-                        <div className="flex flex-col items-center">
+                        <div>
                           {item.values.map(
                             (textItem: string, index: number) => {
                               return (
