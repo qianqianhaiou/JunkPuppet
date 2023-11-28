@@ -55,10 +55,16 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                         }
                         bordered={false}
                       >
-                        <div className="flex items-center">
-                          <div className="whitespace-pre-wrap">
-                            {item.value}
-                          </div>
+                        <div className="flex flex-col items-center">
+                          {item.values.map(
+                            (textItem: string, index: number) => {
+                              return (
+                                <div className="mb-[10px]" key={index}>
+                                  {textItem}
+                                </div>
+                              );
+                            }
+                          )}
                         </div>
                       </Card>
                     </Col>
@@ -88,11 +94,12 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                           <div className="text-center">
                             {item.snapshotName || "未命名" + (index + 1)}
                           </div>
-                          <div className="flex justify-center mt-[10px]">
+                          <div className="flex justify-center flex-wrap mt-[10px]">
                             {item.uids ? (
                               item.uids.map((uid: string) => {
                                 return (
                                   <Image
+                                    className="mb-[10px]"
                                     key={uid}
                                     width={200}
                                     src={snapshotPath(uid)}

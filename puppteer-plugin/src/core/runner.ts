@@ -1,7 +1,12 @@
 import path from 'path';
 import puppeteer, { Page, CDPSession } from 'puppeteer-core';
 import { v4 as uuidv4 } from 'uuid';
-import { asyncFor, cb2Async, clearUserDataDirExitType } from '../util/tools';
+import {
+  asyncFor,
+  cb2Async,
+  clearUserDataDirExitType,
+  getCurrentTime,
+} from '../util/tools';
 import fs from 'fs';
 
 // 初始化日志
@@ -264,28 +269,28 @@ async function startTask(props: any) {
       const uids = await getSnapshotBySelector(page, item.data, props.parent);
       result.snapshots.push({
         type: 'getElementSnapshot',
-        snapshotName: item.snapshotName || '',
+        snapshotName: item.snapshotName || getCurrentTime(),
         uids: uids,
       });
     } else if (item.type === 'snapshotFullScreen') {
       const uid = await snapshotFullScreen(page, props.parent);
       result.snapshots.push({
         type: 'snapshotFullScreen',
-        snapshotName: item.snapshotName || '',
+        snapshotName: item.snapshotName || getCurrentTime(),
         uid,
       });
     } else if (item.type === 'snapshotCurrentScreen') {
       const uid = await getCurrentScreenSnapshot(page, item.data, props.parent);
       result.snapshots.push({
         type: 'snapshotCurrentScreen',
-        snapshotName: item.snapshotName || '',
+        snapshotName: item.snapshotName || getCurrentTime(),
         uid,
       });
     } else if (item.type === 'getText') {
       const data = await getTextBySelector(page, item.data);
       result.texts.push({
-        label: item.getTextLabel || '',
-        value: data.join('  '),
+        label: item.getTextLabel || getCurrentTime(),
+        values: data,
       });
     } else if (item.type === 'delay') {
       const delay = Number(item.delay);
