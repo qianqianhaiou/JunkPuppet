@@ -51,7 +51,7 @@ export const initCronScripts = async () => {
   const result = database.chain.get("list").filter({ auto: true }).value();
   global.cronList = new Map();
   for (const script of result) {
-    if (script.mockDataId) {
+    if (script.cron && script.mockDataId) {
       global.cronList.set(
         script._id.toString(),
         new CronJob(

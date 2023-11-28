@@ -138,6 +138,7 @@ app
     });
   })
   .catch((e) => {
+    console.log(e)
     new Notification({ body: e.message }).show();
   });
 

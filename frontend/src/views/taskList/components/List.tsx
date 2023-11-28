@@ -13,6 +13,10 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const [modal, modalContextHolder] = Modal.useModal();
   const [statusLoading, setStatusLoading] = useState(false);
   const handleTaskStatusChange = async (status: boolean, recard: any) => {
+    if (status && !recard.cron) {
+      messageApi.warning("请先点击编辑设置任务周期");
+      return;
+    }
     setStatusLoading(true);
     recard.auto = status;
     await updateTask(recard);

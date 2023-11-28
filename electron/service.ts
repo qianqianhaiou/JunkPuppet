@@ -297,7 +297,7 @@ export const startplayServer = async (params: any) => {
           // },
         ],
         chromePath: process.env.CHROME_PATH,
-        headless: 'new',
+        headless: "new",
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
         data: data,
       },
