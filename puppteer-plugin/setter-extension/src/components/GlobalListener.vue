@@ -155,12 +155,12 @@ const globalMouse = () => {
       data.deltaX = event.wheelDeltaX || 0;
       data.deltaY = event.wheelDeltaY || event.wheelDelta;
     }
-    if (['mousedown'].includes(event.type)) {
-      emits('addUserDoData', {
-        type: 'click',
-        slot: false,
-      });
-    }
+    // if (['mousedown'].includes(event.type)) {
+    //   emits('addUserDoData', {
+    //     type: 'click',
+    //     slot: false,
+    //   });
+    // }
     emits('addHiddenData', {
       type: 'mouse',
       data,

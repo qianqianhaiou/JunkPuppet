@@ -48,6 +48,11 @@
         <ToolOutlined />
       </template>
     </FloatButton>
+    <FloatButton tooltip="操作列表" :onClick="handleOpenList">
+      <template #icon>
+        <OrderedListOutlined />
+      </template>
+    </FloatButton>
     <FloatButton tooltip="结束" :onClick="() => emits('finishSetting')">
       <template #icon>
         <PoweroffOutlined />
@@ -68,6 +73,7 @@ import {
   PoweroffOutlined,
   GroupOutlined,
   ToolOutlined,
+  OrderedListOutlined
 } from '@ant-design/icons-vue';
 
 const emits = defineEmits([
@@ -76,6 +82,7 @@ const emits = defineEmits([
   'handleChangeFnModalVisible',
   'finishSetting',
   'handleUpdateTool',
+  'handleChangeListVisible',
 ]);
 
 // 工具箱
@@ -88,6 +95,11 @@ const setToolsActive = (item: string) => {
 const handleOpenModal = () => {
   emits('handleChangeFnModalVisible', true);
 };
+
+const handleOpenList = () => {
+  emits('handleChangeListVisible', true);
+};
+
 // 选择相似
 const selectSimilar = ref(false);
 const handleChangeSelectSimilar = () => {

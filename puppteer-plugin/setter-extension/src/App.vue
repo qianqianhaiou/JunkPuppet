@@ -6,6 +6,7 @@
       @handleChangeFnModalVisible="handleChangeFnModalVisible"
       @finishSetting="finishSetting"
       @handleUpdateTool="handleUpdateTool"
+      @handleChangeListVisible="handleChangeListVisible"
     ></Tools>
   </div>
   <GlobalListender
@@ -22,6 +23,7 @@
     @addUserDoData="addUserDoData"
     @handleChangeFnModalVisible="handleChangeFnModalVisible"
   ></FnBoxModal>
+  <OperateList v-if="listVisible" :userDoData="userDoData" @handleChangeListVisible="handleChangeListVisible"></OperateList>
 </template>
 <script setup lang="ts">
 import { nextTick, onMounted } from '@vue/runtime-core';
@@ -30,6 +32,7 @@ import GlobalListender from './components/GlobalListener.vue';
 import Popup from './components/Popup.vue';
 import Tools from './components/Tools.vue';
 import FnBoxModal from './components/FnBoxModal.vue';
+import OperateList from './components/OperateList.vue';
 import { sendMessage } from './util/service';
 const currentDocument = ref('top');
 
@@ -66,6 +69,13 @@ const tool = ref('link');
 const handleUpdateTool = (ctool: string) => {
   tool.value = ctool;
 };
+
+// 操作列表
+const listVisible = ref(false)
+
+const handleChangeListVisible = (visible: boolean) => {
+  listVisible.value = visible
+}
 
 // 内置函数弹框
 const fnModal = ref<boolean>(false);
