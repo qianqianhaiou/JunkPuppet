@@ -15,8 +15,7 @@
             :header="formatOperateType(item.type)"
             :key="index"
           >
-            <div>{{ item }}</div>
-            <Button type="link">编辑</Button>
+            <OperateEdit :data="item"></OperateEdit>
           </CollapsePanel>
         </Collapse>
       </template>
@@ -37,6 +36,7 @@ import {
 } from 'ant-design-vue';
 import { computed, ref } from 'vue';
 import { formatOperateType } from '@/util/format';
+import OperateEdit from './OperateEdit.vue'
 
 const props = defineProps({
   userDoData: {
