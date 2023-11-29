@@ -269,27 +269,27 @@ async function startTask(props: any) {
       const uids = await getSnapshotBySelector(page, item.data, props.parent);
       result.snapshots.push({
         type: 'getElementSnapshot',
-        snapshotName: item.snapshotName || getCurrentTime(),
+        label: item.label || getCurrentTime(),
         uids: uids,
       });
     } else if (item.type === 'snapshotFullScreen') {
       const uid = await snapshotFullScreen(page, props.parent);
       result.snapshots.push({
         type: 'snapshotFullScreen',
-        snapshotName: item.snapshotName || getCurrentTime(),
+        label: item.label || getCurrentTime(),
         uid,
       });
     } else if (item.type === 'snapshotCurrentScreen') {
       const uid = await getCurrentScreenSnapshot(page, item.data, props.parent);
       result.snapshots.push({
         type: 'snapshotCurrentScreen',
-        snapshotName: item.snapshotName || getCurrentTime(),
+        label: item.label || getCurrentTime(),
         uid,
       });
     } else if (item.type === 'getText') {
       const data = await getTextBySelector(page, item.data);
       result.texts.push({
-        label: item.getTextLabel || getCurrentTime(),
+        label: item.label || getCurrentTime(),
         values: data,
       });
     } else if (item.type === 'delay') {

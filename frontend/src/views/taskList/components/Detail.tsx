@@ -92,7 +92,7 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                       >
                         <div>
                           <div className="text-center">
-                            {item.snapshotName || "未命名" + (index + 1)}
+                            {item.label || "未命名" + (index + 1)}
                           </div>
                           <div className="flex justify-center flex-wrap mt-[10px]">
                             {item.uids ? (

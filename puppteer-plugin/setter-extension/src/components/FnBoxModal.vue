@@ -49,7 +49,7 @@ const addBuiltInEvent = (name: string, data?: object) => {
   if (name === 'snapshotFullScreen') {
     emits('addUserDoData', {
       type: 'snapshotFullScreen',
-      snapshotName: '',
+      label: '',
       slot: true,
       data: {},
     });
@@ -62,7 +62,7 @@ const addBuiltInEvent = (name: string, data?: object) => {
   } else if (name === 'snapshotCurrentScreen') {
     emits('addUserDoData', {
       type: 'snapshotCurrentScreen',
-      snapshotName: '',
+      label: '',
       slot: true,
       data: {
         scrollTop: document.documentElement.scrollTop,
