@@ -77,6 +77,7 @@ const recordUserRect = async () => {
     emits('addUserDoData', {
       type: 'getText',
       label: '',
+      multiple: selectSimilar.value,
       slot: true,
       data: newSelector,
     });
@@ -85,6 +86,7 @@ const recordUserRect = async () => {
     emits('addUserDoData', {
       type: 'getElementSnapshot',
       label: '',
+      multiple: selectSimilar.value,
       slot: true,
       data: newSelector,
     });

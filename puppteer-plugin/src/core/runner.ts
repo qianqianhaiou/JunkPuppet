@@ -269,6 +269,7 @@ async function startTask(props: any) {
       const uids = await getSnapshotBySelector(page, item.data, props.parent);
       result.snapshots.push({
         type: 'getElementSnapshot',
+        multiple: item.multiple,
         label: item.label || getCurrentTime(),
         uids: uids,
       });
@@ -290,6 +291,7 @@ async function startTask(props: any) {
       const data = await getTextBySelector(page, item.data);
       result.texts.push({
         label: item.label || getCurrentTime(),
+        multiple: item.multiple,
         values: data,
       });
     } else if (item.type === 'delay') {

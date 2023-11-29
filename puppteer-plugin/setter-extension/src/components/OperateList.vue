@@ -8,22 +8,33 @@
     @close="handleClose"
   >
     <div style="color: #000">
-      <Collapse accordion>
-        <CollapsePanel
-          v-for="(item, index) in userDoData"
-          :header="formatOperateType(item.type)"
-          :key="index"
-        >
-          <div>{{ item }}</div>
-          <Button type="link">编辑</Button>
-        </CollapsePanel>
-      </Collapse>
+      <template v-if="userDoData && userDoData.length">
+        <Collapse accordion>
+          <CollapsePanel
+            v-for="(item, index) in userDoData"
+            :header="formatOperateType(item.type)"
+            :key="index"
+          >
+            <div>{{ item }}</div>
+            <Button type="link">编辑</Button>
+          </CollapsePanel>
+        </Collapse>
+      </template>
+      <template v-else>
+        <Result status="404" title="没有操作" sub-title="当前没有操作"></Result>
+      </template>
     </div>
   </Drawer>
 </template>
 
 <script setup lang="ts">
-import { Button, Drawer, Collapse, CollapsePanel } from 'ant-design-vue';
+import {
+  Button,
+  Drawer,
+  Collapse,
+  CollapsePanel,
+  Result,
+} from 'ant-design-vue';
 import { computed, ref } from 'vue';
 import { formatOperateType } from '@/util/format';
 
