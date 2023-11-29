@@ -6,7 +6,7 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 import { deleteTask, updateTask } from "@/service/index";
 import Config from "./Config";
 import Detail from "./Detail";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const [messageApi, contextHolder] = message.useMessage();
@@ -22,6 +22,18 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
     await updateTask(recard);
     setStatusLoading(false);
   };
+
+  const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42)
+  useEffect(() => {
+    window.onresize = () => {
+      console.log(window.innerHeight - 42)
+      setDrawerHeight(window.innerHeight - 42)
+    }
+    return () => {
+      window.onresize = null
+    }
+  }, [])
+  
   const columns: ColumnsType<any> = [
     {
       title: "任务名称",
@@ -100,12 +112,14 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
               <Config
                 modal={modal}
                 messageApi={messageApi}
+                drwerHeight={drwerHeight}
                 data={record}
                 reflash={reflash}
               ></Config>
               <Detail
                 modal={modal}
                 messageApi={messageApi}
+                drwerHeight={drwerHeight}
                 data={record}
               ></Detail>
             </Space>

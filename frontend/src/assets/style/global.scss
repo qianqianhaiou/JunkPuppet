@@ -47,7 +47,19 @@ body {
     align-items: center;
     background: rgba(0, 0, 0, 0.15);
   }
-  .ant-drawer-header {
-    -webkit-app-region: no-drag;
+  .ant-drawer {
+    .ant-drawer-header {
+      padding: 10px 17px;
+      -webkit-app-region: no-drag;
+      .ant-drawer-header-title {
+        .ant-drawer-close {
+          margin-inline-end: 6px;
+        }
+      }
+    }
+    .ant-drawer-content-wrapper {
+      bottom: 0px;
+      top: auto;
+    }
   }
 }

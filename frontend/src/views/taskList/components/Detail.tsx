@@ -129,10 +129,12 @@ function App({
   modal,
   messageApi,
   data,
+  drwerHeight,
 }: {
   modal: any;
   messageApi: any;
   data: any;
+  drwerHeight: number;
 }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
@@ -177,6 +179,7 @@ function App({
       fetchList();
     }
   }, [modalVisible]);
+
   return (
     <>
       <Button type="link" style={{ padding: "0px" }} onClick={handleOpenDrawer}>
@@ -184,6 +187,7 @@ function App({
       </Button>
       <Drawer
         className={loading ? style.Drawer : style.DrawerScroll}
+        style={{ height: `${drwerHeight}px` }}
         title={
           <div className="w-full flex items-center justify-between">
             <div>

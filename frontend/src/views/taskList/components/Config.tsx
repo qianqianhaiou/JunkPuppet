@@ -130,11 +130,13 @@ function App({
   reflash,
   modal,
   messageApi,
+  drwerHeight,
 }: {
   data: any;
   reflash: any;
   modal: any;
   messageApi: any;
+  drwerHeight: number;
 }) {
   const [config, setConfig] = useState<any>({});
   const [modalVisible, setModalVisible] = useState(false);
@@ -187,6 +189,7 @@ function App({
         配置
       </Button>
       <Drawer
+        style={{ height: `${drwerHeight}px` }}
         title={
           <div className="w-full flex items-center justify-between">
             <div>任务配置</div>
