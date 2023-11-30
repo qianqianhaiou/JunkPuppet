@@ -1,19 +1,17 @@
 <template>
-  <Drawer
+  <Modal
+    ref="modalRef"
     :open="true"
-    width="600"
+    :wrap-style="{ overflow: 'hidden', pointerEvents: 'none' }"
     :getContainer="getModalContainer"
     placement="right"
     :maskClosable="false"
     :mask="false"
-    @close="handleClose"
+    :bodyStyle="{ maxHeight: '700px', overflowY: 'auto' }"
+    :footer="null"
+    @cancel="handleClose"
   >
-    <template #title>
-      <div ref="modalTitleRef" style="width: 100%; cursor: move">
-        当前页操作列表
-      </div>
-    </template>
-    <div style="color: #000">
+    <div v-show="bodyVisible" style="color: #000">
       <template v-if="userDoData && userDoData.length">
         <Collapse v-model:active-key="activeKey" accordion>
           <CollapsePanel
@@ -34,7 +32,31 @@
         <Result status="404" title="没有操作" sub-title="当前没有操作"></Result>
       </template>
     </div>
-  </Drawer>
+    <template #title>
+      <div ref="modalTitleRef" style="width: 100%; cursor: move; display: flex; align-items: center;">
+        <div style="padding: 0px 10px">
+          <template v-if="bodyVisible">
+            <UpOutlined @click="bodyVisible = false" />
+          </template>
+          <template v-else>
+            <DownOutlined @click="bodyVisible = true" />
+          </template>
+        </div>
+
+        当前页操作列表 （
+        <span
+          style="font-weight: bolder; margin-left: 2px; margin-right: 2px"
+          >{{ userDoData.length }}</span
+        >
+        条）
+      </div>
+    </template>
+    <template #modalRender="{ originVNode }">
+      <div :style="transformStyle">
+        <component :is="originVNode" />
+      </div>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -44,10 +66,12 @@ import {
   Collapse,
   CollapsePanel,
   Result,
+  Modal,
 } from 'ant-design-vue';
-import { computed, ref } from 'vue';
+import { computed, ref, CSSProperties, watch, watchEffect } from 'vue';
 import { useDraggable } from '@vueuse/core';
 import { formatOperateType } from '@/util/format';
+import { UpOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import OperateEdit from './OperateEdit.vue';
 
 const props = defineProps({
@@ -56,11 +80,17 @@ const props = defineProps({
     default: () => [],
   },
 });
-const emits = defineEmits(['handleChangeListVisible', 'handleDelete', 'handleUpdate']);
+const emits = defineEmits([
+  'handleChangeListVisible',
+  'handleDelete',
+  'handleUpdate',
+]);
 
 const userDoData = computed(() => {
   return props.userDoData;
 });
+
+const bodyVisible = ref(true);
 
 // 挂载点
 const getModalContainer = () => {
@@ -71,7 +101,53 @@ const getModalContainer = () => {
 };
 
 // 拖动
+const modalTitleRef = ref<any>(null);
+const { x, y, isDragging } = useDraggable(modalTitleRef);
+const startX = ref<number>(0);
+const startY = ref<number>(0);
+const startedDrag = ref(false);
+const transformX = ref(0);
+const transformY = ref(0);
+const preTransformX = ref(0);
+const preTransformY = ref(0);
+const dragRect = ref({ left: 0, right: 0, top: 0, bottom: 0 });
+watch([x, y], () => {
+  if (!startedDrag.value) {
+    startX.value = x.value;
+    startY.value = y.value;
+    const bodyRect = document.body.getBoundingClientRect();
+    const titleRect = modalTitleRef.value.getBoundingClientRect();
+    dragRect.value.right = bodyRect.width - titleRect.width;
+    dragRect.value.bottom = bodyRect.height - titleRect.height;
+    preTransformX.value = transformX.value;
+    preTransformY.value = transformY.value;
+  }
+  startedDrag.value = true;
+});
+watch(isDragging, () => {
+  if (!isDragging) {
+    startedDrag.value = false;
+  }
+});
+watchEffect(() => {
+  if (startedDrag.value) {
+    transformX.value =
+      preTransformX.value +
+      Math.min(Math.max(dragRect.value.left, x.value), dragRect.value.right) -
+      startX.value;
+    transformY.value =
+      preTransformY.value +
+      Math.min(Math.max(dragRect.value.top, y.value), dragRect.value.bottom) -
+      startY.value;
+  }
+});
+const transformStyle = computed<CSSProperties>(() => {
+  return {
+    transform: `translate(${transformX.value}px, ${transformY.value}px)`,
+  };
+});
 
+// edit
 const activeKey = ref(undefined);
 const handleDelete = (index: string) => {
   activeKey.value = undefined;
@@ -79,7 +155,7 @@ const handleDelete = (index: string) => {
 };
 const handleUpdate = (index: string, data: any) => {
   emits('handleUpdate', index, data);
-}
+};
 
 const handleClose = () => {
   emits('handleChangeListVisible', false);
