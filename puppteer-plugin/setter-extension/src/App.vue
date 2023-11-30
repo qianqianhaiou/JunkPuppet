@@ -23,7 +23,13 @@
     @addUserDoData="addUserDoData"
     @handleChangeFnModalVisible="handleChangeFnModalVisible"
   ></FnBoxModal>
-  <OperateList v-if="listVisible" :userDoData="userDoData" @handleChangeListVisible="handleChangeListVisible"></OperateList>
+  <OperateList
+    v-if="listVisible"
+    :userDoData="userDoData"
+    @handleChangeListVisible="handleChangeListVisible"
+    @handleDelete="handleDelete"
+    @handleUpdate="handleUpdate"
+  ></OperateList>
 </template>
 <script setup lang="ts">
 import { nextTick, onMounted } from '@vue/runtime-core';
@@ -71,11 +77,22 @@ const handleUpdateTool = (ctool: string) => {
 };
 
 // 操作列表
-const listVisible = ref(false)
-
+const listVisible = ref(false);
 const handleChangeListVisible = (visible: boolean) => {
-  listVisible.value = visible
-}
+  listVisible.value = visible;
+};
+const handleDelete = (index: string) => {
+  console.log(userDoData.value);
+  userDoData.value.splice(index, 1);
+  console.log(userDoData.value);
+};
+const handleUpdate = (index: string, data: any) => {
+  console.log(data);
+  data.map((item: any) => {
+    userDoData.value[index][item[0]] = item[1];
+  });
+  console.log(userDoData.value);
+};
 
 // 内置函数弹框
 const fnModal = ref<boolean>(false);

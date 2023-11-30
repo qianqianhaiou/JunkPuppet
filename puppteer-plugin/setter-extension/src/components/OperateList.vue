@@ -2,20 +2,31 @@
   <Drawer
     :open="true"
     width="600"
-    title="当前页操作列表"
     :getContainer="getModalContainer"
     placement="right"
+    :maskClosable="false"
+    :mask="false"
     @close="handleClose"
   >
+    <template #title>
+      <div ref="modalTitleRef" style="width: 100%; cursor: move">
+        当前页操作列表
+      </div>
+    </template>
     <div style="color: #000">
       <template v-if="userDoData && userDoData.length">
-        <Collapse accordion>
+        <Collapse v-model:active-key="activeKey" accordion>
           <CollapsePanel
             v-for="(item, index) in userDoData"
             :header="formatOperateType(item.type)"
             :key="index"
           >
-            <OperateEdit :data="item"></OperateEdit>
+            <OperateEdit
+              :data="item"
+              :dindex="index"
+              @delete="handleDelete"
+              @update="handleUpdate"
+            ></OperateEdit>
           </CollapsePanel>
         </Collapse>
       </template>
@@ -35,8 +46,9 @@ import {
   Result,
 } from 'ant-design-vue';
 import { computed, ref } from 'vue';
+import { useDraggable } from '@vueuse/core';
 import { formatOperateType } from '@/util/format';
-import OperateEdit from './OperateEdit.vue'
+import OperateEdit from './OperateEdit.vue';
 
 const props = defineProps({
   userDoData: {
@@ -44,7 +56,7 @@ const props = defineProps({
     default: () => [],
   },
 });
-const emits = defineEmits(['handleChangeListVisible']);
+const emits = defineEmits(['handleChangeListVisible', 'handleDelete', 'handleUpdate']);
 
 const userDoData = computed(() => {
   return props.userDoData;
@@ -57,6 +69,17 @@ const getModalContainer = () => {
   )!.shadowRoot;
   return el;
 };
+
+// 拖动
+
+const activeKey = ref(undefined);
+const handleDelete = (index: string) => {
+  activeKey.value = undefined;
+  emits('handleDelete', index);
+};
+const handleUpdate = (index: string, data: any) => {
+  emits('handleUpdate', index, data);
+}
 
 const handleClose = () => {
   emits('handleChangeListVisible', false);

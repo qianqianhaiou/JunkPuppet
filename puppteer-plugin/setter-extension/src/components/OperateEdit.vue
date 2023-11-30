@@ -8,7 +8,6 @@
         :label-col="{ span: 6 }"
         :wrapper-col="{ span: 18 }"
         autocomplete="off"
-        @finish="submit"
       >
         <template
           v-if="
@@ -28,24 +27,24 @@
         <template v-if="['getText', 'getElementSnapshot'].includes(data.type)">
           <FormItem
             label="iframeIndex"
-            name="iframeIndex"
+            :name="['data', 'iframeIndex']"
             :rules="[{ required: true, message: '请输入iframeIndex' }]"
           >
-            <div v-if="status === 'info'">{{ form.iframeIndex }}</div>
+            <div v-if="status === 'info'">{{ form.data.iframeIndex }}</div>
             <Input
               v-else-if="status === 'edit'"
-              v-model:value="form.iframeIndex"
+              v-model:value="form.data.iframeIndex"
             />
           </FormItem>
           <FormItem
             label="选择器"
-            name="selector"
+            :name="['data', 'selector']"
             :rules="[{ required: true, message: '请输入选择器' }]"
           >
-            <div v-if="status === 'info'">{{ form.selector }}</div>
+            <div v-if="status === 'info'">{{ form.data.selector }}</div>
             <Textarea
               v-else-if="status === 'edit'"
-              v-model:value="form.selector"
+              v-model:value="form.data.selector"
               :rows="3"
             />
           </FormItem>
@@ -69,7 +68,7 @@
           </FormItem>
         </template>
 
-        <FormItem label=" ">
+        <div>
           <Space style="justify-content: flex-end; width: 100%">
             <template v-if="status === 'info'">
               <Button type="primary" @click="handleEdit">
@@ -78,7 +77,7 @@
                 </template>
                 编辑
               </Button>
-              <Button danger>
+              <Button danger @click="handleDelete">
                 <template #icon>
                   <DeleteOutlined />
                 </template>
@@ -87,10 +86,10 @@
             </template>
             <template v-else-if="status === 'edit'">
               <Button type="primary" @click="submit">提交</Button>
-              <Button type="default" @click="status = 'info'">取消</Button>
+              <Button type="default" @click="handleCancel">取消</Button>
             </template>
           </Space>
-        </FormItem>
+        </div>
       </Form>
     </div>
   </div>
@@ -108,31 +107,49 @@ import {
   Space,
 } from 'ant-design-vue';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue';
+import { entries } from 'lodash';
 
 const props = defineProps({
   data: {
     type: Object,
     default: () => {},
   },
+  dindex: {
+    type: String,
+    default: () => -1,
+  },
 });
-
+const emits = defineEmits(['delete', 'update']);
 const data = computed(() => props.data);
 
 const status = ref('info');
 
 const form = reactive({
   label: '',
-  iframeIndex: '',
-  selector: '',
+  data: {
+    iframeIndex: '',
+    selector: '',
+  },
   delay: 1000,
 });
 const formRef = ref<any>(null);
+
+const parseForm = () => {
+  form.label = data.value.label;
+  form.data = data.value?.data;
+  form.delay = data.value?.delay;
+};
 const submit = () => {
   formRef.value
     .validate()
     .then(() => {
-      let params: any = {};
-      console.log(form);
+      const entrys = Object.entries(form);
+      const target = entrys.filter((item) => {
+        if (item[1] !== undefined) {
+          return item;
+        }
+      });
+      emits('update', props.dindex, target);
       status.value = 'info';
     })
     .catch((error: any) => {
@@ -143,12 +160,16 @@ const submit = () => {
 const handleEdit = () => {
   status.value = 'edit';
 };
+const handleCancel = () => {
+  parseForm();
+  status.value = 'info';
+};
+const handleDelete = () => {
+  emits('delete', props.dindex);
+};
 const closeEditModel = () => {};
 
 onBeforeMount(() => {
-  form.label = data.value.label;
-  form.iframeIndex = data.value?.data?.iframeIndex;
-  form.selector = data.value?.data?.selector;
-  form.delay = data.value?.delay;
+  parseForm();
 });
 </script>
