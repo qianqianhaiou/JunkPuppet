@@ -88,7 +88,7 @@ export const getTaskList = async (params: any) => {
       .filter((item) => item.name.includes(params.text))
       .value();
   } else {
-    result = database.chain.get("list").value();
+    result = database.chain.get("list").orderBy(['updatedAt'], 'desc').value();
   }
   return result;
 };

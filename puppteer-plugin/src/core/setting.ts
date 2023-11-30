@@ -56,7 +56,9 @@ const initExcScript = (page: any) => {
       if (!(window as Window)._silentListen) {
         (window as Window)._silentListen = true;
         window.addEventListener('message', (e) => {
-          (window as any)._silentSendData(e.data);
+          if (!e || !e.data) return;
+          const message = JSON.parse(e.data);
+          (window as any)._silentSendData(message);
         });
       }
       (window as Window).open = (url: string) => {
@@ -99,10 +101,11 @@ async function init(props: ISetting) {
   const [page] = await browser.pages();
   return new Promise(async (resolve, reject) => {
     try {
-      await page.exposeFunction('_silentSendData', async (data: any) => {
-        if (!data) return;
+      await page.exposeFunction('_silentSendData', async (dataJson: any) => {
+        if (dataJson['author'] && dataJson['author'] !== 'qianqianhaiou') {
+          return false;
+        }
         try {
-          const dataJson = JSON.parse(data);
           if (dataJson.type === 'finishSetting') {
             userDoData = userDoData.concat(dataJson.data);
             await browser.close();

@@ -1,5 +1,6 @@
-export const sendMessage = (data: Object) => {
-  (window.top as Window).postMessage(JSON.stringify(data), "*");
+export const sendMessage = (data: any) => {
+  data['author'] = 'qianqianhaiou';
+  (window.top as Window).postMessage(JSON.stringify(data), '*');
 };
 
 export const sendChromeMessage = async (type: string, message?: string) => {
