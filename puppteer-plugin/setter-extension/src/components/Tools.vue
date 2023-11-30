@@ -43,11 +43,6 @@
         <GroupOutlined />
       </template>
     </FloatButton>
-    <FloatButton tooltip="内置函数" :onClick="handleOpenModal">
-      <template #icon>
-        <ToolOutlined />
-      </template>
-    </FloatButton>
     <FloatButton tooltip="操作列表" :onClick="handleOpenList">
       <template #icon>
         <OrderedListOutlined />
@@ -73,13 +68,12 @@ import {
   PoweroffOutlined,
   GroupOutlined,
   ToolOutlined,
-  OrderedListOutlined
+  OrderedListOutlined,
 } from '@ant-design/icons-vue';
 
 const emits = defineEmits([
   'addUserDoData',
   'handleChangeSelectSimilar',
-  'handleChangeFnModalVisible',
   'finishSetting',
   'handleUpdateTool',
   'handleChangeListVisible',
@@ -90,10 +84,6 @@ const toolsActive = ref('link');
 const setToolsActive = (item: string) => {
   toolsActive.value = item;
   emits('handleUpdateTool', item);
-};
-
-const handleOpenModal = () => {
-  emits('handleChangeFnModalVisible', true);
 };
 
 const handleOpenList = () => {

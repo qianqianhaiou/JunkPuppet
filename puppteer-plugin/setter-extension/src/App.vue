@@ -3,7 +3,6 @@
     <Tools
       @addUserDoData="addUserDoData"
       @handleChangeSelectSimilar="handleChangeSelectSimilar"
-      @handleChangeFnModalVisible="handleChangeFnModalVisible"
       @finishSetting="finishSetting"
       @handleUpdateTool="handleUpdateTool"
       @handleChangeListVisible="handleChangeListVisible"
@@ -18,17 +17,13 @@
     @clickAndWaitNavigator="clickAndWaitNavigator"
   ></GlobalListender>
   <Popup></Popup>
-  <FnBoxModal
-    v-if="fnModal"
-    @addUserDoData="addUserDoData"
-    @handleChangeFnModalVisible="handleChangeFnModalVisible"
-  ></FnBoxModal>
   <OperateList
     v-if="listVisible"
     :userDoData="userDoData"
     @handleChangeListVisible="handleChangeListVisible"
     @handleDelete="handleDelete"
     @handleUpdate="handleUpdate"
+    @addUserDoData="addUserDoData"
   ></OperateList>
 </template>
 <script setup lang="ts">
@@ -92,12 +87,6 @@ const handleUpdate = (index: string, data: any) => {
     userDoData.value[index][item[0]] = item[1];
   });
   console.log(userDoData.value);
-};
-
-// 内置函数弹框
-const fnModal = ref<boolean>(false);
-const handleChangeFnModalVisible = (visible: boolean) => {
-  fnModal.value = visible;
 };
 
 const computedUserDoData = () => {

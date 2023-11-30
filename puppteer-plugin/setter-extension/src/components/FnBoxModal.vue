@@ -1,11 +1,14 @@
 <template>
-  <Modal
-    v-model:open="modalVisible"
+  <Drawer
+    :open="true"
+    placement="right"
     title="内置工具箱"
+    :width="500"
     :footer="null"
-    :getContainer="getModalContainer"
+    :getContainer="false"
     :zIndex="2147483647"
-    @cancel="emits('handleChangeFnModalVisible', false)"
+    @close="emits('handleChangeFnModalVisible', false)"
+    :style="{ position: 'absolute' }"
   >
     <Space>
       <Button @click="addBuiltInEvent('snapshotFullScreen')">
@@ -27,22 +30,14 @@
         添 加 等 待</Button
       >
     </Space>
-  </Modal>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Button, Modal, Space } from 'ant-design-vue';
+import { Button, Drawer, Space } from 'ant-design-vue';
 import { CameraOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 const emits = defineEmits(['addUserDoData', 'handleChangeFnModalVisible']);
-
-const modalVisible = ref(true);
-const getModalContainer = () => {
-  const el: any = document.querySelector(
-    '#puppeteer-sunsilent-shadow-root'
-  )!.shadowRoot;
-  return el;
-};
 
 // 添加内置功能
 const addBuiltInEvent = (name: string, data?: object) => {

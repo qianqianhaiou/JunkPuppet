@@ -1,22 +1,33 @@
 <template>
   <Modal
     ref="modalRef"
+    :width="600"
     :open="true"
     :wrap-style="{ overflow: 'hidden', pointerEvents: 'none' }"
     :getContainer="getModalContainer"
     placement="right"
     :maskClosable="false"
     :mask="false"
-    :bodyStyle="{ maxHeight: '700px', overflowY: 'auto' }"
+    :bodyStyle="{
+      maxHeight: '700px',
+      minHeight: bodyVisible ? '400px' : '0px',
+      overflowY: 'auto',
+    }"
     :footer="null"
     @cancel="handleClose"
   >
-    <div v-show="bodyVisible" style="color: #000">
+    <div v-show="bodyVisible" style="color: #000; margin-top: 10px">
+      <FnBoxModal
+        v-if="fnBoxVisible"
+        @handleChangeFnModalVisible="handleChangeFnBoxVisible(false)"
+        @addUserDoData="addUserDoData"
+      ></FnBoxModal>
       <template v-if="userDoData && userDoData.length">
         <Collapse v-model:active-key="activeKey" accordion>
           <CollapsePanel
             v-for="(item, index) in userDoData"
             :header="formatOperateType(item.type)"
+            :collapsible="item.slot ? 'header' : 'disabled'"
             :key="index"
           >
             <OperateEdit
@@ -33,7 +44,10 @@
       </template>
     </div>
     <template #title>
-      <div ref="modalTitleRef" style="width: 100%; cursor: move; display: flex; align-items: center;">
+      <div
+        ref="modalTitleRef"
+        style="width: 100%; cursor: move; display: flex; align-items: center"
+      >
         <div style="padding: 0px 10px">
           <template v-if="bodyVisible">
             <UpOutlined @click="bodyVisible = false" />
@@ -42,13 +56,20 @@
             <DownOutlined @click="bodyVisible = true" />
           </template>
         </div>
-
         当前页操作列表 （
         <span
           style="font-weight: bolder; margin-left: 2px; margin-right: 2px"
           >{{ userDoData.length }}</span
         >
         条）
+        <div style="height: 24px" v-if="bodyVisible">
+          <Button
+            style="height: 22px; padding-top: 0px; padding-bottom: 0px; font-size: 16px; line-height: 22px; font-weight: bold;"
+            type="link"
+            @click="handleChangeFnBoxVisible(true)"
+            >内置工具</Button
+          >
+        </div>
       </div>
     </template>
     <template #modalRender="{ originVNode }">
@@ -73,6 +94,7 @@ import { useDraggable } from '@vueuse/core';
 import { formatOperateType } from '@/util/format';
 import { UpOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import OperateEdit from './OperateEdit.vue';
+import FnBoxModal from './FnBoxModal.vue';
 
 const props = defineProps({
   userDoData: {
@@ -84,6 +106,7 @@ const emits = defineEmits([
   'handleChangeListVisible',
   'handleDelete',
   'handleUpdate',
+  'addUserDoData',
 ]);
 
 const userDoData = computed(() => {
@@ -146,6 +169,16 @@ const transformStyle = computed<CSSProperties>(() => {
     transform: `translate(${transformX.value}px, ${transformY.value}px)`,
   };
 });
+
+// 内置工具
+const fnBoxVisible = ref(false);
+const handleChangeFnBoxVisible = (visible: boolean) => {
+  fnBoxVisible.value = visible;
+};
+
+const addUserDoData = (data: any) => {
+  emits('addUserDoData', data);
+};
 
 // edit
 const activeKey = ref(undefined);

@@ -43,3 +43,17 @@ $deepGreen: #13ce66;
     }
   }
 }
+:host {
+  .ant-modal {
+    .ant-modal-header {
+      margin-bottom: 0px;
+    }
+    .ant-modal-content {
+      overflow-x: hidden;
+      .ant-modal-close {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+}
