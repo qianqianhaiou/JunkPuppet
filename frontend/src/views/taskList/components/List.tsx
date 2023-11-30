@@ -15,6 +15,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const handleTaskStatusChange = async (status: boolean, recard: any) => {
     if (status && !recard.cron) {
       messageApi.warning("请先点击编辑设置任务周期");
+      recard.auto = false;
       return false;
     }
     setStatusLoading(true);
@@ -23,17 +24,17 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
     setStatusLoading(false);
   };
 
-  const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42)
+  const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42);
   useEffect(() => {
     window.onresize = () => {
-      console.log(window.innerHeight - 42)
-      setDrawerHeight(window.innerHeight - 42)
-    }
+      console.log(window.innerHeight - 42);
+      setDrawerHeight(window.innerHeight - 42);
+    };
     return () => {
-      window.onresize = null
-    }
-  }, [])
-  
+      window.onresize = null;
+    };
+  }, []);
+
   const columns: ColumnsType<any> = [
     {
       title: "任务名称",
@@ -90,7 +91,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
                 unCheckedChildren="手动"
                 loading={statusLoading}
                 checked={record.auto}
-                onChange={(status: boolean) =>
+                onClick={(status: boolean) =>
                   handleTaskStatusChange(status, record)
                 }
               />
@@ -137,7 +138,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
         tableLayout="fixed"
         dataSource={list}
         rowKey="_id"
-        pagination={{ showTotal: (total) => `共 ${total} 条` }}
+        pagination={{ pageSize: 8, showTotal: (total) => `共 ${total} 条` }}
       />
     </div>
   );

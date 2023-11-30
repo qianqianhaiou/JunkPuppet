@@ -52,7 +52,11 @@ function App({
   const onFinish = async (values: any) => {
     let result = "";
     if (type === "create") {
-      result = await addTask(values);
+      result = await addTask({
+        ...values,
+        auto: false,
+        cron: "",
+      });
     } else {
       result = await updateTask({
         ...values,
