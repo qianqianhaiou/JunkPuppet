@@ -62,4 +62,11 @@ body {
       top: auto;
     }
   }
+  .monaco-editor {
+    .editor-json-highlight {
+      // background: linear-gradient(120deg, #fdfbfb55 0%, #ebedee55 100%);
+      // background: linear-gradient(120deg, #f093fb55 0%, #f5576c55 100%);
+      background-color: #00ff0055;
+    }
+  }
 }

@@ -196,7 +196,7 @@ async function startTask(props: any) {
       height: 1080,
     },
     slowMo: props.slowMo || 100,
-    devtools: !props.headless,
+    // devtools: !props.headless,
     args: [
       '--allow-running-insecure-content',
       '--disable-web-security',
