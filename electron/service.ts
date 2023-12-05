@@ -216,6 +216,28 @@ export const startSetting = async (params: any) => {
     console.log(`setter start error：${error.message}`);
   }
 };
+// 上传JSON模拟数据
+export const uploadJSONSetting = async (params: any) => {
+  const uid = crypto.randomUUID();
+  const fileName = `${uid}.json`;
+  await fswriteFile(
+    join(process.env.DATA_PATH_JSON, fileName),
+    params.data
+  );
+  const datanow = Date.now();
+  const database = await taskListDb();
+  database.chain
+    .get("list")
+    .find({ _id: params._id })
+    .assign({
+      mockDataId: uid,
+      updatedAt: datanow,
+    })
+    .value();
+  database.chain.set("updatedAt", datanow).value();
+  await database.write();
+  return 'success'
+}
 // 调试任务操作运行，放慢速度，可视化
 export const startDebugServer = async (params: any) => {
   try {

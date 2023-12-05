@@ -82,3 +82,6 @@ export const deleteTaskDataDb = async (params: any) => {
 export const openChrome = async (params: any) => {
   return FetchData("openChrome", params);
 };
+export const uploadJSONSetting = async (params: any) => {
+  return FetchData("uploadJSONSetting", params);
+};

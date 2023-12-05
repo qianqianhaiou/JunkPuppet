@@ -23,6 +23,7 @@ import {
   getLogByLine,
   getTaskTypes,
   openChrome,
+  uploadJSONSetting,
 } from "./service";
 
 export interface Route {
@@ -102,6 +103,9 @@ const handleDeleteTaskDataDb: Route["callBack"] = async (event, arg) => {
 };
 const handleOpenChrome: Route["callBack"] = async (event, arg) => {
   return openChrome(arg);
+};
+const handleUploadJSONSetting: Route["callBack"] = async (event, arg) => {
+  return uploadJSONSetting(arg);
 };
 
 export const routes: Route[] = [
@@ -196,6 +200,10 @@ export const routes: Route[] = [
   {
     path: "openChrome",
     callBack: handleOpenChrome,
+  },
+  {
+    path: "uploadJSONSetting",
+    callBack: handleUploadJSONSetting,
   },
 ];
 

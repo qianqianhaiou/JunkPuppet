@@ -1,4 +1,13 @@
-import { Button, Drawer, Modal, Result, Space, message } from "antd";
+import {
+  Button,
+  Drawer,
+  Input,
+  Modal,
+  Result,
+  Space,
+  Upload,
+  message,
+} from "antd";
 import { useEffect, useState } from "react";
 import {
   startSetting,
@@ -6,6 +15,7 @@ import {
   updateTaskMockData,
   deleteTask,
   debugPlay,
+  uploadJSONSetting,
 } from "@/service/index";
 import JsonEditor from "@/components/JsonEditor";
 import {
@@ -14,6 +24,8 @@ import {
   ExclamationCircleFilled,
   DeleteOutlined,
   BugOutlined,
+  UploadOutlined,
+  AimOutlined,
 } from "@ant-design/icons";
 
 function JsonBox({
@@ -103,22 +115,57 @@ function JsonBox({
 }
 
 function NoTaskConfig({
+  config,
   handleStartSetting,
   handleDeleteTask,
+  reFreshAll,
 }: {
+  config: any;
   handleStartSetting: any;
   handleDeleteTask: any;
+  reFreshAll: any;
 }) {
+  async function readFileAsText(file: any) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function (evt: any) {
+        resolve(evt.target.result);
+      };
+      reader.readAsText(file);
+    });
+  }
+  const props = {
+    beforeUpload: async (file: any) => {
+      const text = await readFileAsText(file);
+      const result = await uploadJSONSetting({
+        _id: config._id,
+        data: text,
+      });
+      reFreshAll();
+      return false;
+    },
+  };
   return (
     <Result
       className="h-full flex flex-col justify-center"
       title="当前没有模拟数据"
       extra={
         <Space>
-          <Button type="primary" onClick={handleStartSetting}>
+          <Button
+            type="dashed"
+            icon={<AimOutlined />}
+            onClick={handleStartSetting}
+          >
             开始模拟
           </Button>
-          <Button onClick={handleDeleteTask}>删除任务</Button>
+          <Upload {...props}>
+            <Button icon={<UploadOutlined />} type="dashed">
+              上传文件
+            </Button>
+          </Upload>
+          <Button icon={<DeleteOutlined />} onClick={handleDeleteTask} type="dashed" danger>
+            删除任务
+          </Button>
         </Space>
       }
     />
@@ -146,13 +193,16 @@ function App({
   const handleClose = () => {
     setModalVisible(false);
   };
+  const reFreshAll = () => {
+    reflash();
+    handleGetTaskCOnfigDetail();
+  };
   const handleStartSetting = async () => {
     await startSetting({
       ...config,
       mockData: "",
     });
-    reflash();
-    handleGetTaskCOnfigDetail();
+    reFreshAll();
   };
   const handleGetTaskCOnfigDetail = async () => {
     const result = await getTaskConfigDetail({ _id: data._id });
@@ -218,6 +268,8 @@ function App({
           ></JsonBox>
         ) : (
           <NoTaskConfig
+            config={config}
+            reFreshAll={reFreshAll}
             handleStartSetting={handleStartSetting}
             handleDeleteTask={handleDeleteTask}
           ></NoTaskConfig>
