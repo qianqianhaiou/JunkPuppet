@@ -280,15 +280,14 @@ async function startTask(props: any) {
       await playScroll(client, item.data);
       await waitTime(0.2);
     } else if (item.type === 'clickAndWaitNavigator') {
-      await Promise.all([
-        page.waitForNavigation({
-          timeout: 10 * 1000,
-          waitUntil: ['networkidle0'],
-        }),
-        playClick(page, item.data),
-      ]).catch((e) => {
-        console.warn(e.message);
-      });
+      const navigatorPromise = item.urlChange
+        ? page.waitForNavigation(item.waitForNavigation)
+        : page.waitForNetworkIdle();
+      await Promise.all([navigatorPromise, playClick(page, item.data)]).catch(
+        (e: any) => {
+          console.warn(e?.message);
+        }
+      );
       await waitTime(1);
       if (!props.headless) {
         await initMouseFollwer(page);
@@ -344,7 +343,7 @@ process.on('message', async (args: any) => {
         });
     }
   } catch (e: any) {
-    console.error(e.message);
+    console.error(e?.message);
   } finally {
     process.exit();
   }

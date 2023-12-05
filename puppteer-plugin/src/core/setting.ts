@@ -70,6 +70,14 @@ const initExcScript = (page: any) => {
   });
 };
 
+async function waitTime(time: number) {
+  return new Promise((res, rej) => {
+    setTimeout(() => {
+      res('');
+    }, time * 1000);
+  });
+}
+
 async function init(props: ISetting) {
   if (props.chromeDataPath) {
     await clearUserDataDirExitType(props.chromeDataPath);
@@ -111,8 +119,23 @@ async function init(props: ISetting) {
             await browser.close();
             resolve('');
           } else if (dataJson.type === 'clickAndWaitNavigator') {
+            const oldUrl = page.url();
+            await page.mouse.click(
+              dataJson.data.screenX,
+              dataJson.data.screenY
+            );
+            await waitTime(0.5);
+            const newUrl = page.url();
+            if (oldUrl === newUrl) {
+              for (let i = dataJson.userDoData.length - 1; i > 0; i++) {
+                if (dataJson.userDoData[i].type === 'clickAndWaitNavigator') {
+                  dataJson.userDoData[i]['urlChange'] = false;
+                  break;
+                }
+              }
+            }
+            // 通过 readystatechange 判断是否需要等待 load 事件
             userDoData = userDoData.concat(dataJson.userDoData);
-            page.mouse.click(dataJson.data.screenX, dataJson.data.screenY);
           }
         } catch (e: any) {
           console.warn(e.message);
@@ -132,6 +155,6 @@ process.on('message', async (args: any) => {
       const result = await init(args.params);
     }
   } catch (e: any) {
-    console.error(e.message);
+    console.error(e?.message);
   }
 });
