@@ -40,7 +40,6 @@ function createWindow() {
   }
   // load 前端
   if (!app.isPackaged) {
-    win.webContents.openDevTools();
     win.loadURL("http://localhost:7777");
   } else {
     win.loadFile(join(process.env.DIST, "index.html"));
@@ -59,6 +58,12 @@ function createWindow() {
       click: function () {
         app.relaunch();
         app.exit();
+      },
+    },
+    {
+      label: "devtools",
+      click: function () {
+        win.webContents.toggleDevTools();
       },
     },
     {
@@ -138,7 +143,7 @@ app
     });
   })
   .catch((e) => {
-    console.log(e)
+    console.log(e);
     new Notification({ body: e.message }).show();
   });
 
