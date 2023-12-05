@@ -22,6 +22,7 @@ import {
   deleteTaskDataDb,
   getLogByLine,
   getTaskTypes,
+  openChrome,
 } from "./service";
 
 export interface Route {
@@ -98,6 +99,9 @@ const handleCloseApp: Route["callBack"] = async (event, arg) => {
 };
 const handleDeleteTaskDataDb: Route["callBack"] = async (event, arg) => {
   return deleteTaskDataDb(arg);
+};
+const handleOpenChrome: Route["callBack"] = async (event, arg) => {
+  return openChrome(arg);
 };
 
 export const routes: Route[] = [
@@ -188,6 +192,10 @@ export const routes: Route[] = [
   {
     path: "deleteTaskDataDb",
     callBack: handleDeleteTaskDataDb,
+  },
+  {
+    path: "openChrome",
+    callBack: handleOpenChrome,
   },
 ];
 

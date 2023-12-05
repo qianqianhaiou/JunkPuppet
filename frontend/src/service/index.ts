@@ -79,3 +79,6 @@ export const unMaxWindow = async (params: any) => {
 export const deleteTaskDataDb = async (params: any) => {
   return FetchData("deleteTaskDataDb", params);
 };
+export const openChrome = async (params: any) => {
+  return FetchData("openChrome", params);
+};

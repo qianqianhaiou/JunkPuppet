@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
-import { closeApp, maxWindow, minimizeWindow, unMaxWindow } from "@/service";
+import {
+  closeApp,
+  maxWindow,
+  minimizeWindow,
+  openChrome,
+  unMaxWindow,
+} from "@/service";
 import {
   FullscreenExitOutlined,
   FullscreenOutlined,
   CloseOutlined,
   MinusOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import Aside from "./Aside";
 import { useSettingStore } from "../stores";
@@ -28,6 +35,9 @@ function App(props: any) {
   const handleCloseApp = async () => {
     await closeApp({});
   };
+  const handleOpenChrome = async () => {
+    await openChrome({});
+  };
   const judgeFullScreen = () => {
     setFullScreen(window.innerWidth === window.screen.width);
   };
@@ -48,6 +58,12 @@ function App(props: any) {
           <div className="leading-[20px]">拾荒木偶 - JunkPuppet</div>
         </div>
         <div className="operator h-full flex items-center cursor-default">
+          <div
+            className="h-full hover:bg-[#3a3a3d] leading-[42px] px-[14px]"
+            onClick={handleOpenChrome}
+          >
+            <GlobalOutlined />
+          </div>
           <div
             className="h-full hover:bg-[#3a3a3d] leading-[42px] px-[14px]"
             onClick={handleMinimizeWindow}

@@ -1,4 +1,4 @@
-import { fork } from "child_process";
+import { fork, spawn } from "child_process";
 import path, { join } from "node:path";
 import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "./file";
 import { BrowserWindow, dialog } from "electron";
@@ -420,4 +420,10 @@ export const unmaxWindow = () => {
 export const closeApp = async () => {
   const reuslt = BrowserWindow.getAllWindows();
   reuslt.length && reuslt[0].hide();
+};
+// open chrome
+export const openChrome = async (arg: any) => {
+  spawn(process.env.CHROME_PATH, [
+    `--user-data-dir=${process.env.DATA_PATH_CHROME_DATA}`,
+  ]);
 };
