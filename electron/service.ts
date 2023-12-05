@@ -88,7 +88,7 @@ export const getTaskList = async (params: any) => {
       .filter((item) => item.name.includes(params.text))
       .value();
   } else {
-    result = database.chain.get("list").orderBy(['updatedAt'], 'desc').value();
+    result = database.chain.get("list").orderBy(["updatedAt"], "desc").value();
   }
   return result;
 };
@@ -298,6 +298,7 @@ export const startplayServer = async (params: any) => {
         ],
         chromePath: process.env.CHROME_PATH,
         headless: "new",
+        slowMo: 100,
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
         data: data,
       },

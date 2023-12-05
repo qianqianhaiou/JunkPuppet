@@ -184,6 +184,28 @@ const initExcScript = (page: Page) => {
   });
 };
 
+const initMouseFollwer = async (page: Page) => {
+  await page.evaluate(() => {
+    const el = document.createElement('div');
+    el.style.position = 'fixed';
+    el.style.width = '20px';
+    el.style.height = '20px';
+    el.style.top = '0px';
+    el.style.left = '0px';
+    el.style.pointerEvents = 'none';
+    el.style.backgroundColor = '#f1f1f1';
+    el.style.zIndex = '2147483647';
+    el.style.borderRadius = '50%';
+    el.style.border = '4px solid red';
+    el.id = '_sunsilent_arrow';
+    document.body.appendChild(el);
+    document.documentElement.addEventListener('mousemove', (e) => {
+      el.style.left = e.clientX - 10 + 'px';
+      el.style.top = e.clientY - 10 + 'px';
+    });
+  });
+};
+
 async function startTask(props: any) {
   if (props.chromeDataPath) {
     await clearUserDataDirExitType(props.chromeDataPath);
@@ -246,6 +268,9 @@ async function startTask(props: any) {
   };
   // 初始化截图文件夹
   await initDir(props.parent);
+  if (!props.headless) {
+    await initMouseFollwer(page);
+  }
   await asyncFor(JSON.parse(props.data), async (item, index) => {
     if (item.type === 'mouse') {
       await playMouse(client, item.data);
@@ -265,6 +290,9 @@ async function startTask(props: any) {
         console.warn(e.message);
       });
       await waitTime(1);
+      if (!props.headless) {
+        await initMouseFollwer(page);
+      }
     } else if (item.type === 'getElementSnapshot') {
       const uids = await getSnapshotBySelector(page, item.data, props.parent);
       result.snapshots.push({
