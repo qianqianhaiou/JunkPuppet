@@ -1,11 +1,9 @@
-import { fork, spawn } from "child_process";
-import path, { join } from "node:path";
-import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "./file";
-import { BrowserWindow, dialog } from "electron";
-import { getDiskDetail, relaunchElectron, triggerItemCron } from "./util";
+import { fork } from "child_process";
+import { join } from "node:path";
+import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "../utils/file";
+import { triggerItemCron } from "./cron";
 import { taskDataDb, taskListDb } from "./db";
-import crypto from "crypto";
-import { readLogByLine } from "./logger";
+import { randomUUID } from "crypto";
 
 // 新增任务
 export const addTask = async (params: any) => {
@@ -14,7 +12,7 @@ export const addTask = async (params: any) => {
     throw new Error("名称重复");
   }
   const datanow = Date.now();
-  const uid = crypto.randomUUID();
+  const uid = randomUUID();
   database.chain
     .get("list")
     .unshift({
@@ -129,23 +127,6 @@ export const getTaskDataDetail = async (params: any) => {
   return result;
 };
 
-// 获取任务总数和自动执行数
-export const getTaskTypes = async (params: any) => {
-  const database = await taskListDb();
-  let allTaskLength = database.chain.get("list").size().value();
-  let noConfigTaskLength = database.chain
-    .get("list")
-    .filter({ mockDataId: "" })
-    .size()
-    .value();
-  let autoTaskLength = global.cronList.size;
-  return {
-    total: allTaskLength,
-    auto: autoTaskLength,
-    noConfigTaskLength: noConfigTaskLength,
-  };
-};
-
 // 删除任务所产生的数据
 export const deleteTaskDataDb = async (params: any) => {
   const datanow = Date.now();
@@ -176,7 +157,7 @@ export const startSetting = async (params: any) => {
     return new Promise((resolve, reject) => {
       ChildProcess.on("message", async (msg: any) => {
         if (msg.type === "finish") {
-          const uid = params?.mockDataId || crypto.randomUUID();
+          const uid = params?.mockDataId || randomUUID();
           const fileName = `${uid}.json`;
           await fswriteFile(
             join(process.env.DATA_PATH_JSON, fileName),
@@ -218,12 +199,9 @@ export const startSetting = async (params: any) => {
 };
 // 上传JSON模拟数据
 export const uploadJSONSetting = async (params: any) => {
-  const uid = crypto.randomUUID();
+  const uid = randomUUID();
   const fileName = `${uid}.json`;
-  await fswriteFile(
-    join(process.env.DATA_PATH_JSON, fileName),
-    params.data
-  );
+  await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), params.data);
   const datanow = Date.now();
   const database = await taskListDb();
   database.chain
@@ -236,10 +214,10 @@ export const uploadJSONSetting = async (params: any) => {
     .value();
   database.chain.set("updatedAt", datanow).value();
   await database.write();
-  return 'success'
-}
+  return "success";
+};
 // 调试任务操作运行，放慢速度，可视化
-export const startDebugServer = async (params: any) => {
+export const debugPlay = async (params: any) => {
   try {
     const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
     const data = await fsreadFile(
@@ -263,7 +241,7 @@ export const startDebugServer = async (params: any) => {
         if (msg.type === "result") {
           const database = await taskDataDb();
           const datanow = Date.now();
-          const uid = crypto.randomUUID();
+          const uid = randomUUID();
           database.chain
             .get("list")
             .unshift({
@@ -299,7 +277,7 @@ export const startDebugServer = async (params: any) => {
   }
 };
 // 开始模拟操作运行
-export const startplayServer = async (params: any) => {
+export const startplay = async (params: any) => {
   try {
     const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
     const data = await fsreadFile(
@@ -311,13 +289,7 @@ export const startplayServer = async (params: any) => {
       params: {
         targetUrl: params.targetUrl,
         parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
-        cookies: [
-          // {
-          //   cookieName: "TrainingPlatform-sid",
-          //   cookieValue:
-          //     "s%3Aw9ATIUmSWzAU2q_hgkQXe2S2RJxGWx8m.kj4nh94Eo7wdjuVq6zDhApsLKFoIMKLHWzu3cyeK7wU",
-          // },
-        ],
+        cookies: [],
         chromePath: process.env.CHROME_PATH,
         headless: "new",
         slowMo: 100,
@@ -330,7 +302,7 @@ export const startplayServer = async (params: any) => {
         if (msg.type === "result") {
           const database = await taskDataDb();
           const datanow = Date.now();
-          const uid = crypto.randomUUID();
+          const uid = randomUUID();
           database.chain
             .get("list")
             .unshift({
@@ -367,85 +339,4 @@ export const startplayServer = async (params: any) => {
   } catch (error: any) {
     console.error(`任务: ${params.name} - 执行出错 - ` + error.message);
   }
-};
-
-// 读取最近的几条日志
-export const getLogByLine = async () => {
-  return readLogByLine(join(process.env.DATA_PATH_LOG, "system.log"));
-};
-// 选择一个文件夹
-export const selectDir = async () => {
-  const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
-  if (result.canceled) {
-    return "";
-  } else {
-    return result.filePaths[0];
-  }
-};
-// 选择一个文件
-export const selectFile = async () => {
-  const result = await dialog.showOpenDialog({ properties: ["openFile"] });
-  if (result.canceled) {
-    return "";
-  } else {
-    return result.filePaths[0];
-  }
-};
-// 获取数据盘信息
-export const getDataDistInfo = async () => {
-  return getDiskDetail();
-};
-// 设置全局设置
-export const setGobalSetting = async (params: any) => {
-  const target: any = {};
-  Object.entries(params).map((item: any) => {
-    target[item[0].toUpperCase()] = item[1];
-  });
-  target["DATA_PATH_SNAPSHOT"] = join(target["DATA_PATH"], "Snapshots");
-  target["DATA_PATH_JSON"] = join(target["DATA_PATH"], "JSON");
-  target["DATA_PATH_DB"] = join(target["DATA_PATH"], "Database");
-  target["DATA_PATH_CHROME_DATA"] = join(
-    target["DATA_PATH"],
-    "ChromeData",
-    "Default"
-  );
-  target["DATA_PATH_LOG"] = join(target["DATA_PATH"], "Logs");
-  await fswriteFile(
-    process.env.GLOBAL_SETTING_CONFIG_PATH,
-    JSON.stringify(target)
-  );
-  relaunchElectron();
-};
-// 获取全局设置
-export const getGlobalSetting = async () => {
-  if (process.env.IS_SET === "set") {
-    return await fsreadFile(process.env.GLOBAL_SETTING_CONFIG_PATH);
-  }
-  return null;
-};
-// 最小化窗口
-export const minimizeWindow = () => {
-  const reuslt = BrowserWindow.getAllWindows();
-  reuslt.length && reuslt[0].minimize();
-};
-// 最大化窗口
-export const maxWindow = () => {
-  const reuslt = BrowserWindow.getAllWindows();
-  reuslt.length && reuslt[0].maximize();
-};
-// 取消最大化窗口
-export const unmaxWindow = () => {
-  const reuslt = BrowserWindow.getAllWindows();
-  reuslt.length && reuslt[0].unmaximize();
-};
-// 隐藏electron应用程序
-export const closeApp = async () => {
-  const reuslt = BrowserWindow.getAllWindows();
-  reuslt.length && reuslt[0].hide();
-};
-// open chrome
-export const openChrome = async (arg: any) => {
-  spawn(process.env.CHROME_PATH, [
-    `--user-data-dir=${process.env.DATA_PATH_CHROME_DATA}`,
-  ]);
 };

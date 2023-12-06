@@ -7,10 +7,10 @@ import {
   initGlobalSetting,
   initFiles,
   initCronScripts,
-} from "./init";
-import { initRoutes } from "./routes";
-import { initLogger } from "./logger";
-import { tranlateDate } from "./util";
+} from "./utils/init";
+import { initRoutes } from "./routers";
+import { initLogger } from "./service/logger";
+import { tranlateDate } from "./utils/tools";
 
 function createWindow() {
   const iconPath = join(process.env.VITE_PUBLIC, "robot.png");
