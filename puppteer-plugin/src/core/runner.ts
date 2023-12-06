@@ -1,5 +1,5 @@
 import path from 'path';
-import puppeteer, { Page, CDPSession } from 'puppeteer-core';
+import puppeteer, { Page, CDPSession, ElementHandle } from 'puppeteer-core';
 import { v4 as uuidv4 } from 'uuid';
 import {
   asyncFor,
@@ -54,10 +54,29 @@ const hookA = async (page: any) => {
 
 async function playClick(
   page: Page,
-  data: { screenX: number; screenY: number }
+  data: {
+    selector: { iframeIndex: number; selector: string };
+    screenX: number;
+    screenY: number;
+  }
 ) {
   await hookA(page);
-  await page.mouse.click(data.screenX, data.screenY);
+  let target: ElementHandle<Element> | null = null;
+  if (data.selector.iframeIndex >= 0) {
+    const iframes = await page.$$('iframe');
+    target = await iframes[data.selector.iframeIndex].$(data.selector.selector);
+  } else {
+    target = await page.$(data.selector.selector);
+  }
+  if (target) {
+    await target.click();
+  } else {
+    throw new Error('没有找到点击跳转元素');
+  }
+  // await page.mouse.click(
+  //   data.screenX,
+  //   data.screenY
+  // );
 }
 async function playScroll(
   client: CDPSession,

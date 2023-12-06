@@ -1,5 +1,5 @@
 import path, { resolve } from 'path';
-import puppeteer from 'puppeteer-core';
+import puppeteer, { ElementHandle } from 'puppeteer-core';
 import { clearUserDataDirExitType } from '../util/tools';
 
 interface Window {
@@ -120,10 +120,25 @@ async function init(props: ISetting) {
             resolve('');
           } else if (dataJson.type === 'clickAndWaitNavigator') {
             const oldUrl = page.url();
-            await page.mouse.click(
-              dataJson.data.screenX,
-              dataJson.data.screenY
-            );
+            // click selector
+            let target: ElementHandle<Element> | null = null;
+            if (dataJson.data.selector.iframeIndex >= 0) {
+              const iframes = await page.$$('iframe');
+              target = await iframes[dataJson.data.selector.iframeIndex].$(
+                dataJson.data.selector.selector
+              );
+            } else {
+              target = await page.$(dataJson.data.selector.selector);
+            }
+            if (target) {
+              await target.click();
+            } else {
+              throw new Error('没有找到点击跳转元素');
+            }
+            // await page.mouse.click(
+            //   dataJson.data.screenX,
+            //   dataJson.data.screenY
+            // );
             await waitTime(0.5);
             const newUrl = page.url();
             if (oldUrl === newUrl) {

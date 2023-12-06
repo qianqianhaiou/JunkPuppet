@@ -63,7 +63,7 @@ const userDoDataLastType: any = computed(() => props.userDoDataLastType);
 
 const recordUserRect = async () => {
   let newSelector = null;
-  if (selectSimilar.value) {
+  if (selectSimilar.value && ['text', 'snapshot'].includes(toolActive.value)) {
     newSelector = DomService.getSelectorWithClass(rectDomEl.value);
   } else {
     const simpleSelect = DomService.getSelectorSimple(rectDomEl.value);
@@ -107,11 +107,13 @@ const recordUserRect = async () => {
       data: {
         screenX: rectDomElRect.left + rectDomElRect.width / 2,
         screenY: rectDomElRect.top + rectDomElRect.height / 2,
+        selector: newSelector,
       },
     });
     // 立即恢复rect的穿透性，防止pptr点在实心遮蔽层上
     rectBoxPointerVisible.value = false;
     emits('clickAndWaitNavigator', {
+      selector: newSelector,
       screenX: rectDomElRect.left + rectDomElRect.width / 2,
       screenY: rectDomElRect.top + rectDomElRect.height / 2,
     });
