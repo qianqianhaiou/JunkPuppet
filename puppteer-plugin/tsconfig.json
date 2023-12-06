@@ -1,5 +1,5 @@
 {
-  "include": ["src/*", "src/**/*.d.ts"],
+  "include": ["src/*.ts", "src/**/*.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "outDir": "dist",
@@ -9,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": false,
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": ["src/types/*.d.ts"]
   }
 }
