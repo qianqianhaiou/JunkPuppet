@@ -10,10 +10,11 @@
     :mask="false"
     :bodyStyle="{
       maxHeight: '700px',
-      minHeight: bodyVisible ? '400px' : '0px',
+      minHeight: bodyVisible ? '500px' : '0px',
       overflowY: 'auto',
     }"
     :footer="null"
+    :z-index="2147483646"
     @cancel="handleClose"
   >
     <div v-show="bodyVisible" style="color: #000; margin-top: 10px">
@@ -28,6 +29,7 @@
             v-for="(item, index) in userDoData"
             :header="formatOperateType(item.type)"
             :collapsible="item.slot ? 'header' : 'disabled'"
+            :show-arrow="false"
             :key="index"
           >
             <OperateEdit
@@ -64,7 +66,7 @@
         条）
         <div style="height: 24px" v-if="bodyVisible">
           <Button
-            style="height: 22px; padding-top: 0px; padding-bottom: 0px; font-size: 16px; line-height: 22px; font-weight: bold;"
+            style="height: 22px; padding-top: 0px; padding-bottom: 0px; font-size: 14px; line-height: 22px;"
             type="link"
             @click="handleChangeFnBoxVisible(true)"
             >内置工具</Button
