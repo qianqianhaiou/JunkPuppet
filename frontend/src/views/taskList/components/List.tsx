@@ -27,7 +27,6 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42);
   useEffect(() => {
     window.onresize = () => {
-      console.log(window.innerHeight - 42);
       setDrawerHeight(window.innerHeight - 42);
     };
     return () => {

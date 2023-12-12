@@ -7,6 +7,7 @@ import {
   initLogger,
 } from '../util/tools';
 import {
+  customFn,
   getCurrentScreenSnapshot,
   getSnapshotBySelector,
   getTextBySelector,
@@ -74,6 +75,7 @@ async function startTask(props: TaskRunnerData) {
   const result: TaskRunnerResult = {
     texts: [],
     snapshots: [],
+    customResult: [],
   };
 
   // 初始化截图文件夹
@@ -84,8 +86,10 @@ async function startTask(props: TaskRunnerData) {
     await injectMouseFollwer(page);
   }
 
+  const mockData = JSON.parse(props.data);
+  const customFnData = mockData.customFn;
   // 任务队列
-  await asyncFor(JSON.parse(props.data), async (item) => {
+  await asyncFor(mockData.builtInData, async (item) => {
     if (item.type === 'mouse') {
       await playMouse(client, item.data);
     } else if (item.type === 'keyevent') {
@@ -140,6 +144,13 @@ async function startTask(props: TaskRunnerData) {
       if (!isNaN(delay)) {
         await waitTime(delay / 1000);
       }
+    } else if (item.type === 'customFn') {
+      const functionString = customFnData[item.customFnName].functionString;
+      const customFnResult = await customFn(
+        { page, browser, client },
+        functionString
+      );
+      result.customResult.push(customFnResult);
     }
   });
   await browser.close();

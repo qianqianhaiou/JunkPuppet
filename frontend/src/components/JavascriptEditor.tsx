@@ -2,11 +2,21 @@ import Editor, { useMonaco } from "@monaco-editor/react";
 import { Drawer } from "antd";
 import { useEffect, useState } from "react";
 
-function App() {
+function App({
+  customFn,
+  activeKey,
+  readonly,
+  updateValue,
+}: {
+  customFn: any;
+  activeKey: string;
+  readonly: boolean;
+  updateValue: any;
+}) {
   const monaco: any = useMonaco();
-  const [value, setValue] = useState<string>("const a = 123; let b = 1232");
+  const [defaultValue, setDefaultValue] = useState<string>();
   const handleChange = (e: any) => {
-    setValue(e);
+    updateValue(e, activeKey);
   };
   const autoFormatCode = async () => {
     if (monaco?.editor) {
@@ -18,40 +28,51 @@ function App() {
   };
   useEffect(() => {
     if (monaco) {
-      autoFormatCode();
       monaco.languages.registerCompletionItemProvider("javascript", {
         provideCompletionItems: () => {
           return {
             suggestions: [
-              /**   * 内置函数   */
+              /**   * 内置变量   */
               {
-                label: "puppetinstance",
-                kind: monaco.languages.CompletionItemKind.Function,
-                insertText: "_ABS(${1:val})",
+                label: "injectContext",
+                kind: monaco.languages.CompletionItemKind.Constant,
+                insertText: "injectContext",
                 insertTextRules:
                   monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                detail: "返回指定参数的绝对值",
+                detail: "Puppet上下文",
               },
               {
-                label: "_COS(val:number)",
-                kind: monaco.languages.CompletionItemKind.Function,
-                insertText: "_COS(${1:val})",
+                label: "task",
+                kind: monaco.languages.CompletionItemKind.Constant,
+                insertText: "task",
                 insertTextRules:
                   monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                detail: "求指定角度的余弦值",
+                detail: "task配置",
               },
             ],
           };
         },
       });
+      setTimeout(async () => {
+        await autoFormatCode();
+      }, 100);
     }
   }, [monaco]);
+  useEffect(() => {
+    setDefaultValue(customFn[activeKey]["functionString"] || `//${activeKey}`);
+  }, [activeKey]);
   return (
     <Editor
-      height="80vh"
+      height="100%"
       defaultLanguage="javascript"
       theme="vs-dark"
-      defaultValue={value}
+      value={defaultValue}
+      options={{
+        readOnly: readonly,
+        readOnlyMessage: {
+          value: "当前为只读状态",
+        },
+      }}
       onChange={handleChange}
     />
   );

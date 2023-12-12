@@ -43,7 +43,6 @@ function App({
           false
         );
         matches.forEach((match: any): void => {
-          console.log(match.range.startLineNumber);
           editorModel.deltaDecorations(
             [],
             [

@@ -63,7 +63,10 @@ async function init(props: TaskSetterData) {
     process.send &&
       process.send({
         type: 'finish',
-        data: userDoData,
+        data: {
+          builtInData: userDoData,
+          customFn: {}
+        },
       });
     process.exit();
   });

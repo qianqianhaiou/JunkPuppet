@@ -47,6 +47,7 @@ interface SnapshotResult {
 interface TaskRunnerResult {
   texts: TextResult[];
   snapshots: SnapshotResult[];
+  customResult: any[];
 }
 
 interface TaskSetterData {

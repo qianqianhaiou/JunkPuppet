@@ -5,6 +5,7 @@ import {
   Modal,
   Result,
   Space,
+  Tabs,
   Upload,
   message,
 } from "antd";
@@ -18,6 +19,7 @@ import {
   uploadJSONSetting,
 } from "@/service/index";
 import JsonEditor from "@/components/JsonEditor";
+import style from "../style.module.scss";
 import {
   ToolOutlined,
   EditOutlined,
@@ -27,8 +29,11 @@ import {
   UploadOutlined,
   AimOutlined,
 } from "@ant-design/icons";
+import JavascriptEditor from "@/components/JavascriptEditor";
+import ConfigTab from "./ConfigTab";
+import { flushSync } from "react-dom";
 
-function JsonBox({
+function EditorBox({
   handleStartSetting,
   config,
   handleDeleteTask,
@@ -42,31 +47,96 @@ function JsonBox({
   close: any;
 }) {
   const [editable, setEditable] = useState(false);
-  const [newMockData, setNewMockData] = useState("");
+  const defaultBuiltInData = config?.mockData?.builtInData
+    ? JSON.stringify(config.mockData.builtInData)
+    : "";
+  const [builtInData, setBuiltInData] = useState(defaultBuiltInData);
+  const [customFn, setCustomFn] = useState<any>({});
+  const [activeKey, setActiveKey] = useState("JSON配置");
+  const [defaultCustomFnKeys, setDefaultCustomFnKeys] = useState<any>([]);
   const handleSubmit = async () => {
     try {
-      JSON.parse(newMockData);
+      JSON.parse(builtInData);
     } catch (e) {
       messageApi.error("JSON格式错误，请检查。");
       return false;
     }
     const result = await updateTaskMockData({
       uid: config.mockDataId,
-      data: newMockData,
+      builtInData: JSON.parse(builtInData),
+      customFn: customFn,
     });
     if (result === "ok") {
       messageApi.success("修改成功");
       setEditable(false);
     }
   };
+  const handleAddTab = (name: string) => {
+    setCustomFn((c: any) => {
+      c[name] = {
+        label: name,
+        functionString: "",
+      };
+      return c;
+    });
+  };
+  const handleUpdateActive = (active: string) => {
+    setActiveKey(active);
+  };
+  const handleUpdateFn = (e: string, activeKey: string) => {
+    setCustomFn((c: any) => {
+      c[activeKey]["functionString"] = e;
+      return c;
+    });
+  };
+  const handleUpdateTabName = (oldName: string, newName: string) => {
+    setCustomFn((c: any) => {
+      const oldConfig = structuredClone(c[oldName]);
+      delete c[oldName];
+      c[newName] = oldConfig;
+      return c;
+    });
+  };
+  const handleDeleteTabs = (target: string) => {
+    setCustomFn((c: any) => {
+      delete c[target];
+      return c;
+    });
+  };
+  useEffect(() => {
+    if (config?.mockData && config?.mockData?.customFn) {
+      setCustomFn(config?.mockData?.customFn);
+      setDefaultCustomFnKeys(Object.keys(config?.mockData?.customFn));
+    }
+  }, [config]);
   return (
     <div className="h-full">
-      <div style={{ height: "calc(100% - 42px)" }}>
-        <JsonEditor
-          defaultValue={config.mockData}
+      <div className="flex flex-col" style={{ height: "calc(100% - 42px)" }}>
+        <ConfigTab
+          activeKey={activeKey}
           readonly={!editable}
-          setValue={setNewMockData}
-        ></JsonEditor>
+          defaultCustomFnKeys={defaultCustomFnKeys}
+          handleDeleteTabs={handleDeleteTabs}
+          handleAddTab={handleAddTab}
+          handleUpdateTabName={handleUpdateTabName}
+          handleUpdateActive={handleUpdateActive}
+        ></ConfigTab>
+        <div className="flex-1">
+          {activeKey === "JSON配置" ? (
+            <JsonEditor
+              defaultValue={defaultBuiltInData}
+              readonly={!editable}
+              setValue={setBuiltInData}
+            ></JsonEditor>
+          ) : (
+            <JavascriptEditor
+              customFn={customFn}
+              readonly={!editable}
+              activeKey={activeKey}
+              updateValue={handleUpdateFn}
+            ></JavascriptEditor>
+          )}
+        </div>
       </div>
       <div className="flex justify-between items-center pt-[10px] px-[10px]">
         <Space>
@@ -163,7 +233,12 @@ function NoTaskConfig({
               上传文件
             </Button>
           </Upload>
-          <Button icon={<DeleteOutlined />} onClick={handleDeleteTask} type="dashed" danger>
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={handleDeleteTask}
+            type="dashed"
+            danger
+          >
             删除任务
           </Button>
         </Space>
@@ -206,6 +281,15 @@ function App({
   };
   const handleGetTaskCOnfigDetail = async () => {
     const result = await getTaskConfigDetail({ _id: data._id });
+    if (result.mockData) {
+      try {
+        const mockData = JSON.parse(result.mockData);
+        result.mockData = mockData;
+      } catch (e) {
+        console.log(e);
+        result.mockData = {};
+      }
+    }
     setConfig(result);
   };
   const handleDeleteTask = () => {
@@ -259,13 +343,13 @@ function App({
         open={modalVisible}
       >
         {config?.mockDataId ? (
-          <JsonBox
+          <EditorBox
             handleStartSetting={handleStartSetting}
             handleDeleteTask={handleDeleteTask}
             config={config}
             messageApi={messageApi}
             close={handleClose}
-          ></JsonBox>
+          ></EditorBox>
         ) : (
           <NoTaskConfig
             config={config}

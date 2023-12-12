@@ -103,7 +103,7 @@ export const getTaskConfigDetail = async (params: any) => {
     );
     return {
       ...result,
-      mockData: mockData.replaceAll("\\", ""),
+      mockData: mockData,
     };
   }
   return result;
@@ -111,7 +111,13 @@ export const getTaskConfigDetail = async (params: any) => {
 // 修改模拟数据Json文件
 export const updateTaskMockData = async (params: any) => {
   const fileName = `${params.uid}.json`;
-  await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), params.data);
+  await fswriteFile(
+    join(process.env.DATA_PATH_JSON, fileName),
+    JSON.stringify({
+      builtInData: params.builtInData,
+      customFn: params.customFn,
+    })
+  );
   const database = await taskListDb();
   database.chain.set("updatedAt", Date.now()).value();
   await database.write();

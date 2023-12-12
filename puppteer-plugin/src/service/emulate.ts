@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { hookA } from '../util/dom';
 import { selectBySelector } from './select';
 import { injectFunction } from './inject';
+import { InjectContexts } from '../types/Puppet';
 
 export async function playClick(
   page: Page,
@@ -112,4 +113,10 @@ export async function snapshotFullScreen(page: Page, parent: string) {
     fullPage: true,
   });
   return uid;
+}
+export async function customFn(
+  _injectContexts: InjectContexts,
+  _silent_exec_string: string
+) {
+  return eval(`(async() => {${_silent_exec_string}})()`);
 }
