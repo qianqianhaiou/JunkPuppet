@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { fsreadFile, fswriteFile } from './file';
+import { existsSync } from 'fs';
 
 /**
  * 异步队列
@@ -106,8 +107,10 @@ export const initLogger = () => {
  */
 export const clearUserDataDirExitType = async (path: string) => {
   const preferencePath = join(path, '/Default/Preferences');
-  const fsContent = await fsreadFile(preferencePath);
-  const pConfig = JSON.parse(fsContent);
-  pConfig['profile']['exit_type'] = 'Normal';
-  await fswriteFile(preferencePath, JSON.stringify(pConfig));
+  if (existsSync(preferencePath)) {
+    const fsContent = await fsreadFile(preferencePath);
+    const pConfig = JSON.parse(fsContent);
+    pConfig['profile']['exit_type'] = 'Normal';
+    await fswriteFile(preferencePath, JSON.stringify(pConfig));
+  }
 };

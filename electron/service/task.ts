@@ -205,19 +205,29 @@ export const startSetting = async (params: any) => {
 };
 // 上传JSON模拟数据
 export const uploadJSONSetting = async (params: any) => {
-  const uid = randomUUID();
-  const fileName = `${uid}.json`;
-  await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), params.data);
-  const datanow = Date.now();
   const database = await taskListDb();
-  database.chain
-    .get("list")
-    .find({ _id: params._id })
-    .assign({
-      mockDataId: uid,
-      updatedAt: datanow,
-    })
-    .value();
+  const datanow = Date.now();
+  const taskChain: any = database.chain.get("list").find({ _id: params._id });
+  const result: any = taskChain.value();
+  if (result?.mockDataId) {
+    const fileName = `${result.mockDataId}.json`;
+    await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), params.data);
+    taskChain
+      .assign({
+        updatedAt: datanow,
+      })
+      .value();
+  } else {
+    const uid = randomUUID();
+    const fileName = `${uid}.json`;
+    await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), params.data);
+    taskChain
+      .assign({
+        mockDataId: uid,
+        updatedAt: datanow,
+      })
+      .value();
+  }
   database.chain.set("updatedAt", datanow).value();
   await database.write();
   return "success";

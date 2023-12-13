@@ -105,7 +105,9 @@ app
     const win = createWindow();
     // 建立日志通道
     if (logger) {
+      let loggerCount = 0;
       console.log = (...data) => {
+        loggerCount++;
         const string = data.join(" ");
         logger!.info(string);
         const time = tranlateDate(Date.now());
@@ -113,9 +115,11 @@ app
           time: `[${time}]`,
           type: "[INFO]",
           message: ` system - ${string}`,
+          index: "realtime-" + loggerCount,
         });
       };
       console.warn = (...data) => {
+        loggerCount++;
         const string = data.join(" ");
         logger!.warn(string);
         const time = tranlateDate(Date.now());
@@ -123,9 +127,11 @@ app
           time: `[${time}]`,
           type: "[WARN]",
           message: ` system - ${string}`,
+          index: "realtime-" + loggerCount,
         });
       };
       console.error = (...data) => {
+        loggerCount++;
         const string = data.join(" ");
         logger!.error(string);
         const time = tranlateDate(Date.now());
@@ -133,6 +139,7 @@ app
           time: `[${time}]`,
           type: "[ERROR]",
           message: ` system - ${string}`,
+          index: "realtime-" + loggerCount,
         });
       };
     }

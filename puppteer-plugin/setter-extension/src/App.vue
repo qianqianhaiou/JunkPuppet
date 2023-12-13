@@ -114,8 +114,12 @@ const clickAndWaitNavigator = (data: any) => {
     },
     userDoData: target,
   });
-  userDoData.value = [];
-  hiddenData.value = [];
+
+  // 丢弃导航后 1s 内的操作数据，为了防止Puppeteer导航模拟的事件被记录
+  setTimeout(() => {
+    userDoData.value = [];
+    hiddenData.value = [];
+  }, 1000);
 };
 
 // 结束设置

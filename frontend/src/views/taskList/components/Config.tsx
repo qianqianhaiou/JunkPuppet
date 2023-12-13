@@ -33,16 +33,56 @@ import JavascriptEditor from "@/components/JavascriptEditor";
 import ConfigTab from "./ConfigTab";
 import { flushSync } from "react-dom";
 
+function UploadJsonConfig({
+  configId,
+  reFreshAll,
+  messageApi,
+  children,
+}: {
+  configId: string;
+  reFreshAll: any;
+  children: any;
+  messageApi?: any;
+}) {
+  async function readFileAsText(file: any) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function (evt: any) {
+        resolve(evt.target.result);
+      };
+      reader.readAsText(file);
+    });
+  }
+  const props = {
+    showUploadList: false,
+    beforeUpload: async (file: any) => {
+      const text = await readFileAsText(file);
+      const result = await uploadJSONSetting({
+        _id: configId,
+        data: text,
+      });
+      if (messageApi) {
+        messageApi.success("覆盖成功");
+      }
+      reFreshAll();
+      return false;
+    },
+  };
+  return <Upload {...props}>{children}</Upload>;
+}
+
 function EditorBox({
   handleStartSetting,
   config,
   handleDeleteTask,
   messageApi,
+  reFreshAll,
   close,
 }: {
   handleStartSetting: any;
   config: any;
   messageApi: any;
+  reFreshAll: any;
   handleDeleteTask: any;
   close: any;
 }) {
@@ -103,6 +143,10 @@ function EditorBox({
       return c;
     });
   };
+  const handleUploadSuccces = () => {
+    reFreshAll();
+    close();
+  };
   useEffect(() => {
     if (config?.mockData && config?.mockData?.customFn) {
       setCustomFn(config?.mockData?.customFn);
@@ -148,6 +192,15 @@ function EditorBox({
           >
             重新模拟
           </Button>
+          <UploadJsonConfig
+            configId={config._id}
+            reFreshAll={handleUploadSuccces}
+            messageApi={messageApi}
+          >
+            <Button type="dashed" danger icon={<UploadOutlined />}>
+              上传配置
+            </Button>
+          </UploadJsonConfig>
           <Button
             type="dashed"
             icon={<DeleteOutlined />}
@@ -195,26 +248,6 @@ function NoTaskConfig({
   handleDeleteTask: any;
   reFreshAll: any;
 }) {
-  async function readFileAsText(file: any) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = function (evt: any) {
-        resolve(evt.target.result);
-      };
-      reader.readAsText(file);
-    });
-  }
-  const props = {
-    beforeUpload: async (file: any) => {
-      const text = await readFileAsText(file);
-      const result = await uploadJSONSetting({
-        _id: config._id,
-        data: text,
-      });
-      reFreshAll();
-      return false;
-    },
-  };
   return (
     <Result
       className="h-full flex flex-col justify-center"
@@ -228,11 +261,11 @@ function NoTaskConfig({
           >
             开始模拟
           </Button>
-          <Upload {...props}>
+          <UploadJsonConfig configId={config._id} reFreshAll={reFreshAll}>
             <Button icon={<UploadOutlined />} type="dashed">
               上传文件
             </Button>
-          </Upload>
+          </UploadJsonConfig>
           <Button
             icon={<DeleteOutlined />}
             onClick={handleDeleteTask}
@@ -270,7 +303,7 @@ function App({
   };
   const reFreshAll = () => {
     reflash();
-    handleGetTaskCOnfigDetail();
+    handleGetTaskConfigDetail();
   };
   const handleStartSetting = async () => {
     await startSetting({
@@ -279,7 +312,7 @@ function App({
     });
     reFreshAll();
   };
-  const handleGetTaskCOnfigDetail = async () => {
+  const handleGetTaskConfigDetail = async () => {
     const result = await getTaskConfigDetail({ _id: data._id });
     if (result.mockData) {
       try {
@@ -314,7 +347,7 @@ function App({
   };
   useEffect(() => {
     if (modalVisible) {
-      handleGetTaskCOnfigDetail();
+      handleGetTaskConfigDetail();
     }
   }, [modalVisible]);
   return (
@@ -349,6 +382,7 @@ function App({
             config={config}
             messageApi={messageApi}
             close={handleClose}
+            reFreshAll={reFreshAll}
           ></EditorBox>
         ) : (
           <NoTaskConfig

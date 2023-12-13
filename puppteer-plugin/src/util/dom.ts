@@ -1,7 +1,7 @@
 /**
  * 拦截 A 标签的 _blank 改为  _self
  */
-export const hookA = async () => {
+export const hookA = () => {
   // 遍历A标签更改 _blank -> self
   Array.prototype.map.call(
     document.querySelectorAll('a'),
