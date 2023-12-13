@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 import lodash from "lodash";
-import { fsreadFile } from "./file";
+import { fsreadFile } from "../utils/file";
 
 interface TaskList {
   list: TaskDetail[];

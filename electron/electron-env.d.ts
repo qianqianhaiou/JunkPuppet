@@ -50,10 +50,10 @@ interface ISetting extends ChromeSetting {
 interface IRunner extends ISetting {
   cookies: [
     {
-      cookieName: "TrainingPlatform-sid";
-      cookieValue: "s%3Aw9ATIUmSWzAU2q_hgkQXe2S2RJxGWx8m.kj4nh94Eo7wdjuVq6zDhApsLKFoIMKLHWzu3cyeK7wU";
+      cookieName: string;
+      cookieValue: string;
     }
   ];
 }
 
-declare module 'diskinfo'
+declare module "diskinfo";

@@ -1,80 +1,44 @@
-import path, { resolve } from 'path';
-import puppeteer from 'puppeteer-core';
-import { clearUserDataDirExitType } from '../util/tools';
-
-interface Window {
-  open: Function;
-  _silentListen?: boolean;
-}
-interface ISetting {
-  targetUrl: string;
-  chromePath: string;
-  headless: boolean;
-  size?: {
-    width: number;
-    height: number;
-  };
-  chromeDataPath: string;
-}
-
-// 初始化日志
-function initLogger() {
-  console.warn = (...data) => {
-    const string = data.join(' ');
-    process.send &&
-      process.send({
-        type: 'warn',
-        data: string,
-      });
-  };
-  console.error = (...data) => {
-    const string = data.join(' ');
-    process.send &&
-      process.send({
-        type: 'error',
-        data: string,
-      });
-  };
-}
-initLogger();
+import { resolve } from 'path';
+import puppeteer, { ElementHandle } from 'puppeteer-core';
+import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
+import { selectBySelector } from '../service/select';
 
 const IS_DEV = process.argv[1].includes('setting.ts');
-const DEV_EXTENSION_PATH = path.resolve(
+const DEV_EXTENSION_PATH = resolve(
   __dirname,
   '../../setter-extension/setter-dist'
 );
-const PRO_EXTENSION_PATH = path.resolve(__dirname, './setter-dist');
+const PRO_EXTENSION_PATH = resolve(__dirname, './setter-dist');
 const EXTENSION_PATH = IS_DEV ? DEV_EXTENSION_PATH : PRO_EXTENSION_PATH;
 
-let userDoData: any[] = [];
+// 初始化日志
+initLogger();
 
 // 初始化通信通道
 const initExcScript = (page: any) => {
   // 当页面domcontentloaded事件触发才可以接受到postMessage，与插件run_at: document_end配合
   page.on('domcontentloaded', async () => {
     await page.evaluate(() => {
-      if (!(window as Window)._silentListen) {
-        (window as Window)._silentListen = true;
+      window;
+      if (!window._silentListen) {
+        window._silentListen = true;
         window.addEventListener('message', (e) => {
           if (!e || !e.data) return;
           const message = JSON.parse(e.data);
           (window as any)._silentSendData(message);
         });
       }
-      (window as Window).open = (url: string) => {
+      window.open = ((url: string) => {
         location.href = url;
         return false;
-      };
+      }) as any;
       // 还差一个遍历A标签更改 _blank -> self
     });
   });
 };
 
-async function init(props: ISetting) {
-  if (props.chromeDataPath) {
-    await clearUserDataDirExitType(props.chromeDataPath);
-  }
-  const browser = await puppeteer.launch({
+async function init(props: TaskSetterData) {
+  const launchParams: any = {
     executablePath: props.chromePath,
     headless: props.headless,
     defaultViewport: props.size || {
@@ -87,14 +51,22 @@ async function init(props: ISetting) {
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
     ],
-    userDataDir: props.chromeDataPath,
-  });
+  };
+  if (props.chromeDataPath) {
+    await clearUserDataDirExitType(props.chromeDataPath);
+    launchParams.userDataDir = props.chromeDataPath;
+  }
+  const browser = await puppeteer.launch(launchParams);
   if (!browser) return;
+  let userDoData: any[] = [];
   browser.on('disconnected', (target) => {
     process.send &&
       process.send({
         type: 'finish',
-        data: userDoData,
+        data: {
+          builtInData: userDoData,
+          customFn: {}
+        },
       });
     process.exit();
   });
@@ -102,6 +74,7 @@ async function init(props: ISetting) {
   return new Promise(async (resolve, reject) => {
     try {
       await page.exposeFunction('_silentSendData', async (dataJson: any) => {
+        // 令牌粗筛
         if (dataJson['author'] && dataJson['author'] !== 'qianqianhaiou') {
           return false;
         }
@@ -111,8 +84,33 @@ async function init(props: ISetting) {
             await browser.close();
             resolve('');
           } else if (dataJson.type === 'clickAndWaitNavigator') {
+            const oldUrl = page.url();
+            // click selector
+            const target = await selectBySelector(
+              { page },
+              dataJson.data.selector
+            );
+            if (target) {
+              await target.click();
+            } else {
+              throw new Error('没有找到点击跳转元素');
+            }
+            // await page.mouse.click(
+            //   dataJson.data.screenX,
+            //   dataJson.data.screenY
+            // );
+            await waitTime(0.5);
+            const newUrl = page.url();
+            if (oldUrl === newUrl) {
+              for (let i = dataJson.userDoData.length - 1; i > 0; i++) {
+                if (dataJson.userDoData[i].type === 'clickAndWaitNavigator') {
+                  dataJson.userDoData[i]['urlChange'] = false;
+                  break;
+                }
+              }
+            }
+            // 通过 readystatechange 判断是否需要等待 load 事件
             userDoData = userDoData.concat(dataJson.userDoData);
-            page.mouse.click(dataJson.data.screenX, dataJson.data.screenY);
           }
         } catch (e: any) {
           console.warn(e.message);
@@ -132,6 +130,6 @@ process.on('message', async (args: any) => {
       const result = await init(args.params);
     }
   } catch (e: any) {
-    console.error(e.message);
+    console.error(e?.message);
   }
 });

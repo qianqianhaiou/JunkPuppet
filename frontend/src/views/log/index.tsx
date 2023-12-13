@@ -74,7 +74,7 @@ function App() {
         data={list}
         height={height}
         itemHeight={itemHeight}
-        itemKey={(item) => JSON.stringify(item)}
+        itemKey={(item) => item.index}
         onScroll={onScroll}
       >
         {(item: any) => (

@@ -16,6 +16,7 @@ import { once } from "events";
 import { createInterface } from "readline";
 import { EOL } from "os";
 
+// 读文件
 export const fsreadFile = (path: string): Promise<string> => {
   return new Promise((res, rej) => {
     readFile(path, { encoding: "utf8" }, (err, data) => {
@@ -25,6 +26,7 @@ export const fsreadFile = (path: string): Promise<string> => {
   });
 };
 
+// 检查文件，如果没有则会创建一个
 export const fsCheckFile = (path: string): Promise<string> => {
   return new Promise((res, rej) => {
     if (existsSync(path)) {
@@ -38,6 +40,7 @@ export const fsCheckFile = (path: string): Promise<string> => {
   });
 };
 
+// 写文件
 export const fswriteFile = (
   path: string,
   data: string | NodeJS.ArrayBufferView
@@ -59,6 +62,7 @@ async function cb2Async(fn: Function, ...params: any[]) {
   });
 }
 
+// 初始化文件夹
 export async function initDir(path: string) {
   async function createSourceDir(dirPath: string) {
     if (!existsSync(dirPath)) {
@@ -68,10 +72,12 @@ export async function initDir(path: string) {
   await createSourceDir(path);
 }
 
+// 删除文件
 export async function deleteFile(url: string) {
   await cb2Async(unlink, url);
 }
 
+// 删除文件夹
 export async function deleteDir(url: string) {
   return new Promise(async (resolve, rejected) => {
     if (existsSync(url)) {
@@ -96,6 +102,7 @@ export async function deleteDir(url: string) {
   });
 }
 
+// 逐行读取文件
 export async function readFileByLine(path: string, bufferSize = 1024 * 5) {
   const target: any = [];
   const rl = createInterface({
@@ -119,11 +126,8 @@ export async function readFileByLine(path: string, bufferSize = 1024 * 5) {
   await once(rl, "close");
   return target;
 }
-// const filePath1 = "logs/cheese.log";
-// readFileByLine(filePath1).then((res) => {
-//   console.log(res);
-// });
 
+// 向文件末尾添加一行
 export async function addToLine(path: string, text: string, log = "info") {
   return new Promise((res, rej) => {
     const date = new Date().toISOString();
@@ -137,5 +141,3 @@ export async function addToLine(path: string, text: string, log = "info") {
     );
   });
 }
-// const filePath = "logs/cheese.log";
-// addToLine(filePath, "jaksjkldfjkl", "error");

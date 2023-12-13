@@ -7,10 +7,10 @@ import {
   initGlobalSetting,
   initFiles,
   initCronScripts,
-} from "./init";
-import { initRoutes } from "./routes";
-import { initLogger } from "./logger";
-import { tranlateDate } from "./util";
+} from "./utils/init";
+import { initRoutes } from "./routers";
+import { initLogger } from "./service/logger";
+import { tranlateDate } from "./utils/tools";
 
 function createWindow() {
   const iconPath = join(process.env.VITE_PUBLIC, "robot.png");
@@ -40,7 +40,6 @@ function createWindow() {
   }
   // load 前端
   if (!app.isPackaged) {
-    win.webContents.openDevTools();
     win.loadURL("http://localhost:7777");
   } else {
     win.loadFile(join(process.env.DIST, "index.html"));
@@ -59,6 +58,12 @@ function createWindow() {
       click: function () {
         app.relaunch();
         app.exit();
+      },
+    },
+    {
+      label: "devtools",
+      click: function () {
+        win.webContents.toggleDevTools();
       },
     },
     {
@@ -100,7 +105,9 @@ app
     const win = createWindow();
     // 建立日志通道
     if (logger) {
+      let loggerCount = 0;
       console.log = (...data) => {
+        loggerCount++;
         const string = data.join(" ");
         logger!.info(string);
         const time = tranlateDate(Date.now());
@@ -108,9 +115,11 @@ app
           time: `[${time}]`,
           type: "[INFO]",
           message: ` system - ${string}`,
+          index: "realtime-" + loggerCount,
         });
       };
       console.warn = (...data) => {
+        loggerCount++;
         const string = data.join(" ");
         logger!.warn(string);
         const time = tranlateDate(Date.now());
@@ -118,9 +127,11 @@ app
           time: `[${time}]`,
           type: "[WARN]",
           message: ` system - ${string}`,
+          index: "realtime-" + loggerCount,
         });
       };
       console.error = (...data) => {
+        loggerCount++;
         const string = data.join(" ");
         logger!.error(string);
         const time = tranlateDate(Date.now());
@@ -128,6 +139,7 @@ app
           time: `[${time}]`,
           type: "[ERROR]",
           message: ` system - ${string}`,
+          index: "realtime-" + loggerCount,
         });
       };
     }
@@ -138,7 +150,7 @@ app
     });
   })
   .catch((e) => {
-    console.log(e)
+    console.log(e);
     new Notification({ body: e.message }).show();
   });
 

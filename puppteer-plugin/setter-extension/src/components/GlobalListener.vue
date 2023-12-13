@@ -63,7 +63,7 @@ const userDoDataLastType: any = computed(() => props.userDoDataLastType);
 
 const recordUserRect = async () => {
   let newSelector = null;
-  if (selectSimilar.value) {
+  if (selectSimilar.value && ['text', 'snapshot'].includes(toolActive.value)) {
     newSelector = DomService.getSelectorWithClass(rectDomEl.value);
   } else {
     const simpleSelect = DomService.getSelectorSimple(rectDomEl.value);
@@ -94,17 +94,26 @@ const recordUserRect = async () => {
     const rectDomElRect = rectDomEl.value.getBoundingClientRect();
     rectDomEl.value.className =
       rectDomEl.value.className + ` puppeteer_sunsilent_light_click_navigator`;
+    // 通过 readystatechange 判断是否需要等待 load 事件
+    // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
     emits('addUserDoData', {
       type: 'clickAndWaitNavigator',
       slot: true,
+      urlChange: true,
+      waitForNavigation: {
+        timeout: 10 * 1000,
+        waitUntil: ['load', 'networkidle0'],
+      },
       data: {
         screenX: rectDomElRect.left + rectDomElRect.width / 2,
         screenY: rectDomElRect.top + rectDomElRect.height / 2,
+        selector: newSelector,
       },
     });
     // 立即恢复rect的穿透性，防止pptr点在实心遮蔽层上
     rectBoxPointerVisible.value = false;
     emits('clickAndWaitNavigator', {
+      selector: newSelector,
       screenX: rectDomElRect.left + rectDomElRect.width / 2,
       screenY: rectDomElRect.top + rectDomElRect.height / 2,
     });

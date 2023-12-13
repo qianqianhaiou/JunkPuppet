@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { routes, Route } from "./routes";
+import { routes, Route } from "./routers";
 
 const initSSAPI = () => {
   const target: {

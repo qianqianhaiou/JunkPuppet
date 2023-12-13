@@ -1,7 +1,11 @@
-import { Button, Form, Input, message, Modal, Space, Switch } from "antd";
+import { Button, Form, Input, Modal, Space, Switch } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { addTask, updateTask } from "@/service/index";
-import { PlusOutlined } from "@ant-design/icons";
+import { addTask, deleteTask, updateTask } from "@/service/index";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  ExclamationCircleFilled,
+} from "@ant-design/icons";
 import { validCronString } from "@/utils/valid";
 
 const cronStringValid = (rule: any, value: string) => {
@@ -19,17 +23,20 @@ const cronStringValid = (rule: any, value: string) => {
 };
 
 function App({
+  messageApi,
+  modal,
   type,
   reflash,
   data,
 }: {
+  messageApi: any;
+  modal: any;
   type: string;
   reflash: any;
   data?: any;
 }) {
   const [modelVisible, setModelVisible] = useState(false);
   const [autoTask, setAutoTask] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
   const formRef = useRef<any>(null);
   const handleOpen = () => {
     setModelVisible(true);
@@ -49,6 +56,19 @@ function App({
       setAutoTask(false);
     }
   };
+  const handleDeleteTask = () => {
+    modal.confirm({
+      title: "是否要删除该任务",
+      icon: <ExclamationCircleFilled />,
+      content: "删除该任务后，该任务所得数据将会同步删除",
+      async onOk() {
+        await deleteTask({ _id: data._id });
+        messageApi.success("删除成功");
+        reflash();
+      },
+      onCancel() {},
+    });
+  };
   const onFinish = async (values: any) => {
     let result = "";
     if (type === "create") {
@@ -64,7 +84,7 @@ function App({
       });
     }
     if (result === "ok") {
-      messageApi.success("修改成功");
+      messageApi && messageApi.success("修改成功");
       reflash();
       setModelVisible(false);
     }
@@ -80,7 +100,6 @@ function App({
   }, [modelVisible]);
   return (
     <div>
-      {contextHolder}
       {type === "create" ? (
         <Button type="primary" icon={<PlusOutlined />} onClick={handleOpen}>
           新建任务
@@ -147,15 +166,29 @@ function App({
             </>
           )}
 
-          <Form.Item className="text-right mb-[0px]">
-            <Space>
-              <Button type="primary" htmlType="submit">
-                提 交
-              </Button>
-              <Button htmlType="button" onClick={handleClose}>
-                取 消
-              </Button>
-            </Space>
+          <Form.Item className="mb-[0px]">
+            <div className="flex justify-between">
+              {type !== "create" ? (
+                <Button
+                  danger
+                  type="dashed"
+                  onClick={handleDeleteTask}
+                  icon={<DeleteOutlined />}
+                >
+                  删除
+                </Button>
+              ) : (
+                <div></div>
+              )}
+              <Space>
+                <Button type="primary" htmlType="submit">
+                  提 交
+                </Button>
+                <Button htmlType="button" onClick={handleClose}>
+                  取 消
+                </Button>
+              </Space>
+            </div>
           </Form.Item>
         </Form>
       </Modal>

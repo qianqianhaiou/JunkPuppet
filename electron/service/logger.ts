@@ -2,7 +2,8 @@ import log4js from "log4js";
 import { once } from "events";
 import { createInterface } from "readline";
 import { createReadStream, statSync } from "fs";
-import { fsCheckFile } from "./file";
+import { join } from "path";
+import { fsCheckFile } from "../utils/file";
 
 export const initLogger = (path: string) => {
   log4js.configure({
@@ -23,15 +24,11 @@ export const initLogger = (path: string) => {
   return logger;
 };
 
-interface LogItem {
-  time: string;
-  type: string;
-  message: string;
-}
-export const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
+const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
   await fsCheckFile(path);
   // 默认拿 24KB 数据  应该在300-500条
   const target: LogItem[] = [];
+  let count = 0;
   const rl = createInterface({
     input: createReadStream(path, {
       start: statSync(path).size - Math.min(statSync(path).size, bufferSize),
@@ -39,6 +36,7 @@ export const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
     crlfDelay: Infinity,
   });
   rl.on("line", (line: string) => {
+    count++;
     const timeType = line.match(/^(\[(.+)\])/g);
     if (timeType && timeType.length) {
       const tag = timeType[0].split(" ");
@@ -47,9 +45,15 @@ export const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
         time: tag[0],
         type: tag[1],
         message: text,
+        index: "block-" + count,
       });
     }
   });
   await once(rl, "close");
   return target;
+};
+
+// 读取最近的几条日志
+export const getRecentLogs = async () => {
+  return readLogByLine(join(process.env.DATA_PATH_LOG, "system.log"));
 };

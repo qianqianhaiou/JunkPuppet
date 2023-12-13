@@ -1,10 +1,9 @@
 import { app } from "electron";
 import { join, resolve } from "node:path";
 import { fsCheckFile, fsreadFile, initDir } from "./file";
-import { getDiskDetail, hasGlobalSetting } from "./util";
-import { CronJob } from "cron";
-import { taskDataDb, taskListDb } from "./db";
-import { startplayServer } from "./service";
+import { hasGlobalSetting } from "./tools";
+import { taskListDb } from "../service/db";
+import { turnOnCron } from "../service/cron";
 
 export const initGlobalSetting = async () => {
   if (hasGlobalSetting()) {
@@ -51,25 +50,7 @@ export const initCronScripts = async () => {
   const result = database.chain.get("list").filter({ auto: true }).value();
   global.cronList = new Map();
   for (const script of result) {
-    if (script.cron && script.mockDataId) {
-      global.cronList.set(
-        script._id.toString(),
-        new CronJob(
-          script.cron,
-          async () => {
-            const params = {
-              targetUrl: script.targetUrl,
-              _id: script._id,
-              mockDataId: script.mockDataId,
-              name: script.name
-            };
-            await startplayServer(params);
-          },
-          null,
-          true
-        )
-      );
-    }
+    turnOnCron(script);
   }
   console.log("start auto task: " + [...global.cronList].length + " count");
 };

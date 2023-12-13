@@ -56,4 +56,10 @@ $deepGreen: #13ce66;
       }
     }
   }
+  .fnbox_modal {
+    z-index: 2147483647;
+    .ant-collapse-header-text {
+      width: 100%;
+    }
+  }
 }
