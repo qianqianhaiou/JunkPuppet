@@ -13,6 +13,8 @@ function App() {
   const [setting, setSetting] = useState<any>(null);
   const [chromePath, setChromePath] = useState("");
   const [basePath, setBasePath] = useState("");
+  const [mail, setMail] = useState("");
+  const [mailToken, setMailToken] = useState("");
 
   const handleGetGlobalSetting = async () => {
     const result = await getGlobalSetting({});
@@ -20,6 +22,8 @@ function App() {
     setSetting(setting);
     setBasePath(setting.DATA_PATH);
     setChromePath(setting.CHROME_PATH);
+    setMail(setting.MAIL);
+    setMailToken(setting.MAIL_TOKEN);
   };
   const handleSelectDir = async () => {
     const result = await selectDir({});
@@ -34,6 +38,8 @@ function App() {
   const handleCancelChange = () => {
     setBasePath(setting.DATA_PATH);
     setChromePath(setting.CHROME_PATH);
+    setMail(setting.MAIL);
+    setMailToken(setting.MAIL_TOKEN);
     setStatus("info");
   };
   const [modal, contextHolder] = Modal.useModal();
@@ -45,6 +51,8 @@ function App() {
         await setGlobalSetting({
           chrome_path: chromePath,
           data_path: basePath,
+          mail: mail,
+          mail_token: mailToken,
         });
         setStatus("info");
       },
@@ -100,7 +108,7 @@ function App() {
           </Button>
         ) : null}
       </div>
-      <div>
+      <div className="mb-[20px]">
         <div className="font-bold text-[18px] mb-[10px]">数据存放位置</div>
         <Input
           className="w-[400px]"
@@ -117,6 +125,24 @@ function App() {
             手动选择
           </Button>
         ) : null}
+      </div>
+      <div className="mb-[20px]">
+        <div className="font-bold text-[18px] mb-[10px]">邮件地址</div>
+        <Input
+          className="w-[400px]"
+          value={mail}
+          onChange={(e) => setMail(e.target.value)}
+          disabled={status !== "edit"}
+        ></Input>
+      </div>
+      <div>
+        <div className="font-bold text-[18px] mb-[10px]">邮件令牌</div>
+        <Input
+          className="w-[400px]"
+          value={mailToken}
+          onChange={(e) => setMailToken(e.target.value)}
+          disabled={status !== "edit"}
+        ></Input>
       </div>
     </div>
   );

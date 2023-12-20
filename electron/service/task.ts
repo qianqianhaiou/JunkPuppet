@@ -4,6 +4,17 @@ import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "../utils/file";
 import { triggerItemCron } from "./cron";
 import { taskDataDb, taskListDb } from "./db";
 import { randomUUID } from "crypto";
+import { MailerService } from "./mailer";
+
+const renderTaskResultMail = (result: any, to: string) => {
+  const receiver = {
+    from: `"拾荒木偶"<${process.env.MAIL}>`,
+    subject: "通知",
+    to: to,
+    html: JSON.stringify(result),
+  };
+  return receiver;
+};
 
 // 新增任务
 export const addTask = async (params: any) => {
@@ -332,6 +343,23 @@ export const startplay = async (params: any) => {
           database.chain.set("updatedAt", datanow).value();
           await database.write();
           console.log("任务：" + params.name + " - 执行完成");
+          if (params.autoMail && params.mail) {
+            console.log("任务：" + params.name + " - 正在发送邮件");
+            const instance = MailerService();
+            if (instance) {
+              const message = renderTaskResultMail(msg.data, params.mail);
+              try {
+                await instance.sendMail(message);
+                console.log("任务：" + params.name + " - 邮件发送成功");
+              } catch (e: any) {
+                console.log(
+                  "任务：" + params.name + " - 邮件发送错误 - " + e?.message
+                );
+              }
+            } else {
+              console.log("任务：" + params.name + " - 邮件配置错误");
+            }
+          }
           resolve("sucess");
         } else if (msg.type === "warn") {
           console.warn(

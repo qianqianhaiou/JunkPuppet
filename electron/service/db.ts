@@ -15,6 +15,8 @@ interface TaskDetail {
   cron: string;
   createdAt: number;
   updatedAt: number;
+  autoMail: boolean;
+  mail: string;
   mockDataId: string;
   _id: string;
 }

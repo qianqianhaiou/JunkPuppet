@@ -1,5 +1,6 @@
 /// <reference types="vite-plugin-electron/electron-env" />
 declare module "uuid";
+declare module "nodemailer";
 declare namespace globalThis {
   var cronList: Map<string, any>;
 }
@@ -14,6 +15,10 @@ declare namespace NodeJS {
     SCRIPTS_PATH: string;
     /** 数据总文件夹 */
     DATA_PATH: string;
+    /** 邮件地址 */
+    MAIL: string;
+    /** 邮件令牌 */
+    MAIL_TOKEN: string;
     /** 是否已经完成过全局设置 set noset */
     IS_SET: string;
     /** 全局设置配置文件存放位置 */

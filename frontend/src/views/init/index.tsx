@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { selectDir, setGlobalSetting, selectFile } from "@/service";
-import { Button, Modal, Space, Steps, Tag } from "antd";
+import { Button, Input, Modal, Space, Steps, Tag } from "antd";
 import {
   SelectOutlined,
   ArrowLeftOutlined,
@@ -10,6 +10,9 @@ import {
 function Init() {
   const [chromePath, setChromePath] = useState("");
   const [basePath, setBasePath] = useState("");
+
+  const [mail, setMail] = useState("");
+  const [mailToken, setMailToken] = useState("");
 
   const [step, setStep] = useState(0);
   const handleSelectDir = async () => {
@@ -23,6 +26,12 @@ function Init() {
     if (!result) return;
     setChromePath(result);
     setStep((c) => c + 1);
+  };
+  const handleMailChange = (e: any) => {
+    setMail(e.target.value);
+  };
+  const handleMailTokenChange = (e: any) => {
+    setMailToken(e.target.value);
   };
   const handleBackStep = () => {
     setStep((c) => c - 1);
@@ -39,17 +48,22 @@ function Init() {
         setGlobalSetting({
           chrome_path: chromePath,
           data_path: basePath,
+          mail: mail,
+          mail_token: mailToken,
         });
       },
     });
   };
   return (
-    <div>
+    <div className="h-full">
       {contextHolder}
       <div className="text-[22px] py-[30px] font-bold text-center">
         初始化应用程序
       </div>
-      <div className="flex justify-center">
+      <div
+        className="flex justify-center"
+        style={{ height: "calc(100% - 150px)" }}
+      >
         <Steps
           className="w-[320px] flex-shrink-0"
           direction="vertical"
@@ -61,6 +75,10 @@ function Init() {
             },
             {
               title: "选择数据存放位置",
+              description: <div className="h-[100px]"></div>,
+            },
+            {
+              title: "邮件服务（可选）",
               description: <div className="h-[100px]"></div>,
             },
             {
@@ -165,6 +183,47 @@ function Init() {
             </div>
           )}
           {step === 2 && (
+            <div className="text-center">
+              <div className="leading-[36px]">
+                <div>请选择应用程序所产生的数据存放位置</div>
+                <div>由于数据量在日常使用过程中会不断增加</div>
+                <div>建议存放在非系统盘或机械硬盘中</div>
+              </div>
+              <div className="w-[80%] mx-[auto] mt-[20px]">
+                <Space className="w-full" direction="vertical">
+                  <Input
+                    placeholder="mail"
+                    value={mail}
+                    onChange={handleMailChange}
+                  ></Input>
+                  <Input
+                    placeholder="mailToken"
+                    value={mailToken}
+                    onChange={handleMailTokenChange}
+                  ></Input>
+                </Space>
+              </div>
+              <Space className="mt-[10px]">
+                <Button
+                  className="w-[150px] mt-[10px]"
+                  size="large"
+                  icon={<ArrowLeftOutlined />}
+                  onClick={handleBackStep}
+                >
+                  上一步
+                </Button>
+                <Button
+                  className="w-[150px] mt-[10px]"
+                  size="large"
+                  icon={<ArrowDownOutlined />}
+                  onClick={handleNextStep}
+                >
+                  下一步
+                </Button>
+              </Space>
+            </div>
+          )}
+          {step === 3 && (
             <div className="text-center">
               <div>请确认初始化配置，点击提交之后软件将重新启动。</div>
               <div>

@@ -37,7 +37,7 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
   return (
     <div className="h-full overflow-y-auto f-beautify-scrollbar">
       <div>
-        <div className="mb-[30px] ">
+        <div className="mb-[30px]">
           <Alert
             className="px-[10px] py-[20px] bg-[#292929] border-[#292929]"
             message={
@@ -74,7 +74,7 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
             }
           />
         </div>
-        <div>
+        <div className="mb-[30px]">
           <Alert
             className="px-[10px] py-[20px] bg-[#292929] border-[#292929]"
             message={
@@ -118,7 +118,33 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
               </Row>
             }
           />
-          <div></div>
+        </div>
+        <div>
+          <Alert
+            className="px-[10px] py-[20px] bg-[#292929] border-[#292929]"
+            message={
+              <div className="text-[20px] font-bold pl-[12px]">自定义数据</div>
+            }
+            type="success"
+            description={
+              <Row style={{ margin: "0px" }} gutter={[16, 16]}>
+                {data.customResult.map((item: any, index: number) => {
+                  return (
+                    <Col span={8} key={index}>
+                      <Card
+                        title={
+                          <div>{item.label || "未命名" + (index + 1)}</div>
+                        }
+                        bordered={false}
+                      >
+                        <div>{JSON.stringify(item)}</div>
+                      </Card>
+                    </Col>
+                  );
+                })}
+              </Row>
+            }
+          />
         </div>
       </div>
     </div>
@@ -145,6 +171,8 @@ function App({
       _id: data._id,
       mockDataId: data.mockDataId,
       targetUrl: data.targetUrl,
+      autoMail: data.autoMail,
+      mail: data.mail,
     });
     setLoading(false);
     fetchList();

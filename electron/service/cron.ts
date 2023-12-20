@@ -23,6 +23,8 @@ export const triggerItemCron = async (script: any) => {
               _id: result._id,
               mockDataId: result.mockDataId,
               name: result.name,
+              autoMail: result.autoMail || false,
+              mail: result.mail,
             };
             await startplay(params);
           },
@@ -54,6 +56,8 @@ export const turnOnCron = (script: any) => {
             _id: script._id,
             mockDataId: script.mockDataId,
             name: script.name,
+            autoMail: script.autoMail || false,
+            mail: script.mail,
           };
           await startplay(params);
         },

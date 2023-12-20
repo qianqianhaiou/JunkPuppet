@@ -150,7 +150,9 @@ async function startTask(props: TaskRunnerData) {
         { page, browser, client },
         functionString
       );
-      result.customResult.push(customFnResult);
+      if (customFnResult) {
+        result.customResult.push(customFnResult);
+      }
     }
   });
   await browser.close();
