@@ -24,7 +24,8 @@
     "electron-squirrel-startup": "^1.0.0",
     "lodash": "^4.17.21",
     "log4js": "^6.9.1",
-    "lowdb": "^6.1.0"
+    "lowdb": "^6.1.0",
+    "nodemailer": "^6.9.7"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",

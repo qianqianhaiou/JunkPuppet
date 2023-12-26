@@ -6,7 +6,7 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
-import { validCronString } from "@/utils/valid";
+import { validCronString, validateMail } from "@/utils/valid";
 
 const cronStringValid = (rule: any, value: string) => {
   try {
@@ -16,6 +16,19 @@ const cronStringValid = (rule: any, value: string) => {
       return Promise.resolve(true);
     } else {
       throw new Error("请输入格式正确的Cron表达式");
+    }
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+const mailStringValid = (rule: any, value: string) => {
+  try {
+    if (!value) {
+      throw new Error("请输入邮件地址");
+    } else if (validateMail(value)) {
+      return Promise.resolve(true);
+    } else {
+      throw new Error("请输入格式正确的邮件地址");
     }
   } catch (err) {
     return Promise.reject(err);
@@ -37,6 +50,7 @@ function App({
 }) {
   const [modelVisible, setModelVisible] = useState(false);
   const [autoTask, setAutoTask] = useState(false);
+  const [autoMail, setAutoMail] = useState(false);
   const formRef = useRef<any>(null);
   const handleOpen = () => {
     setModelVisible(true);
@@ -55,6 +69,9 @@ function App({
     } else {
       setAutoTask(false);
     }
+  };
+  const handleAutoMailChange = (status: boolean) => {
+    setAutoMail(status);
   };
   const handleDeleteTask = () => {
     modal.confirm({
@@ -95,7 +112,10 @@ function App({
       formRef.current.setFieldValue("targetUrl", data.targetUrl);
       formRef.current.setFieldValue("cron", data.cron);
       formRef.current.setFieldValue("auto", data.auto);
+      formRef.current.setFieldValue("autoMail", data.autoMail);
+      formRef.current.setFieldValue("mail", data.mail);
       setAutoTask(data.auto);
+      setAutoMail(data.autoMail);
     }
   }, [modelVisible]);
   return (
@@ -165,7 +185,30 @@ function App({
               )}
             </>
           )}
-
+          <>
+            <Form.Item name="autoMail" label="发送邮件">
+              <Switch
+                checked={autoMail}
+                checkedChildren="开启"
+                unCheckedChildren="关闭"
+                onChange={handleAutoMailChange}
+              />
+            </Form.Item>
+            {autoMail && (
+              <Form.Item
+                name="mail"
+                label="邮件地址"
+                rules={[
+                  {
+                    required: true,
+                    validator: mailStringValid,
+                  },
+                ]}
+              >
+                <Input placeholder="请输入邮件地址" />
+              </Form.Item>
+            )}
+          </>
           <Form.Item className="mb-[0px]">
             <div className="flex justify-between">
               {type !== "create" ? (

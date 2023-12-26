@@ -34,9 +34,7 @@ async function startTask(props: TaskRunnerData) {
     },
     slowMo: props.slowMo || 100,
     args: [
-      '--allow-running-insecure-content',
-      '--disable-web-security',
-      '--start-fullscreen',
+      '--start-maximized',
     ],
   };
   if (props.chromeDataPath) {
@@ -150,7 +148,9 @@ async function startTask(props: TaskRunnerData) {
         { page, browser, client },
         functionString
       );
-      result.customResult.push(customFnResult);
+      if (customFnResult) {
+        result.customResult.push(customFnResult);
+      }
     }
   });
   await browser.close();

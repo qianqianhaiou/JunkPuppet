@@ -4,6 +4,104 @@ import { fswriteFile, fsreadFile, deleteFile, deleteDir } from "../utils/file";
 import { triggerItemCron } from "./cron";
 import { taskDataDb, taskListDb } from "./db";
 import { randomUUID } from "crypto";
+import { MailerService } from "./mailer";
+
+const renderTaskResultMail = (result: any, to: string, parent: string) => {
+  const receiver: any = {
+    from: `"拾荒木偶"<${process.env.MAIL}>`,
+    subject: "通知",
+    to: to,
+    html: `执行完成`,
+    attachments: [],
+  };
+  const computedText = (texts: any) => {
+    return texts
+      .map((item: any) => {
+        return `
+          <div style="text-align:center; margin-bottom: 20px; background-color: #f3f3f3; padding-bottom: 16px; padding-top: 16px;">
+            <div style="font-size: 5vw; font-weight: bold; line-height: 9vw;">${
+              item.label
+            }</div>
+            <div>
+              ${item.values
+                .map((value: any) => {
+                  return `<div style="font-size: 4vw; color: #535353; line-height: 6vw;">${value}</div>`;
+                })
+                .join("\n")}
+            </div>
+          </div>
+        `;
+      })
+      .join("\n");
+  };
+
+  const textHtml = computedText(result.texts);
+
+  const computedSnapshot = (snapshots: any) => {
+    const types: any = {
+      getElementSnapshot: "截取元素",
+      snapshotFullScreen: "截取全屏",
+      snapshotCurrentScreen: "截取当前窗口",
+    };
+    return snapshots
+      .map((item: any) => {
+        if (item.uid) {
+          receiver.attachments.push({
+            filename: `${item.uid}.png`,
+            path: join(parent, `${item.uid}.png`),
+            cid: item.uid,
+          });
+        }
+        return `
+          <div style="text-align:center; margin-bottom: 20px; background-color: #f3f3f3; padding-bottom: 16px; padding-top: 16px;">
+            <div style="font-size: 5vw; font-weight: bold; line-height: 9vw;">${
+              item.label
+            }</div>
+            <div style="margin-right: 20px; text-align: right; color: #007afb; font-size: 3vw; line-height: 6vw">${
+              types[item.type]
+            }</div>
+            <div>
+              ${
+                item.uids
+                  ? item.uids
+                      .map((value: any) => {
+                        receiver.attachments.push({
+                          filename: `${value}.png`,
+                          path: join(parent, `${value}.png`),
+                          cid: value,
+                        });
+                        return `<img src="cid:${value}" style="max-width: 100%;"></img>`;
+                      })
+                      .join("\n")
+                  : `<img src="cid:${item.uid}" style="max-width: 100%;"></img>`
+              }
+            </div>
+          </div>
+        `;
+      })
+      .join("\n");
+  };
+  const snapshotHtml = computedSnapshot(result.snapshots);
+
+  const computedCustomResult = (result: any) => {
+    return result
+      .map((item: any) => {
+        return `
+          <div style="text-align:center; margin-bottom: 20px; background-color: #f3f3f3; padding-bottom: 16px; padding-top: 16px;">
+            <div style="font-size: 5vw; font-weight: bold; line-height: 9vw;">自定义数据</div>
+            <div> ${
+              typeof item === "object" ? JSON.stringify(item) : item
+            }</div>
+          </div>
+        `;
+      })
+      .join("\n");
+  };
+  const customHtml = computedCustomResult(result.customResult);
+  receiver.html = `<div>${textHtml + snapshotHtml + customHtml}</div>`;
+
+  return receiver;
+};
 
 // 新增任务
 export const addTask = async (params: any) => {
@@ -332,6 +430,27 @@ export const startplay = async (params: any) => {
           database.chain.set("updatedAt", datanow).value();
           await database.write();
           console.log("任务：" + params.name + " - 执行完成");
+          if (params.autoMail && params.mail) {
+            console.log("任务：" + params.name + " - 正在发送邮件");
+            const instance = MailerService();
+            if (instance) {
+              const message = renderTaskResultMail(
+                msg.data,
+                params.mail,
+                join(process.env.DATA_PATH_SNAPSHOT, params._id)
+              );
+              try {
+                await instance.sendMail(message);
+                console.log("任务：" + params.name + " - 邮件发送成功");
+              } catch (e: any) {
+                console.log(
+                  "任务：" + params.name + " - 邮件发送错误 - " + e?.message
+                );
+              }
+            } else {
+              console.log("任务：" + params.name + " - 邮件配置错误");
+            }
+          }
           resolve("sucess");
         } else if (msg.type === "warn") {
           console.warn(
