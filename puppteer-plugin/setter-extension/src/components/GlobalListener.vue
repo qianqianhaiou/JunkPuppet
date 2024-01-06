@@ -146,10 +146,12 @@ const globalMouse = () => {
       return;
     }
     if (
-      event.type !== 'mousewheel' &&
-      buttons[event.which] === 'none' &&
-      event.type !== 'mousemove'
+      (event.type !== 'mousewheel' &&
+        buttons[event.which] === 'none' &&
+        event.type !== 'mousemove') ||
+      buttons[event.which] === 'right'
     ) {
+      // 过滤 右键 及 非正常鼠标事件
       return;
     }
     const x = event.clientX;
