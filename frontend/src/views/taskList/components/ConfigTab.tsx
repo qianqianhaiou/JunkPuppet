@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, StarTwoTone } from "@ant-design/icons";
 import type { InputRef } from "antd";
 import { Input, Space, Tag, theme, Tooltip } from "antd";
+import { LIFE_HOOKS } from "@/utils/const";
 
 function App({
   activeKey,
@@ -121,7 +122,12 @@ function App({
             color={activeKey === tag ? "#108ee9" : ""}
             key={tag}
             closable={index !== 0 && !readonly}
-            style={{ userSelect: "none", height: "26px", lineHeight: "24px" }}
+            style={{
+              userSelect: "none",
+              height: "26px",
+              lineHeight: "24px",
+              position: "relative",
+            }}
             onClick={() => handleUpdateActive(tag)}
             onClose={() => handleClose(tag)}
           >
@@ -136,6 +142,17 @@ function App({
             >
               {isLongTag ? `${tag.slice(0, 8)}...` : tag}
             </span>
+            {LIFE_HOOKS.includes(tag) ? (
+              <div
+                className="absolute"
+                style={{
+                  top: "-12px",
+                  left: "-6px",
+                }}
+              >
+                <StarTwoTone twoToneColor="#eb2f96" />
+              </div>
+            ) : null}
           </Tag>
         );
         return isLongTag ? (
