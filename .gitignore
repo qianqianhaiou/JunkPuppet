@@ -14,6 +14,7 @@ dist-electron
 release
 *.local
 public/puppteer-plugin
+public/GlobalConfig.json
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
