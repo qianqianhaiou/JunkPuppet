@@ -32,22 +32,23 @@ function App({
         provideCompletionItems: () => {
           return {
             suggestions: [
-              /**   * 内置变量   */
+              /** 快捷输入 */
               {
                 label: "injectContext",
                 kind: monaco.languages.CompletionItemKind.Constant,
-                insertText: "injectContext",
+                insertText:
+                  "const { page, browser, client } = _injectContexts;",
                 insertTextRules:
                   monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                detail: "Puppet上下文",
+                detail: "Puppet Context",
               },
               {
-                label: "task",
+                label: "waitTime",
                 kind: monaco.languages.CompletionItemKind.Constant,
-                insertText: "task",
+                insertText: `await new Pormise((resolve, reject) => { setTimeout(() => { resolve('') }, 1000) })`,
                 insertTextRules:
                   monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                detail: "task配置",
+                detail: "等待延迟",
               },
             ],
           };
