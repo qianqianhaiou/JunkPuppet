@@ -29,7 +29,7 @@ import {
   getDataDistInfo,
 } from "../service/system";
 
-import { getRecentLogs } from "../service/logger";
+import { getRecentLogs, clearAllLogs } from "../service/logger";
 
 import { openChrome } from "../service/spawn";
 
@@ -127,6 +127,10 @@ export const routes: Route[] = [
   {
     path: "getRecentLogs",
     callBack: (_event, arg) => wrapService(getRecentLogs, arg),
+  },
+  {
+    path: "clearAllLogs",
+    callBack: (_event, arg) => wrapService(clearAllLogs, arg),
   },
   {
     path: "closeApp",

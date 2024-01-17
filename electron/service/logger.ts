@@ -3,7 +3,12 @@ import { once } from "events";
 import { createInterface } from "readline";
 import { createReadStream, statSync } from "fs";
 import { join } from "path";
-import { fsCheckFile } from "../utils/file";
+import {
+  fsCheckFile,
+  deleteFile,
+  fswriteFile,
+  readDir,
+} from "../utils/file";
 
 export const initLogger = (path: string) => {
   log4js.configure({
@@ -56,4 +61,16 @@ const readLogByLine = async (path: string, bufferSize = 1024 * 24) => {
 // 读取最近的几条日志
 export const getRecentLogs = async () => {
   return readLogByLine(join(process.env.DATA_PATH_LOG, "system.log"));
+};
+
+// 清除所有日志
+export const clearAllLogs = async () => {
+  const files = await readDir(process.env.DATA_PATH_LOG);
+  for (let i = 0; i < files.length; i++) {
+    if (files[i] !== "system.log") {
+      await deleteFile(join(process.env.DATA_PATH_LOG, files[i]));
+    }
+  }
+  await fswriteFile(join(process.env.DATA_PATH_LOG, "system.log"), "");
+  return "success";
 };

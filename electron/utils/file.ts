@@ -141,3 +141,8 @@ export async function addToLine(path: string, text: string, log = "info") {
     );
   });
 }
+
+// 读文件夹下所有文件名
+export async function readDir(url: string): Promise<string[]> {
+  return await cb2Async(readdir, url);
+}

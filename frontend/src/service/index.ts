@@ -45,6 +45,9 @@ export const updateTaskMockData = async (params: any) => {
 export const getRecentLogs = async () => {
   return FetchData("getRecentLogs", {});
 };
+export const clearAllLogs = async () => {
+  return FetchData("clearAllLogs", {});
+};
 
 export const startSetting = async (params: any) => {
   return FetchData("startSetting", params);

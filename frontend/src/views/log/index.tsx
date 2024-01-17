@@ -1,11 +1,15 @@
-import { getRecentLogs } from "@/service";
+import { clearAllLogs, getRecentLogs } from "@/service";
 import VirtualList from "rc-virtual-list";
 import { useEffect, useRef, useState } from "react";
 import style from "./style.module.scss";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import { Button, Modal, message } from "antd";
 
 function App() {
   const [list, setList] = useState<any[]>([]);
   const [height, setHeight] = useState(400);
+  const [modal, contextHolder] = Modal.useModal();
+  const [messageApi, messageContextHolder] = message.useMessage();
   const vListRef = useRef<any>(null);
   const autoScrollKey = useRef<boolean>(true);
   const ColorMap: any = {
@@ -38,7 +42,23 @@ function App() {
         time: value.time,
         type: value.type,
         message: value.message,
+        index: value.index,
       });
+    });
+  };
+  const handleClearLogs = () => {
+    modal.confirm({
+      title: "警告",
+      icon: <ExclamationCircleFilled></ExclamationCircleFilled>,
+      content: "该操作将删除清除日志，是否继续？",
+      async onOk() {
+        const result = await clearAllLogs();
+        if (result === "success") {
+          messageApi.success("清除成功");
+          setList([]);
+        }
+      },
+      onCancel() {},
     });
   };
   useEffect(() => {
@@ -63,10 +83,18 @@ function App() {
   }, []);
   return (
     <div className="bg-[#212121]">
+      {contextHolder}
+      {messageContextHolder}
       <div className="h-[36px]"></div>
       <div className="h-[36px] bg-[#000] flex items-center justify-between py-[10px] px-[20px] mx-[20px]">
         <div className="font-bold">服务日志</div>
-        <div></div>
+        {list.length ? (
+          <Button danger type="text" onClick={handleClearLogs}>
+            清空日志
+          </Button>
+        ) : (
+          <div></div>
+        )}
       </div>
       <VirtualList
         className={style.VList + " px-[20px] pb-[20px] mx-[20px] bg-[#000]"}
