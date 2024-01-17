@@ -59,7 +59,7 @@ function App({
     }
   }, [monaco]);
   useEffect(() => {
-    setDefaultValue(customFn[activeKey]["functionString"] || `//${activeKey}`);
+    setDefaultValue(customFn[activeKey]["functionString"] || `// ${activeKey}`);
   }, [activeKey]);
   return (
     <Editor

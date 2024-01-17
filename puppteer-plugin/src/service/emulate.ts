@@ -118,5 +118,25 @@ export async function customFn(
   _injectContexts: InjectContexts,
   _silent_exec_string: string
 ) {
-  return eval(`(async() => {${_silent_exec_string}})()`);
+  if (_silent_exec_string) {
+    return eval(`(async() => {${_silent_exec_string}})()`);
+  } else {
+    return Promise.resolve('');
+  }
+}
+export async function runLifeHook(
+  _injectContexts: InjectContexts,
+  customFnData: any,
+  label: string
+) {
+  const _silent_exec_string = customFnData[label]?.functionString;
+  if (_silent_exec_string) {
+    return await customFn(_injectContexts, _silent_exec_string).catch(
+      (e: any) => {
+        console.error(`LIFE_HOOK（${label}）: ` + e?.message);
+      }
+    );
+  } else {
+    return Promise.resolve('');
+  }
 }
