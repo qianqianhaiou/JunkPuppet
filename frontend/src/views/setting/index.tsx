@@ -137,12 +137,12 @@ function App() {
       </div>
       <div>
         <div className="font-bold text-[18px] mb-[10px]">邮件令牌</div>
-        <Input
+        <Input.Password
           className="w-[400px]"
           value={mailToken}
           onChange={(e) => setMailToken(e.target.value)}
           disabled={status !== "edit"}
-        ></Input>
+        ></Input.Password>
       </div>
     </div>
   );
