@@ -19,11 +19,11 @@ import path from 'path';
 const ChildProcess = fork(path.resolve(__dirname, './core/setting.ts'));
 ChildProcess.send('StartSetting');
 ChildProcess.on('message', (msg) => {
-  console.log(JSON.stringify(msg));
+	console.log(JSON.stringify(msg));
 });
 ChildProcess.on('error', function (code) {
-  console.log('exit error code: ' + code);
+	console.log('exit error code: ' + code);
 });
 ChildProcess.on('close', function (code) {
-  console.log('exit code: ' + code);
+	console.log('exit code: ' + code);
 });
