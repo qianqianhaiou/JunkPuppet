@@ -1,3 +1,3 @@
-import { useSettingStore } from "./modules/setting";
+import { useSettingStore } from './modules/setting';
 
 export { useSettingStore };

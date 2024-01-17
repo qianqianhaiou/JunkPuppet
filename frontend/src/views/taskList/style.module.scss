@@ -1,23 +1,23 @@
 .Tabs {
-  :global(.ant-tabs-content) {
-    height: 100%;
-  }
-  :global(.ant-tabs-tabpane) {
-    height: 100%;
-  }
+	:global(.ant-tabs-content) {
+		height: 100%;
+	}
+	:global(.ant-tabs-tabpane) {
+		height: 100%;
+	}
 }
 .DrawerScroll {
-  :global(.ant-drawer-body) {
-    :global(.ant-spin-nested-loading) {
-      height: 100%;
-      :global(.ant-spin-container) {
-        height: 100%;
-      }
-    }
-  }
+	:global(.ant-drawer-body) {
+		:global(.ant-spin-nested-loading) {
+			height: 100%;
+			:global(.ant-spin-container) {
+				height: 100%;
+			}
+		}
+	}
 }
 .Drawer {
-  :global(.ant-drawer-body) {
-    overflow: hidden;
-  }
+	:global(.ant-drawer-body) {
+		overflow: hidden;
+	}
 }

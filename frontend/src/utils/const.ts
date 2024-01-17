@@ -1,5 +1,1 @@
-export const LIFE_HOOKS = [
-  "onBeforeFirstNavigate",
-  "onAfterQueue",
-  "onBeforeEachClickNavigate",
-];
+export const LIFE_HOOKS = ['onBeforeFirstNavigate', 'onAfterQueue', 'onBeforeEachClickNavigate'];

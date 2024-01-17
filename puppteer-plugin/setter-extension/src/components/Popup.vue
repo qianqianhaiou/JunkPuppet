@@ -40,7 +40,7 @@ const globalAListener = () => {
         popupVisible.value = false;
         event.stopPropagation();
       });
-    }
+    },
   );
 };
 const globalContextListener = () => {

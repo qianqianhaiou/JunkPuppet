@@ -48,7 +48,7 @@ const userDoData = ref<any>([]);
 const userDoDataLastType = computed(() =>
   userDoData.value.length
     ? userDoData.value[userDoData.value.length - 1].type
-    : ''
+    : '',
 );
 const addUserDoData = (item: any) => {
   userDoData.value.push(item);

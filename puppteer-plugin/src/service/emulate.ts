@@ -12,7 +12,7 @@ export async function playClick(
     selector: Selector;
     screenX?: number;
     screenY?: number;
-  }
+  },
 ) {
   await injectFunction({ page }, hookA);
   const target = await selectBySelector({ page }, data.selector);
@@ -64,7 +64,7 @@ export async function getTextBySelector(page: Page, data: Selector) {
 export async function getSnapshotBySelector(
   page: Page,
   data: Selector,
-  parent: string
+  parent: string,
 ) {
   const result: any = [];
   if (data.iframeIndex >= 0) {
@@ -92,7 +92,7 @@ export async function getSnapshotBySelector(
 export async function getCurrentScreenSnapshot(
   page: Page,
   data: CurrentScreenSnapshot,
-  parent: string
+  parent: string,
 ) {
   const uid = uuidv4();
   await page.screenshot({
@@ -116,7 +116,7 @@ export async function snapshotFullScreen(page: Page, parent: string) {
 }
 export async function customFn(
   _injectContexts: InjectContexts,
-  _silent_exec_string: string
+  _silent_exec_string: string,
 ) {
   if (_silent_exec_string) {
     return eval(`(async() => {${_silent_exec_string}})()`);
@@ -127,14 +127,14 @@ export async function customFn(
 export async function runLifeHook(
   _injectContexts: InjectContexts,
   customFnData: any,
-  label: string
+  label: string,
 ) {
   const _silent_exec_string = customFnData[label]?.functionString;
   if (_silent_exec_string) {
     return await customFn(_injectContexts, _silent_exec_string).catch(
       (e: any) => {
         console.error(`LIFE_HOOK（${label}）: ` + e?.message);
-      }
+      },
     );
   } else {
     return Promise.resolve('');

@@ -7,7 +7,7 @@ import { playClick } from '../service/emulate';
 const IS_DEV = process.argv[1].includes('setting.ts');
 const DEV_EXTENSION_PATH = resolve(
   __dirname,
-  '../../setter-extension/setter-dist'
+  '../../setter-extension/setter-dist',
 );
 const PRO_EXTENSION_PATH = resolve(__dirname, './setter-dist');
 const EXTENSION_PATH = IS_DEV ? DEV_EXTENSION_PATH : PRO_EXTENSION_PATH;

@@ -3,7 +3,7 @@ import { InjectContexts } from '../types/Puppet';
 
 export const selectBySelector = async (
   contexts: InjectContexts,
-  selector: Selector
+  selector: Selector,
 ) => {
   let target: ElementHandle<Element> | null = null;
   if (selector.iframeIndex >= 0) {

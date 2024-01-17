@@ -9,7 +9,7 @@ export const hookA = () => {
       if ($el.target === '_blank') {
         $el.target = '_self';
       }
-    }
+    },
   );
 };
 

@@ -62,7 +62,9 @@
             </div>
           </div>
         </template>
-        <div>截取当前网页可视区的截图，及当前可以看到的地方，不包括滚动条。</div>
+        <div>
+          截取当前网页可视区的截图，及当前可以看到的地方，不包括滚动条。
+        </div>
       </CollapsePanel>
       <CollapsePanel collapsible="header" :showArrow="false">
         <template #header>

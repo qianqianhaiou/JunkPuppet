@@ -52,7 +52,7 @@ const rectBoxMove = () => {
       (rectBoxRef.value as HTMLElement).style.width = rectData.width + 'px';
       (rectBoxRef.value as HTMLElement).style.height = rectData.height + 'px';
     },
-    false
+    false,
   );
 };
 
@@ -69,7 +69,7 @@ const recordUserRect = async () => {
     const simpleSelect = DomService.getSelectorSimple(rectDomEl.value);
     newSelector = DomService.getSelectorWithNthUniq(
       simpleSelect,
-      rectDomEl.value
+      rectDomEl.value,
     );
   }
   if (toolActive.value === 'text') {
@@ -235,7 +235,7 @@ const globalKeyDown = () => {
     const isCombination = combinationKey(
       event.type,
       event.code,
-      event.shiftKey
+      event.shiftKey,
     );
     if (isCombination) return;
     let type;

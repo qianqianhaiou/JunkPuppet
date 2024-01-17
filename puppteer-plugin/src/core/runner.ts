@@ -73,7 +73,7 @@ async function startTask(props: TaskRunnerData) {
   await runLifeHook(
     { page, browser, client },
     customFnData,
-    'onBeforeFirstNavigate'
+    'onBeforeFirstNavigate',
   );
 
   // 等待导航结束
@@ -112,7 +112,7 @@ async function startTask(props: TaskRunnerData) {
       await runLifeHook(
         { page, browser, client },
         customFnData,
-        'onBeforeEachClickNavigate'
+        'onBeforeEachClickNavigate',
       );
       const navigatorPromise = item.urlChange
         ? page.waitForNavigation(item.waitForNavigation)
@@ -120,7 +120,7 @@ async function startTask(props: TaskRunnerData) {
       await Promise.all([navigatorPromise, playClick(page, item.data)]).catch(
         (e: any) => {
           console.warn(e?.message);
-        }
+        },
       );
       await waitTime(1);
       if (!props.headless) {
@@ -165,7 +165,7 @@ async function startTask(props: TaskRunnerData) {
         const functionString = customFnData[item.customFnName].functionString;
         const customFnResult = await customFn(
           { page, browser, client },
-          functionString
+          functionString,
         );
         if (customFnResult) {
           result.customResult.push(customFnResult);

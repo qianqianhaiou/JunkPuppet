@@ -8,7 +8,7 @@ import { existsSync } from 'fs';
 export const asyncFor = <T = any>(
   items: T[],
   fn: (item: T, i: number) => Promise<any>,
-  limit = 1
+  limit = 1,
 ): Promise<void> => {
   return new Promise((resolve) => {
     if (!items.length) return resolve();

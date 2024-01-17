@@ -66,7 +66,13 @@
         条）
         <div style="height: 24px" v-if="bodyVisible">
           <Button
-            style="height: 22px; padding-top: 0px; padding-bottom: 0px; font-size: 14px; line-height: 22px;"
+            style="
+              height: 22px;
+              padding-top: 0px;
+              padding-bottom: 0px;
+              font-size: 14px;
+              line-height: 22px;
+            "
             type="link"
             @click="handleChangeFnBoxVisible(true)"
             >内置工具</Button
@@ -120,7 +126,7 @@ const bodyVisible = ref(true);
 // 挂载点
 const getModalContainer = () => {
   const el: any = document.querySelector(
-    '#puppeteer-sunsilent-shadow-root'
+    '#puppeteer-sunsilent-shadow-root',
   )!.shadowRoot;
   return el;
 };
