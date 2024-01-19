@@ -33,7 +33,7 @@ function About() {
           <img src={Robot} className='block w-[64px] h-[64px]' alt='icon' />
           <div className='font-bold text-[18px] mt-[12px]'>拾荒木偶 - JunkPuppet</div>
           <div className='mt-[10px]'>一款基于 Electron + Puppeteer 的可视化爬虫工具</div>
-          <div className='mt-[10px]'>Version: 0.0.5</div>
+          <div className='mt-[10px]'>Version: 0.0.6</div>
           <div className='mt-[10px]'>Author: qianqianhaiou</div>
         </div>
       </Modal>
