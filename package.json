@@ -1,50 +1,50 @@
 {
-	"name": "junk-puppet",
-	"private": true,
-	"version": "0.0.1",
-	"author": {
-		"name": "qianqianhaiou"
-	},
-	"description": "zzzz",
-	"scripts": {
-		"install": "npm-run-all --serial install:*",
-		"install:electron": "cd puppteer-plugin && npm i",
-		"install:plugin": "cd puppteer-plugin/setter-extension && npm i",
-		"install:frontend": "cd frontend && npm i",
-		"dev": "vite",
-		"core": "bash ./scripts/build.sh",
-		"build": "vite build && bash ./scripts/build.sh && npm run package && bash ./scripts/moveCore.sh",
-		"start": "electron-forge start",
-		"package": "electron-forge package",
-		"make": "electron-forge make",
-		"prepare": "husky install"
-	},
-	"dependencies": {
-		"cron": "^3.1.6",
-		"diskinfo": "^0.0.3",
-		"electron-squirrel-startup": "^1.0.0",
-		"lodash": "^4.17.21",
-		"log4js": "^6.9.1",
-		"lowdb": "^6.1.0",
-		"nodemailer": "^6.9.7"
-	},
-	"devDependencies": {
-		"@electron-forge/cli": "^6.4.2",
-		"@electron-forge/maker-deb": "^6.4.2",
-		"@electron-forge/maker-rpm": "^6.4.2",
-		"@electron-forge/maker-squirrel": "^6.4.2",
-		"@electron-forge/maker-zip": "^6.4.2",
-		"@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
-		"@types/lodash": "^4.14.200",
-		"electron": "^26.1.0",
-		"husky": "^8.0.0",
-		"npm-run-all": "^4.1.5",
-		"prettier": "^3.2.3",
-		"pretty-quick": "^4.0.0",
-		"typescript": "^5.2.2",
-		"vite": "^4.4.9",
-		"vite-plugin-electron": "^0.14.0",
-		"vite-plugin-electron-renderer": "^0.14.5"
-	},
-	"main": "dist-electron/main.js"
+  "name": "junk-puppet",
+  "private": true,
+  "version": "0.0.1",
+  "author": {
+    "name": "qianqianhaiou"
+  },
+  "description": "zzzz",
+  "scripts": {
+    "install": "npm-run-all --serial install:*",
+    "install:electron": "cd puppteer-plugin && npm i",
+    "install:plugin": "cd puppteer-plugin/setter-extension && npm i",
+    "install:frontend": "cd frontend && npm i",
+    "dev": "vite",
+    "core": "bash ./scripts/build.sh",
+    "build": "vite build && bash ./scripts/build.sh && npm run package && bash ./scripts/moveCore.sh",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "cron": "^3.1.6",
+    "diskinfo": "^0.0.3",
+    "electron-squirrel-startup": "^1.0.0",
+    "lodash": "^4.17.21",
+    "log4js": "^6.9.1",
+    "lowdb": "^6.1.0",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-deb": "^6.4.2",
+    "@electron-forge/maker-rpm": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
+    "@types/lodash": "^4.14.200",
+    "electron": "^26.1.0",
+    "husky": "^8.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.2.3",
+    "pretty-quick": "^4.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9",
+    "vite-plugin-electron": "^0.14.0",
+    "vite-plugin-electron-renderer": "^0.14.5"
+  },
+  "main": "dist-electron/main.js"
 }

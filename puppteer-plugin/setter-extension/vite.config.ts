@@ -10,23 +10,23 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [vue()],
-	resolve: {
-		alias: {
-			'@': path.resolve(__dirname, 'src'),
-			assets: path.resolve(__dirname, 'src/assets'),
-		},
-	},
-	build: {
-		outDir: 'setter-dist',
-		rollupOptions: {
-			input: {
-				index: 'src/main.ts',
-			},
-			output: {
-				entryFileNames: '[name].js',
-				format: 'iife',
-			},
-		},
-	},
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      assets: path.resolve(__dirname, 'src/assets'),
+    },
+  },
+  build: {
+    outDir: 'setter-dist',
+    rollupOptions: {
+      input: {
+        index: 'src/main.ts',
+      },
+      output: {
+        entryFileNames: '[name].js',
+        format: 'iife',
+      },
+    },
+  },
 });
