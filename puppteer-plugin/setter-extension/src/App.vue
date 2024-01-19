@@ -16,7 +16,7 @@
     @addHiddenData="addHiddenData"
     @clickAndWaitNavigator="clickAndWaitNavigator"
   ></GlobalListender>
-  <Popup></Popup>
+  <Popup :selectSimilar="selectSimilar" @addUserDoData="addUserDoData"></Popup>
   <OperateList
     v-if="listVisible"
     :userDoData="userDoData"
@@ -46,9 +46,7 @@ const handleChangeSelectSimilar = (similar: boolean) => {
 // 用户操作数据
 const userDoData = ref<any>([]);
 const userDoDataLastType = computed(() =>
-  userDoData.value.length
-    ? userDoData.value[userDoData.value.length - 1].type
-    : '',
+  userDoData.value.length ? userDoData.value[userDoData.value.length - 1].type : '',
 );
 const addUserDoData = (item: any) => {
   userDoData.value.push(item);
@@ -77,16 +75,12 @@ const handleChangeListVisible = (visible: boolean) => {
   listVisible.value = visible;
 };
 const handleDelete = (index: string) => {
-  console.log(userDoData.value);
   userDoData.value.splice(index, 1);
-  console.log(userDoData.value);
 };
 const handleUpdate = (index: string, data: any) => {
-  console.log(data);
   data.map((item: any) => {
     userDoData.value[index][item[0]] = item[1];
   });
-  console.log(userDoData.value);
 };
 
 const computedUserDoData = () => {
@@ -125,6 +119,7 @@ const clickAndWaitNavigator = (data: any) => {
 // 结束设置
 const finishSetting = () => {
   const target = computedUserDoData();
+  console.log(target);
   sendMessage({
     type: 'finishSetting',
     data: target,
