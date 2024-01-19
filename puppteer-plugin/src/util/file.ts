@@ -12,10 +12,7 @@ export const fsreadFile = (path: string): Promise<string> => {
 };
 
 // 写文件
-export const fswriteFile = (
-  path: string,
-  data: string | NodeJS.ArrayBufferView
-) => {
+export const fswriteFile = (path: string, data: string | NodeJS.ArrayBufferView) => {
   return new Promise((res, rej) => {
     writeFile(path, data, { encoding: 'utf8' }, (err) => {
       if (err) rej(err);

@@ -1,72 +1,72 @@
 @font-face {
-  font-family: "PuHui55Regular";
-  src: url("@/assets/font/PuHui55Regular.ttf") format("truetype");
+	font-family: 'PuHui55Regular';
+	src: url('@/assets/font/PuHui55Regular.ttf') format('truetype');
 }
 html,
 body {
-  width: 100%;
-  height: 100%;
-  margin: 0px;
-  font-family: "PuHui55Regular";
-  -webkit-app-region: no-drag;
-  // overflow: hidden;
-  #root {
-    width: 100%;
-    height: 100%;
-    color: #f1f1f1;
-    font-size: 16px;
-    .title-bar {
-      -webkit-app-region: drag;
-      .operator {
-        -webkit-app-region: no-drag;
-      }
-    }
-  }
-  .f-beautify-scrollbar {
-    &::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-      background-color: #181818;
-    }
-    &::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-      background-color: #181818;
-    }
-    &::-webkit-scrollbar-thumb {
-      border-radius: 8px;
-      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-      background-color: #535353;
-    }
-  }
-  .page-loading {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.15);
-  }
-  .ant-drawer {
-    .ant-drawer-header {
-      padding: 10px 17px;
-      -webkit-app-region: no-drag;
-      .ant-drawer-header-title {
-        .ant-drawer-close {
-          margin-inline-end: 6px;
-        }
-      }
-    }
-    .ant-drawer-content-wrapper {
-      bottom: 0px;
-      top: auto;
-    }
-  }
-  .monaco-editor {
-    .editor-json-highlight {
-      // background: linear-gradient(120deg, #fdfbfb55 0%, #ebedee55 100%);
-      // background: linear-gradient(120deg, #f093fb55 0%, #f5576c55 100%);
-      background-color: #00ff0055;
-    }
-  }
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	font-family: 'PuHui55Regular';
+	-webkit-app-region: no-drag;
+	// overflow: hidden;
+	#root {
+		width: 100%;
+		height: 100%;
+		color: #f1f1f1;
+		font-size: 16px;
+		.title-bar {
+			-webkit-app-region: drag;
+			.operator {
+				-webkit-app-region: no-drag;
+			}
+		}
+	}
+	.f-beautify-scrollbar {
+		&::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			background-color: #181818;
+		}
+		&::-webkit-scrollbar {
+			width: 10px;
+			height: 10px;
+			background-color: #181818;
+		}
+		&::-webkit-scrollbar-thumb {
+			border-radius: 8px;
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+			background-color: #535353;
+		}
+	}
+	.page-loading {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: rgba(0, 0, 0, 0.15);
+	}
+	.ant-drawer {
+		.ant-drawer-header {
+			padding: 10px 17px;
+			-webkit-app-region: no-drag;
+			.ant-drawer-header-title {
+				.ant-drawer-close {
+					margin-inline-end: 6px;
+				}
+			}
+		}
+		.ant-drawer-content-wrapper {
+			bottom: 0px;
+			top: auto;
+		}
+	}
+	.monaco-editor {
+		.editor-json-highlight {
+			// background: linear-gradient(120deg, #fdfbfb55 0%, #ebedee55 100%);
+			// background: linear-gradient(120deg, #f093fb55 0%, #f5576c55 100%);
+			background-color: #00ff0055;
+		}
+	}
 }

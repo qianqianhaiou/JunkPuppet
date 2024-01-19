@@ -1,4 +1,4 @@
-declare module 'uuid'
+declare module 'uuid';
 
 interface Window {
   _silentListen?: boolean;

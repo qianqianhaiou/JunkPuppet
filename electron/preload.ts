@@ -1,5 +1,5 @@
-import { contextBridge, ipcRenderer } from "electron";
-import { routes, Route } from "./routers";
+import { contextBridge, ipcRenderer } from 'electron';
+import { routes, Route } from './routers';
 
 const initSSAPI = () => {
   const target: {
@@ -10,9 +10,9 @@ const initSSAPI = () => {
       return ipcRenderer.invoke(route.path, params);
     };
   });
-  contextBridge.exposeInMainWorld("SSAPI", target);
-  contextBridge.exposeInMainWorld("onLog", (callBack: any) => {
-    ipcRenderer.on("onLog", callBack);
+  contextBridge.exposeInMainWorld('SSAPI', target);
+  contextBridge.exposeInMainWorld('onLog', (callBack: any) => {
+    ipcRenderer.on('onLog', callBack);
   });
 };
 

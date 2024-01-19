@@ -3,6 +3,8 @@ export const formatOperateType = (type: string): string => {
     getText: '获取文本',
     getElementSnapshot: '截取元素',
     clickAndWaitNavigator: '点击跳转',
+    clickElement: '点击元素',
+    getAttribute: '提取属性',
     snapshotFullScreen: '全页截图',
     snapshotCurrentScreen: '当前窗口截图',
     delay: '延迟',

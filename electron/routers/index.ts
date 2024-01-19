@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain } from 'electron';
 import {
   addTask,
   updateTask,
@@ -12,7 +12,7 @@ import {
   debugPlay,
   startplay,
   uploadJSONSetting,
-} from "../service/task";
+} from '../service/task';
 
 import {
   selectDir,
@@ -21,26 +21,19 @@ import {
   unMaxWindow,
   minimizeWindow,
   closeApp,
-} from "../service/electron";
+} from '../service/electron';
 
-import {
-  getGlobalSetting,
-  setGlobalSetting,
-  getDataDistInfo,
-} from "../service/system";
+import { getGlobalSetting, setGlobalSetting, getDataDistInfo } from '../service/system';
 
-import { getRecentLogs } from "../service/logger";
+import { getRecentLogs, clearAllLogs } from '../service/logger';
 
-import { openChrome } from "../service/spawn";
+import { openChrome } from '../service/spawn';
 
-import { getTaskTypes } from "../service/statistics";
+import { getTaskTypes } from '../service/statistics';
 
 export interface Route {
   path: string;
-  callBack: (
-    event: Electron.IpcMainInvokeEvent,
-    ...args: any[]
-  ) => Promise<any>;
+  callBack: (event: Electron.IpcMainInvokeEvent, ...args: any[]) => Promise<any>;
 }
 
 const wrapService = async (fn: (arg: any) => Promise<any>, arg: any) => {
@@ -49,99 +42,103 @@ const wrapService = async (fn: (arg: any) => Promise<any>, arg: any) => {
 
 export const routes: Route[] = [
   {
-    path: "addTask",
+    path: 'addTask',
     callBack: (_event, arg) => wrapService(addTask, arg),
   },
   {
-    path: "updateTask",
+    path: 'updateTask',
     callBack: (_event, arg) => wrapService(updateTask, arg),
   },
   {
-    path: "deleteTask",
+    path: 'deleteTask',
     callBack: (_event, arg) => wrapService(deleteTask, arg),
   },
   {
-    path: "getTaskList",
+    path: 'getTaskList',
     callBack: (_event, arg) => wrapService(getTaskList, arg),
   },
   {
-    path: "getTaskTypes",
+    path: 'getTaskTypes',
     callBack: (_event, arg) => wrapService(getTaskTypes, arg),
   },
   {
-    path: "getTaskDataDetail",
+    path: 'getTaskDataDetail',
     callBack: (_event, arg) => wrapService(getTaskDataDetail, arg),
   },
   {
-    path: "getTaskConfigDetail",
+    path: 'getTaskConfigDetail',
     callBack: (_event, arg) => wrapService(getTaskConfigDetail, arg),
   },
   {
-    path: "updateTaskMockData",
+    path: 'updateTaskMockData',
     callBack: (_event, arg) => wrapService(updateTaskMockData, arg),
   },
   {
-    path: "startSetting",
+    path: 'startSetting',
     callBack: (_event, arg) => wrapService(startSetting, arg),
   },
   {
-    path: "startplay",
+    path: 'startplay',
     callBack: (_event, arg) => wrapService(startplay, arg),
   },
   {
-    path: "debugPlay",
+    path: 'debugPlay',
     callBack: (_event, arg) => wrapService(debugPlay, arg),
   },
   {
-    path: "setGlobalSetting",
+    path: 'setGlobalSetting',
     callBack: (_event, arg) => wrapService(setGlobalSetting, arg),
   },
   {
-    path: "getGlobalSetting",
+    path: 'getGlobalSetting',
     callBack: (_event, arg) => wrapService(getGlobalSetting, arg),
   },
   {
-    path: "selectFile",
+    path: 'selectFile',
     callBack: (_event, arg) => wrapService(selectFile, arg),
   },
   {
-    path: "selectDir",
+    path: 'selectDir',
     callBack: (_event, arg) => wrapService(selectDir, arg),
   },
   {
-    path: "minimizeWindow",
+    path: 'minimizeWindow',
     callBack: (_event, arg) => wrapService(minimizeWindow, arg),
   },
   {
-    path: "maxWindow",
+    path: 'maxWindow',
     callBack: (_event, arg) => wrapService(maxWindow, arg),
   },
   {
-    path: "unMaxWindow",
+    path: 'unMaxWindow',
     callBack: (_event, arg) => wrapService(unMaxWindow, arg),
   },
   {
-    path: "getDataDistInfo",
+    path: 'getDataDistInfo',
     callBack: (_event, arg) => wrapService(getDataDistInfo, arg),
   },
   {
-    path: "getRecentLogs",
+    path: 'getRecentLogs',
     callBack: (_event, arg) => wrapService(getRecentLogs, arg),
   },
   {
-    path: "closeApp",
+    path: 'clearAllLogs',
+    callBack: (_event, arg) => wrapService(clearAllLogs, arg),
+  },
+  {
+    path: 'closeApp',
     callBack: (_event, arg) => wrapService(closeApp, arg),
   },
   {
-    path: "deleteTaskDataDb",
+    path: 'deleteTaskDataDb',
     callBack: (_event, arg) => wrapService(deleteTaskDataDb, arg),
   },
   {
-    path: "openChrome",
+    path: 'openChrome',
     callBack: (_event, arg) => wrapService(openChrome, arg),
   },
   {
-    path: "uploadJSONSetting",
+    path: 'uploadJSONSetting',
     callBack: (_event, arg) => wrapService(uploadJSONSetting, arg),
   },
 ];

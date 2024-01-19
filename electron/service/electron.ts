@@ -1,19 +1,19 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog } from 'electron';
 
 // 选择一个文件夹
 export const selectDir = async () => {
-  const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
+  const result = await dialog.showOpenDialog({ properties: ['openDirectory'] });
   if (result.canceled) {
-    return "";
+    return '';
   } else {
     return result.filePaths[0];
   }
 };
 // 选择一个文件
 export const selectFile = async () => {
-  const result = await dialog.showOpenDialog({ properties: ["openFile"] });
+  const result = await dialog.showOpenDialog({ properties: ['openFile'] });
   if (result.canceled) {
-    return "";
+    return '';
   } else {
     return result.filePaths[0];
   }

@@ -12,6 +12,8 @@
         v-if="
           [
             'getText',
+            'getAttribute',
+            'clickElement',
             'getElementSnapshot',
             'snapshotFullScreen',
             'snapshotCurrentScreen',
@@ -23,17 +25,16 @@
           <Input v-else-if="status === 'edit'" v-model:value="form.label" />
         </FormItem>
       </template>
-      <template v-if="['getText', 'getElementSnapshot'].includes(data.type)">
+      <template
+        v-if="['getText', 'getElementSnapshot', 'getAttribute', 'clickElement'].includes(data.type)"
+      >
         <FormItem
           label="iframeIndex"
           :name="['data', 'iframeIndex']"
           :rules="[{ required: true, message: '请输入iframeIndex' }]"
         >
           <div v-if="status === 'info'">{{ form.data.iframeIndex }}</div>
-          <Input
-            v-else-if="status === 'edit'"
-            v-model:value="form.data.iframeIndex"
-          />
+          <Input v-else-if="status === 'edit'" v-model:value="form.data.iframeIndex" />
         </FormItem>
         <FormItem
           label="选择器"
@@ -41,13 +42,27 @@
           :rules="[{ required: true, message: '请输入选择器' }]"
         >
           <div v-if="status === 'info'">{{ form.data.selector }}</div>
-          <Textarea
-            v-else-if="status === 'edit'"
-            v-model:value="form.data.selector"
-            :rows="3"
-          />
+          <Textarea v-else-if="status === 'edit'" v-model:value="form.data.selector" :rows="3" />
         </FormItem>
       </template>
+      <template v-if="['getAttribute'].includes(data.type) && data?.attributes">
+        <FormItem
+          label="属性"
+          :name="['attribute']"
+          :rules="[{ required: true, message: '请输入attribute' }]"
+        >
+          <div v-if="status === 'info'">{{ form.attribute }}</div>
+          <RadioGroup
+            v-else-if="status === 'edit'"
+            v-for="item in data.attributes"
+            v-model:value="form.attribute"
+            button-style="solid"
+          >
+            <RadioButton :value="item">{{ item }}</RadioButton>
+          </RadioGroup>
+        </FormItem>
+      </template>
+
       <template v-if="['delay'].includes(data.type)">
         <FormItem
           label="延迟时长"
@@ -79,8 +94,8 @@
               <template #icon>
                 <DeleteOutlined />
               </template>
-              删除</Button
-            >
+              删除
+            </Button>
           </template>
           <template v-else-if="status === 'edit'">
             <Button type="primary" @click="submit">提交</Button>
@@ -102,6 +117,8 @@ import {
   Textarea,
   InputNumber,
   Space,
+  RadioGroup,
+  RadioButton,
 } from 'ant-design-vue';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue';
 import { entries } from 'lodash';
@@ -123,6 +140,7 @@ const status = ref('info');
 
 const form = reactive({
   label: '',
+  attribute: '',
   data: {
     iframeIndex: '',
     selector: '',
@@ -135,6 +153,7 @@ const parseForm = () => {
   form.label = data.value.label;
   form.data = data.value?.data;
   form.delay = data.value?.delay;
+  form.attribute = data.value?.attribute;
 };
 const submit = () => {
   formRef.value

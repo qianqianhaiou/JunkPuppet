@@ -1,10 +1,10 @@
-import { ConfigProvider, theme } from "antd";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import zhCN from "antd/locale/zh_CN";
-import { defaultRouter, optionalRouter } from "@/routers/index";
-import { getGlobalSetting } from "./service";
-import { useEffect, useState } from "react";
-import { useSettingStore } from "./views/stores";
+import { ConfigProvider, theme } from 'antd';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import zhCN from 'antd/locale/zh_CN';
+import { defaultRouter, optionalRouter } from '@/routers/index';
+import { getGlobalSetting } from './service';
+import { useEffect, useState } from 'react';
+import { useSettingStore } from './views/stores';
 
 function pickOptionalRouters() {
   // pick some routes
@@ -33,17 +33,16 @@ function App() {
       theme={{
         algorithm: theme.darkAlgorithm,
         token: {
-          fontFamily: "PuHui55Regular",
-          colorPrimary: "#3160F8",
+          fontFamily: 'PuHui55Regular',
+          colorPrimary: '#3160F8',
         },
         components: {
           Menu: {
-            darkItemSelectedBg: "#3a3a3a",
+            darkItemSelectedBg: '#3a3a3a',
           },
         },
       }}
-      locale={zhCN}
-    >
+      locale={zhCN}>
       <RouterProvider router={routes} />
     </ConfigProvider>
   ) : null;

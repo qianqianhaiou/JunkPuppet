@@ -15,22 +15,14 @@
       <CollapsePanel collapsible="header" :showArrow="false">
         <template #header>
           <div
-            style="
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-            "
+            style="width: 100%; display: flex; align-items: center; justify-content: space-between"
           >
             <div style="display: flex; align-items: center">
               <CameraOutlined style="font-size: 24px"></CameraOutlined>
               <span style="margin-left: 10px">截取全屏幕</span>
             </div>
             <div>
-              <Button
-                type="link"
-                @click="(e) => addBuiltInEvent(e, 'snapshotFullScreen')"
-              >
+              <Button type="link" @click="(e) => addBuiltInEvent(e, 'snapshotFullScreen')">
                 添加
               </Button>
             </div>
@@ -41,22 +33,14 @@
       <CollapsePanel collapsible="header" :showArrow="false">
         <template #header>
           <div
-            style="
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-            "
+            style="width: 100%; display: flex; align-items: center; justify-content: space-between"
           >
             <div style="display: flex; align-items: center">
               <CameraOutlined style="font-size: 24px"></CameraOutlined>
               <span style="margin-left: 10px">截取当前屏幕</span>
             </div>
             <div>
-              <Button
-                type="link"
-                @click="(e) => addBuiltInEvent(e, 'snapshotCurrentScreen')"
-              >
+              <Button type="link" @click="(e) => addBuiltInEvent(e, 'snapshotCurrentScreen')">
                 添加
               </Button>
             </div>
@@ -67,21 +51,14 @@
       <CollapsePanel collapsible="header" :showArrow="false">
         <template #header>
           <div
-            style="
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-            "
+            style="width: 100%; display: flex; align-items: center; justify-content: space-between"
           >
             <div style="display: flex; align-items: center">
               <CameraOutlined style="font-size: 24px"></CameraOutlined>
               <span style="margin-left: 10px">添 加 等 待</span>
             </div>
             <div>
-              <Button type="link" @click="(e) => addBuiltInEvent(e, 'delay')">
-                添加
-              </Button>
+              <Button type="link" @click="(e) => addBuiltInEvent(e, 'delay')">添加</Button>
             </div>
           </div>
         </template>

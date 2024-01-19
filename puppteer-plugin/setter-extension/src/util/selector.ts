@@ -1,10 +1,7 @@
-function parentUtilBody(
-  el: HTMLElement,
-  parents: HTMLElement[] = []
-): HTMLElement[] {
-  if (el.tagName === "BODY") {
+function parentUtilBody(el: HTMLElement, parents: HTMLElement[] = []): HTMLElement[] {
+  if (el.tagName === 'BODY') {
     return [];
-  } else if (el.parentElement?.tagName === "BODY") {
+  } else if (el.parentElement?.tagName === 'BODY') {
     parents.push(el);
     return parents;
   } else {
@@ -31,18 +28,13 @@ export class DomService {
   }
   static getSelectorWithNthUniq(
     _selector: any,
-    selectedElement: any
+    selectedElement: any,
   ): { iframeIndex: number; selector: string } {
     let _document = document;
     if (_document.querySelectorAll(_selector.selector).length <= 1) {
       return _selector;
     }
-    let selector = this.getGlobalUniqSelector(
-      _document,
-      _selector,
-      selectedElement,
-      1
-    );
+    let selector = this.getGlobalUniqSelector(_document, _selector, selectedElement, 1);
     if (_document.querySelectorAll(selector.selector).length > 1) {
       return this.getSelectorWithNthUniq(selector, selectedElement);
     }
@@ -52,18 +44,13 @@ export class DomService {
   static getGlobalUniqSelectors(
     _selector: any,
     selectedElement: any,
-    realLen: number
+    realLen: number,
   ): { iframeIndex: number; selector: string } {
     let _document = document;
     if (_document.querySelectorAll(_selector.selector).length <= 1) {
       return _selector;
     }
-    let selector = this.getGlobalUniqSelector(
-      _document,
-      _selector,
-      selectedElement,
-      realLen
-    );
+    let selector = this.getGlobalUniqSelector(_document, _selector, selectedElement, realLen);
     if (_document.querySelectorAll(selector.selector).length > realLen) {
       return this.getGlobalUniqSelectors(selector, selectedElement, realLen);
     }
@@ -73,13 +60,12 @@ export class DomService {
     _document: any,
     selectorData: any,
     $selectedElement: any,
-    realLen: number
+    realLen: number,
   ) {
     let { selector: _selector, iframeIndex } = selectorData;
     let findDiffLenNodeLevel = (_selector: string): string => {
-      if (_document.querySelectorAll(_selector).length == realLen)
-        return _selector;
-      let parent = _selector.slice(0, _selector.lastIndexOf(">"));
+      if (_document.querySelectorAll(_selector).length == realLen) return _selector;
+      let parent = _selector.slice(0, _selector.lastIndexOf('>'));
       let parentLen = _document.querySelectorAll(parent).length;
       if (parentLen <= realLen) {
         return _selector;
@@ -104,9 +90,7 @@ export class DomService {
     }
     let indexSelector =
       diffNode +
-      `:nth-of-type(${
-        parentNodeIndex > -1 ? parentNodeIndex + 1 : selectedElementIndex + 1
-      })`;
+      `:nth-of-type(${parentNodeIndex > -1 ? parentNodeIndex + 1 : selectedElementIndex + 1})`;
     indexSelector += _selector.slice(diffNode.length);
     return {
       iframeIndex: iframeIndex,
@@ -115,7 +99,7 @@ export class DomService {
   }
   static getSelector(ele: HTMLElement, widthClass: Boolean = false) {
     const getClassorNodeName = (ele: HTMLElement) => {
-      let className = "";
+      let className = '';
       let nodeName = ele.tagName.toLowerCase();
       if (!widthClass) {
         return nodeName;
@@ -125,29 +109,29 @@ export class DomService {
         ele.classList.forEach((_class, index) => {
           _class = String(_class);
           if (
-            _class.indexOf("ng-") != 0 &&
-            _class.indexOf("sunsilent-") != 0 &&
+            _class.indexOf('ng-') != 0 &&
+            _class.indexOf('sunsilent-') != 0 &&
             /^[a-z|A-Z|0-9|+|~|-]*$/.test(_class)
           ) {
             if (isNaN(parseInt(_class))) classNames.push(_class);
           }
         });
-        className = classNames.join(".");
-        if (className) className = "." + className;
+        className = classNames.join('.');
+        if (className) className = '.' + className;
       }
       let _selector = className ? nodeName + className : nodeName;
       return _selector;
     };
     const parentsEl = parentUtilBody(ele);
-    let selector = "";
+    let selector = '';
     parentsEl.forEach((el: HTMLElement, index: number) => {
       if (!selector) {
         selector = getClassorNodeName(el);
       } else {
-        selector = getClassorNodeName(el) + ">" + selector;
+        selector = getClassorNodeName(el) + '>' + selector;
       }
     });
-    const bodySelector = selector ? "body>" + selector : "body";
+    const bodySelector = selector ? 'body>' + selector : 'body';
     let iframeIndex: number = -1;
     const getIframeIndex = (selector: string) => {
       if (self === top) {
@@ -157,16 +141,14 @@ export class DomService {
         }
       } else {
         // iframe层
-        const iframes: any = (window.top as Window).document.querySelectorAll(
-          "iframe"
-        );
+        const iframes: any = (window.top as Window).document.querySelectorAll('iframe');
         Array.prototype.map.call(iframes, (el: HTMLIFrameElement, index) => {
           const iframeVisible = () => {
             const iframeRect = el.getBoundingClientRect();
             const iframeStyle = getComputedStyle(el);
-            if (iframeStyle.display === "none") {
+            if (iframeStyle.display === 'none') {
               return false;
-            } else if (iframeStyle.opacity === "0") {
+            } else if (iframeStyle.opacity === '0') {
               return false;
             } else if (iframeRect.width * iframeRect.height === 0) {
               return false;

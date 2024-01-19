@@ -10,16 +10,16 @@ import {
   createReadStream,
   statSync,
   appendFile,
-} from "fs";
-import { join } from "path";
-import { once } from "events";
-import { createInterface } from "readline";
-import { EOL } from "os";
+} from 'fs';
+import { join } from 'path';
+import { once } from 'events';
+import { createInterface } from 'readline';
+import { EOL } from 'os';
 
 // 读文件
 export const fsreadFile = (path: string): Promise<string> => {
   return new Promise((res, rej) => {
-    readFile(path, { encoding: "utf8" }, (err, data) => {
+    readFile(path, { encoding: 'utf8' }, (err, data) => {
       if (err) rej(err);
       res(data);
     });
@@ -30,25 +30,22 @@ export const fsreadFile = (path: string): Promise<string> => {
 export const fsCheckFile = (path: string): Promise<string> => {
   return new Promise((res, rej) => {
     if (existsSync(path)) {
-      res("");
+      res('');
     } else {
-      writeFile(path, "", { encoding: "utf8" }, (err) => {
+      writeFile(path, '', { encoding: 'utf8' }, (err) => {
         if (err) rej(err);
-        res("");
+        res('');
       });
     }
   });
 };
 
 // 写文件
-export const fswriteFile = (
-  path: string,
-  data: string | NodeJS.ArrayBufferView
-) => {
+export const fswriteFile = (path: string, data: string | NodeJS.ArrayBufferView) => {
   return new Promise((res, rej) => {
-    writeFile(path, data, { encoding: "utf8" }, (err) => {
+    writeFile(path, data, { encoding: 'utf8' }, (err) => {
       if (err) rej(err);
-      res("");
+      res('');
     });
   });
 };
@@ -92,12 +89,12 @@ export async function deleteDir(url: string) {
           } else {
             await cb2Async(unlink, curPath);
           }
-        })
+        }),
       );
       await cb2Async(rmdir, url);
       resolve(true);
     } else {
-      resolve("路径不存在");
+      resolve('路径不存在');
     }
   });
 }
@@ -111,11 +108,11 @@ export async function readFileByLine(path: string, bufferSize = 1024 * 5) {
     }),
     crlfDelay: Infinity,
   });
-  rl.on("line", (line: string) => {
+  rl.on('line', (line: string) => {
     const timeType = line.match(/^(\[(.+)\])/g);
     if (timeType && timeType.length) {
-      const tag = timeType[0].split(" ");
-      const text = line.replace(timeType[0], "");
+      const tag = timeType[0].split(' ');
+      const text = line.replace(timeType[0], '');
       target.push({
         time: tag[0],
         type: tag[1],
@@ -123,21 +120,22 @@ export async function readFileByLine(path: string, bufferSize = 1024 * 5) {
       });
     }
   });
-  await once(rl, "close");
+  await once(rl, 'close');
   return target;
 }
 
 // 向文件末尾添加一行
-export async function addToLine(path: string, text: string, log = "info") {
+export async function addToLine(path: string, text: string, log = 'info') {
   return new Promise((res, rej) => {
     const date = new Date().toISOString();
-    appendFile(
-      path,
-      `[${date}] [${log.toUpperCase()}] ${text}${EOL}`,
-      (err: any) => {
-        if (err) rej(err);
-        res(text);
-      }
-    );
+    appendFile(path, `[${date}] [${log.toUpperCase()}] ${text}${EOL}`, (err: any) => {
+      if (err) rej(err);
+      res(text);
+    });
   });
+}
+
+// 读文件夹下所有文件名
+export async function readDir(url: string): Promise<string[]> {
+  return await cb2Async(readdir, url);
 }

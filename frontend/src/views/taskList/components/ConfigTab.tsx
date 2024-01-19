@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
-import type { InputRef } from "antd";
-import { Input, Space, Tag, theme, Tooltip } from "antd";
+import React, { useEffect, useRef, useState } from 'react';
+import { PlusOutlined, StarTwoTone } from '@ant-design/icons';
+import type { InputRef } from 'antd';
+import { Input, Space, Tag, theme, Tooltip } from 'antd';
+import { LIFE_HOOKS } from '@/utils/const';
 
 function App({
   activeKey,
@@ -21,17 +22,17 @@ function App({
   handleAddTab: any;
 }) {
   const { token } = theme.useToken();
-  const [tags, setTags] = useState(["JSON配置"]);
+  const [tags, setTags] = useState(['JSON配置']);
   const [inputVisible, setInputVisible] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [editInputIndex, setEditInputIndex] = useState(-1);
-  const [editInputValue, setEditInputValue] = useState("");
+  const [editInputValue, setEditInputValue] = useState('');
   const inputRef = useRef<InputRef>(null);
   const editInputRef = useRef<InputRef>(null);
 
   useEffect(() => {
     setTags(() => {
-      return ["JSON配置"].concat(defaultCustomFnKeys);
+      return ['JSON配置'].concat(defaultCustomFnKeys);
     });
   }, [defaultCustomFnKeys]);
 
@@ -49,7 +50,7 @@ function App({
     const newTags = tags.filter((tag) => tag !== removedTag);
     setTags(newTags);
     if (removedTag === activeKey) {
-      handleUpdateActive("JSON配置");
+      handleUpdateActive('JSON配置');
     }
     handleDeleteTabs(removedTag);
   };
@@ -68,7 +69,7 @@ function App({
     }
     handleAddTab(inputValue);
     setInputVisible(false);
-    setInputValue("");
+    setInputValue('');
   };
 
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,32 +82,32 @@ function App({
     handleUpdateTabName(tags[editInputIndex], editInputValue);
     setTags(newTags);
     setEditInputIndex(-1);
-    setEditInputValue("");
+    setEditInputValue('');
   };
 
   const tagInputStyle: React.CSSProperties = {
     width: 112,
     height: 26,
     marginInlineEnd: 8,
-    verticalAlign: "top",
+    verticalAlign: 'top',
   };
 
   const tagPlusStyle: React.CSSProperties = {
     height: 26,
-    lineHeight: "24px",
+    lineHeight: '24px',
     background: token.colorBgContainer,
-    borderStyle: "dashed",
+    borderStyle: 'dashed',
   };
 
   return (
-    <Space className="pb-[10px] flex-shrink-0" size={[0, 8]} wrap>
+    <Space className='pb-[10px] flex-shrink-0' size={[0, 8]} wrap>
       {tags.map((tag, index) => {
         if (editInputIndex === index) {
           return (
             <Input
               ref={editInputRef}
               key={tag}
-              size="small"
+              size='small'
               style={tagInputStyle}
               value={editInputValue}
               onChange={handleEditInputChange}
@@ -118,13 +119,17 @@ function App({
         const isLongTag = tag.length > 8;
         const tagElem = (
           <Tag
-            color={activeKey === tag ? "#108ee9" : ""}
+            color={activeKey === tag ? '#108ee9' : ''}
             key={tag}
             closable={index !== 0 && !readonly}
-            style={{ userSelect: "none", height: "26px", lineHeight: "24px" }}
+            style={{
+              userSelect: 'none',
+              height: '26px',
+              lineHeight: '24px',
+              position: 'relative',
+            }}
             onClick={() => handleUpdateActive(tag)}
-            onClose={() => handleClose(tag)}
-          >
+            onClose={() => handleClose(tag)}>
             <span
               onDoubleClick={(e) => {
                 if (index !== 0) {
@@ -132,10 +137,19 @@ function App({
                   setEditInputValue(tag);
                   e.preventDefault();
                 }
-              }}
-            >
+              }}>
               {isLongTag ? `${tag.slice(0, 8)}...` : tag}
             </span>
+            {LIFE_HOOKS.includes(tag) ? (
+              <div
+                className='absolute'
+                style={{
+                  top: '-12px',
+                  left: '-6px',
+                }}>
+                <StarTwoTone twoToneColor='#eb2f96' />
+              </div>
+            ) : null}
           </Tag>
         );
         return isLongTag ? (
@@ -149,8 +163,8 @@ function App({
       {inputVisible ? (
         <Input
           ref={inputRef}
-          type="text"
-          size="small"
+          type='text'
+          size='small'
           style={tagInputStyle}
           value={inputValue}
           onChange={handleInputChange}

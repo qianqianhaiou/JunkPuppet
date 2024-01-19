@@ -1,20 +1,15 @@
-import { useEffect, useState } from "react";
-import {
-  getGlobalSetting,
-  selectDir,
-  setGlobalSetting,
-  selectFile,
-} from "@/service";
-import { Button, Input, Modal, Space, Tag } from "antd";
-import { SelectOutlined, EditOutlined, CheckOutlined } from "@ant-design/icons";
+import { useEffect, useState } from 'react';
+import { getGlobalSetting, selectDir, setGlobalSetting, selectFile } from '@/service';
+import { Button, Input, Modal, Space, Tag } from 'antd';
+import { SelectOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
 
 function App() {
-  const [status, setStatus] = useState("info");
+  const [status, setStatus] = useState('info');
   const [setting, setSetting] = useState<any>(null);
-  const [chromePath, setChromePath] = useState("");
-  const [basePath, setBasePath] = useState("");
-  const [mail, setMail] = useState("");
-  const [mailToken, setMailToken] = useState("");
+  const [chromePath, setChromePath] = useState('');
+  const [basePath, setBasePath] = useState('');
+  const [mail, setMail] = useState('');
+  const [mailToken, setMailToken] = useState('');
 
   const handleGetGlobalSetting = async () => {
     const result = await getGlobalSetting({});
@@ -40,13 +35,13 @@ function App() {
     setChromePath(setting.CHROME_PATH);
     setMail(setting.MAIL);
     setMailToken(setting.MAIL_TOKEN);
-    setStatus("info");
+    setStatus('info');
   };
   const [modal, contextHolder] = Modal.useModal();
   const handleSubmit = async () => {
     modal.confirm({
-      title: "提示",
-      content: "保存修改配置后，软件将自动重启以生效",
+      title: '提示',
+      content: '保存修改配置后，软件将自动重启以生效',
       onOk: async () => {
         await setGlobalSetting({
           chrome_path: chromePath,
@@ -54,7 +49,7 @@ function App() {
           mail: mail,
           mail_token: mailToken,
         });
-        setStatus("info");
+        setStatus('info');
       },
     });
   };
@@ -62,87 +57,67 @@ function App() {
     handleGetGlobalSetting();
   }, []);
   return (
-    <div className="px-[20px] py-[20px]">
+    <div className='px-[20px] py-[20px]'>
       {contextHolder}
-      <div className="flex justify-end">
+      <div className='flex justify-end'>
         <Space>
-          {status === "edit" ? (
+          {status === 'edit' ? (
             <>
-              <Button
-                type="text"
-                icon={<CheckOutlined />}
-                onClick={handleSubmit}
-              >
+              <Button type='text' icon={<CheckOutlined />} onClick={handleSubmit}>
                 保存
               </Button>
-              <Button type="text" onClick={handleCancelChange}>
+              <Button type='text' onClick={handleCancelChange}>
                 取消
               </Button>
             </>
           ) : (
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => setStatus("edit")}
-            >
+            <Button type='text' icon={<EditOutlined />} onClick={() => setStatus('edit')}>
               编辑
             </Button>
           )}
         </Space>
       </div>
-      <div className="mb-[20px]">
-        <div className="font-bold text-[18px] mb-[10px]">Chrome位置</div>
+      <div className='mb-[20px]'>
+        <div className='font-bold text-[18px] mb-[10px]'>Chrome位置</div>
         <Input
-          className="w-[400px]"
+          className='w-[400px]'
           value={chromePath}
           onChange={(e) => setChromePath(e.target.value)}
-          disabled={status !== "edit"}
-        ></Input>
-        {status === "edit" ? (
-          <Button
-            type="link"
-            icon={<SelectOutlined />}
-            onClick={handleSelectFile}
-          >
+          disabled={status !== 'edit'}></Input>
+        {status === 'edit' ? (
+          <Button type='link' icon={<SelectOutlined />} onClick={handleSelectFile}>
             手动选择
           </Button>
         ) : null}
       </div>
-      <div className="mb-[20px]">
-        <div className="font-bold text-[18px] mb-[10px]">数据存放位置</div>
+      <div className='mb-[20px]'>
+        <div className='font-bold text-[18px] mb-[10px]'>数据存放位置</div>
         <Input
-          className="w-[400px]"
+          className='w-[400px]'
           value={basePath}
           onChange={(e) => setBasePath(e.target.value)}
-          disabled={status !== "edit"}
-        ></Input>
-        {status === "edit" ? (
-          <Button
-            type="link"
-            icon={<SelectOutlined />}
-            onClick={handleSelectDir}
-          >
+          disabled={status !== 'edit'}></Input>
+        {status === 'edit' ? (
+          <Button type='link' icon={<SelectOutlined />} onClick={handleSelectDir}>
             手动选择
           </Button>
         ) : null}
       </div>
-      <div className="mb-[20px]">
-        <div className="font-bold text-[18px] mb-[10px]">邮件地址</div>
+      <div className='mb-[20px]'>
+        <div className='font-bold text-[18px] mb-[10px]'>邮件地址</div>
         <Input
-          className="w-[400px]"
+          className='w-[400px]'
           value={mail}
           onChange={(e) => setMail(e.target.value)}
-          disabled={status !== "edit"}
-        ></Input>
+          disabled={status !== 'edit'}></Input>
       </div>
       <div>
-        <div className="font-bold text-[18px] mb-[10px]">邮件令牌</div>
-        <Input
-          className="w-[400px]"
+        <div className='font-bold text-[18px] mb-[10px]'>邮件令牌</div>
+        <Input.Password
+          className='w-[400px]'
           value={mailToken}
           onChange={(e) => setMailToken(e.target.value)}
-          disabled={status !== "edit"}
-        ></Input>
+          disabled={status !== 'edit'}></Input.Password>
       </div>
     </div>
   );

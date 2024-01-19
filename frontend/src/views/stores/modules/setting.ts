@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface Setting {
   CHROME_PATH: string;
@@ -17,13 +17,13 @@ export interface SettingStore extends Setting {
 }
 
 export const useSettingStore = create<SettingStore>((set, get: Function) => ({
-  CHROME_PATH: "",
-  DATA_PATH: "",
-  DATA_PATH_CHROME_DATA: "",
-  DATA_PATH_DB: "",
-  DATA_PATH_JSON: "",
-  DATA_PATH_SNAPSHOT: "",
-  version: "",
+  CHROME_PATH: '',
+  DATA_PATH: '',
+  DATA_PATH_CHROME_DATA: '',
+  DATA_PATH_DB: '',
+  DATA_PATH_JSON: '',
+  DATA_PATH_SNAPSHOT: '',
+  version: '',
   getSettingInfo: () => {
     return get();
   },

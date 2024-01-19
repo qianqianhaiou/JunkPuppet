@@ -2,12 +2,10 @@ import { resolve } from 'path';
 import puppeteer, { ElementHandle } from 'puppeteer-core';
 import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
 import { selectBySelector } from '../service/select';
+import { playClick } from '../service/emulate';
 
 const IS_DEV = process.argv[1].includes('setting.ts');
-const DEV_EXTENSION_PATH = resolve(
-  __dirname,
-  '../../setter-extension/setter-dist'
-);
+const DEV_EXTENSION_PATH = resolve(__dirname, '../../setter-extension/setter-dist');
 const PRO_EXTENSION_PATH = resolve(__dirname, './setter-dist');
 const EXTENSION_PATH = IS_DEV ? DEV_EXTENSION_PATH : PRO_EXTENSION_PATH;
 
@@ -19,7 +17,6 @@ const initExcScript = (page: any) => {
   // 当页面domcontentloaded事件触发才可以接受到postMessage，与插件run_at: document_end配合
   page.on('domcontentloaded', async () => {
     await page.evaluate(() => {
-      window;
       if (!window._silentListen) {
         window._silentListen = true;
         window.addEventListener('message', (e) => {
@@ -65,7 +62,7 @@ async function init(props: TaskSetterData) {
         type: 'finish',
         data: {
           builtInData: userDoData,
-          customFn: {}
+          customFn: {},
         },
       });
     process.exit();
@@ -86,19 +83,8 @@ async function init(props: TaskSetterData) {
           } else if (dataJson.type === 'clickAndWaitNavigator') {
             const oldUrl = page.url();
             // click selector
-            const target = await selectBySelector(
-              { page },
-              dataJson.data.selector
-            );
-            if (target) {
-              await target.click();
-            } else {
-              throw new Error('没有找到点击跳转元素');
-            }
-            // await page.mouse.click(
-            //   dataJson.data.screenX,
-            //   dataJson.data.screenY
-            // );
+            await playClick(page, { selector: dataJson.data.selector });
+
             await waitTime(0.5);
             const newUrl = page.url();
             if (oldUrl === newUrl) {

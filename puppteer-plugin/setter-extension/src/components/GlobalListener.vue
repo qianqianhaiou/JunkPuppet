@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="{ 'rect-box': true, pointervisible: rectBoxPointerVisible }"
-    ref="rectBoxRef"
-  ></div>
+  <div :class="{ 'rect-box': true, pointervisible: rectBoxPointerVisible }" ref="rectBoxRef"></div>
 </template>
 
 <script setup lang="ts">
@@ -27,11 +24,7 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits([
-  'addUserDoData',
-  'addHiddenData',
-  'clickAndWaitNavigator',
-]);
+const emits = defineEmits(['addUserDoData', 'addHiddenData', 'clickAndWaitNavigator']);
 
 // 鼠标跟随框
 const rectBoxRef: any = ref(null);
@@ -52,7 +45,7 @@ const rectBoxMove = () => {
       (rectBoxRef.value as HTMLElement).style.width = rectData.width + 'px';
       (rectBoxRef.value as HTMLElement).style.height = rectData.height + 'px';
     },
-    false
+    false,
   );
 };
 
@@ -67,10 +60,7 @@ const recordUserRect = async () => {
     newSelector = DomService.getSelectorWithClass(rectDomEl.value);
   } else {
     const simpleSelect = DomService.getSelectorSimple(rectDomEl.value);
-    newSelector = DomService.getSelectorWithNthUniq(
-      simpleSelect,
-      rectDomEl.value
-    );
+    newSelector = DomService.getSelectorWithNthUniq(simpleSelect, rectDomEl.value);
   }
   if (toolActive.value === 'text') {
     addClass(newSelector, 'puppeteer_sunsilent_light_text');
@@ -92,8 +82,7 @@ const recordUserRect = async () => {
     });
   } else if (toolActive.value === 'link') {
     const rectDomElRect = rectDomEl.value.getBoundingClientRect();
-    rectDomEl.value.className =
-      rectDomEl.value.className + ` puppeteer_sunsilent_light_click_navigator`;
+    addClass(newSelector, 'puppeteer_sunsilent_light_click_navigator');
     // 通过 readystatechange 判断是否需要等待 load 事件
     // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
     emits('addUserDoData', {
@@ -123,6 +112,9 @@ const recordUserRect = async () => {
 // 全局监听事件
 const globalMouse = () => {
   const emitMouse = (evt: any) => {
+    if (!evt.isTrusted) {
+      return;
+    }
     const buttons: any = { 0: 'none', 1: 'left', 2: 'middle', 3: 'right' };
     const event = evt;
     const types: any = {
@@ -146,10 +138,12 @@ const globalMouse = () => {
       return;
     }
     if (
-      event.type !== 'mousewheel' &&
-      buttons[event.which] === 'none' &&
-      event.type !== 'mousemove'
+      (event.type !== 'mousewheel' &&
+        buttons[event.which] === 'none' &&
+        event.type !== 'mousemove') ||
+      buttons[event.which] === 'right'
     ) {
+      // 过滤 右键 及 非正常鼠标事件
       return;
     }
     const x = event.clientX;
@@ -183,6 +177,9 @@ const globalMouse = () => {
 };
 const globalWhell = () => {
   function scrollFunction(e: any) {
+    if (e.target.id === 'puppeteer-sunsilent-shadow-root') {
+      return false;
+    }
     emits('addHiddenData', {
       type: 'scroll',
       data: {
@@ -208,33 +205,15 @@ const globalKeyDown = () => {
     // 由于鼠标移入可能会导致样式改变，所以按住shift键之后rect变为无法穿透的遮蔽层
     if (event.type === 'keydown' && (event.shiftKey || event.key === 'Shift')) {
       rectBoxPointerVisible.value = true;
-    } else if (
-      event.type === 'keyup' &&
-      (event.shiftKey || event.key === 'Shift')
-    ) {
+    } else if (event.type === 'keyup' && (event.shiftKey || event.key === 'Shift')) {
       rectBoxPointerVisible.value = false;
     }
     // 剔除特殊键
-    if (
-      [
-        'Control',
-        'Shift',
-        'Alt',
-        'Meta',
-        'CapsLock',
-        'Tab',
-        'F11',
-        'F12',
-      ].includes(event.key)
-    ) {
+    if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab', 'F11', 'F12'].includes(event.key)) {
       return false;
     }
     // 自定义组合键
-    const isCombination = combinationKey(
-      event.type,
-      event.code,
-      event.shiftKey
-    );
+    const isCombination = combinationKey(event.type, event.code, event.shiftKey);
     if (isCombination) return;
     let type;
     // if (event.keyCode === 8) {
@@ -254,8 +233,7 @@ const globalKeyDown = () => {
       default:
         return;
     }
-    const text =
-      type === 'char' ? String.fromCharCode(event.charCode) : undefined;
+    const text = type === 'char' ? String.fromCharCode(event.charCode) : undefined;
     const data = {
       type,
       text,

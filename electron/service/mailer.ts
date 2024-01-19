@@ -1,4 +1,4 @@
-import { createTransport } from "nodemailer";
+import { createTransport } from 'nodemailer';
 
 interface MailerOption {
   mail: string;
@@ -25,7 +25,7 @@ class Mailer {
   };
   constructor(options: MailerOption) {
     this.transporter = createTransport({
-      service: "QQ",
+      service: 'QQ',
       auth: {
         user: options.mail,
         pass: options.mailToken,

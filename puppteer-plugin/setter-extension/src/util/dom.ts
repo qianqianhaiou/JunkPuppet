@@ -4,19 +4,19 @@ interface Selector {
 }
 
 export const addClass = (selector: Selector, className: string) => {
-  const $els = document.querySelectorAll(selector.selector)
+  const $els = document.querySelectorAll(selector.selector);
   if ($els.length) {
     Array.prototype.forEach.call($els, (item) => {
-      item.className = item.className + ` ${className}`
-    })
+      item.className = item.className + ` ${className}`;
+    });
   }
-}
+};
 
 export const removeClass = (className: string) => {
-  const $els = document.querySelectorAll(className)
+  const $els = document.querySelectorAll(className);
   if ($els.length) {
     Array.prototype.forEach.call($els, (item) => {
-      item.className = item.className.replace(className, '')
-    })
+      item.className = item.className.replace(className, '');
+    });
   }
-}
+};

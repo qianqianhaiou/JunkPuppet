@@ -59,18 +59,24 @@
           </template>
         </div>
         当前页操作列表 （
-        <span
-          style="font-weight: bolder; margin-left: 2px; margin-right: 2px"
-          >{{ userDoData.length }}</span
-        >
+        <span style="font-weight: bolder; margin-left: 2px; margin-right: 2px">
+          {{ userDoData.length }}
+        </span>
         条）
         <div style="height: 24px" v-if="bodyVisible">
           <Button
-            style="height: 22px; padding-top: 0px; padding-bottom: 0px; font-size: 14px; line-height: 22px;"
+            style="
+              height: 22px;
+              padding-top: 0px;
+              padding-bottom: 0px;
+              font-size: 14px;
+              line-height: 22px;
+            "
             type="link"
             @click="handleChangeFnBoxVisible(true)"
-            >内置工具</Button
           >
+            内置工具
+          </Button>
         </div>
       </div>
     </template>
@@ -83,14 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Button,
-  Drawer,
-  Collapse,
-  CollapsePanel,
-  Result,
-  Modal,
-} from 'ant-design-vue';
+import { Button, Drawer, Collapse, CollapsePanel, Result, Modal } from 'ant-design-vue';
 import { computed, ref, CSSProperties, watch, watchEffect } from 'vue';
 import { useDraggable } from '@vueuse/core';
 import { formatOperateType } from '@/util/format';
@@ -119,9 +118,7 @@ const bodyVisible = ref(true);
 
 // 挂载点
 const getModalContainer = () => {
-  const el: any = document.querySelector(
-    '#puppeteer-sunsilent-shadow-root'
-  )!.shadowRoot;
+  const el: any = document.querySelector('#puppeteer-sunsilent-shadow-root')!.shadowRoot;
   return el;
 };
 

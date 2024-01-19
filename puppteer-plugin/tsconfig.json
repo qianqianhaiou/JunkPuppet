@@ -10,6 +10,6 @@
     "skipLibCheck": false,
     "strict": true,
     "resolveJsonModule": true,
-    "typeRoots": ["src/types/*.d.ts"]
-  }
+    "typeRoots": ["src/types/*.d.ts"],
+  },
 }

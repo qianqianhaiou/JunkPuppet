@@ -1,6 +1,6 @@
-import Editor, { useMonaco } from "@monaco-editor/react";
-import { Drawer } from "antd";
-import { useEffect, useState } from "react";
+import Editor, { useMonaco } from '@monaco-editor/react';
+import { Drawer } from 'antd';
+import { useEffect, useState } from 'react';
 
 function App({
   customFn,
@@ -20,34 +20,29 @@ function App({
   };
   const autoFormatCode = async () => {
     if (monaco?.editor) {
-      monaco.editor
-        .getEditors()[0]
-        ._actions.get("editor.action.formatDocument")
-        ._run();
+      monaco.editor.getEditors()[0]._actions.get('editor.action.formatDocument')._run();
     }
   };
   useEffect(() => {
     if (monaco) {
-      monaco.languages.registerCompletionItemProvider("javascript", {
+      monaco.languages.registerCompletionItemProvider('javascript', {
         provideCompletionItems: () => {
           return {
             suggestions: [
-              /**   * 内置变量   */
+              /** 快捷输入 */
               {
-                label: "injectContext",
+                label: 'injectContext',
                 kind: monaco.languages.CompletionItemKind.Constant,
-                insertText: "injectContext",
-                insertTextRules:
-                  monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                detail: "Puppet上下文",
+                insertText: 'const { page, browser, client } = _injectContexts;',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                detail: 'Puppet Context',
               },
               {
-                label: "task",
+                label: 'waitTime',
                 kind: monaco.languages.CompletionItemKind.Constant,
-                insertText: "task",
-                insertTextRules:
-                  monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                detail: "task配置",
+                insertText: `await new Pormise((resolve, reject) => { setTimeout(() => { resolve('') }, 1000) })`,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                detail: '等待延迟',
               },
             ],
           };
@@ -59,18 +54,18 @@ function App({
     }
   }, [monaco]);
   useEffect(() => {
-    setDefaultValue(customFn[activeKey]["functionString"] || `//${activeKey}`);
+    setDefaultValue(customFn[activeKey]['functionString'] || `// ${activeKey}`);
   }, [activeKey]);
   return (
     <Editor
-      height="100%"
-      defaultLanguage="javascript"
-      theme="vs-dark"
+      height='100%'
+      defaultLanguage='javascript'
+      theme='vs-dark'
       value={defaultValue}
       options={{
         readOnly: readonly,
         readOnlyMessage: {
-          value: "当前为只读状态",
+          value: '当前为只读状态',
         },
       }}
       onChange={handleChange}

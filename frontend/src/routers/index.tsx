@@ -1,12 +1,12 @@
-import { Suspense, lazy } from "react";
-import Layout from "@/views/layout";
-import Home from "@/views/home";
-import { Spin } from "antd";
-import { Navigate } from "react-router-dom";
-const InitRouter = lazy(() => import("@/views/init"));
-const SettingRouter = lazy(() => import("@/views/setting"));
-const TaskListRouter = lazy(() => import("@/views/taskList"));
-const LogRouter = lazy(() => import("@/views/log"));
+import { Suspense, lazy } from 'react';
+import Layout from '@/views/layout';
+import Home from '@/views/home';
+import { Spin } from 'antd';
+import { Navigate } from 'react-router-dom';
+const InitRouter = lazy(() => import('@/views/init'));
+const SettingRouter = lazy(() => import('@/views/setting'));
+const TaskListRouter = lazy(() => import('@/views/taskList'));
+const LogRouter = lazy(() => import('@/views/log'));
 
 function LodingPage(props: any) {
   document.title = props.title;
@@ -14,11 +14,10 @@ function LodingPage(props: any) {
     <Layout>
       <Suspense
         fallback={
-          <div className="page-loading">
-            <Spin size="large"></Spin>
+          <div className='page-loading'>
+            <Spin size='large'></Spin>
           </div>
-        }
-      >
+        }>
         {props.children}
       </Suspense>
     </Layout>
@@ -27,56 +26,56 @@ function LodingPage(props: any) {
 
 export const defaultRouter: any[] = [
   {
-    path: "/init",
+    path: '/init',
     element: (
-      <LodingPage title="初始化配置">
+      <LodingPage title='初始化配置'>
         <InitRouter></InitRouter>
       </LodingPage>
     ),
   },
   {
-    path: "*",
-    permission: "",
+    path: '*',
+    permission: '',
     element: <Navigate to={`/init`} replace />,
   },
 ];
 
 export const optionalRouter: any[] = [
   {
-    path: "/",
+    path: '/',
     element: (
-      <LodingPage title="首页">
+      <LodingPage title='首页'>
         <Home></Home>
       </LodingPage>
     ),
   },
   {
-    path: "/tasklist",
+    path: '/tasklist',
     element: (
-      <LodingPage title="任务列表">
+      <LodingPage title='任务列表'>
         <TaskListRouter></TaskListRouter>
       </LodingPage>
     ),
   },
   {
-    path: "/logs",
+    path: '/logs',
     element: (
-      <LodingPage title="服务日志">
+      <LodingPage title='服务日志'>
         <LogRouter></LogRouter>
       </LodingPage>
     ),
   },
   {
-    path: "/setting",
+    path: '/setting',
     element: (
-      <LodingPage title="全局设置">
+      <LodingPage title='全局设置'>
         <SettingRouter></SettingRouter>
       </LodingPage>
     ),
   },
   {
-    path: "*",
-    permission: "",
+    path: '*',
+    permission: '',
     element: <Navigate to={`/`} replace />,
   },
 ];

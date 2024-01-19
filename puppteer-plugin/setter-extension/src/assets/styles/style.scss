@@ -1,4 +1,5 @@
 $lightGreen: #e7ffb2;
+$defaultBlue: #4096ff;
 $normalGreen: #c5ff45;
 $deepGreen: #13ce66;
 
@@ -31,14 +32,18 @@ $deepGreen: #13ce66;
     user-select: none;
     background-color: #fff;
     border: 1px solid #e0e0e0;
-    padding: 5px 2px;
+    padding: 6px 6px;
     border-radius: 5px;
-    box-shadow: 0px 12px 32px 4px rgba(0, 0, 0, 0.04),
+    box-shadow:
+      0px 12px 32px 4px rgba(0, 0, 0, 0.04),
       0px 8px 20px rgba(0, 0, 0, 0.08);
     .pop-item {
       padding: 5px 10px;
+      border-radius: 4px;
       &:hover {
-        background-color: $lightGreen;
+        background-color: $defaultBlue;
+        color: #fff;
+        cursor: pointer;
       }
     }
   }

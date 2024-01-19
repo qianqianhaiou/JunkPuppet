@@ -1,6 +1,6 @@
-import { CronJob } from "cron";
-import { startplay } from "./task";
-import { taskListDb } from "./db";
+import { CronJob } from 'cron';
+import { startplay } from './task';
+import { taskListDb } from './db';
 
 // 定时任务开关
 export const triggerItemCron = async (script: any) => {
@@ -11,7 +11,7 @@ export const triggerItemCron = async (script: any) => {
       cron.stop();
     }
     const database = await taskListDb();
-    const result = database.chain.get("list").find({ _id: script._id }).value();
+    const result = database.chain.get('list').find({ _id: script._id }).value();
     if (result.mockDataId) {
       global.cronList.set(
         result._id.toString(),
@@ -29,8 +29,8 @@ export const triggerItemCron = async (script: any) => {
             await startplay(params);
           },
           null,
-          true
-        )
+          true,
+        ),
       );
     }
   } else {
@@ -62,8 +62,8 @@ export const turnOnCron = (script: any) => {
           await startplay(params);
         },
         null,
-        true
-      )
+        true,
+      ),
     );
   }
 };

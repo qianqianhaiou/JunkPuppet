@@ -12,7 +12,7 @@ export async function playClick(
     selector: Selector;
     screenX?: number;
     screenY?: number;
-  }
+  },
 ) {
   await injectFunction({ page }, hookA);
   const target = await selectBySelector({ page }, data.selector);
@@ -41,31 +41,27 @@ export async function playMouse(client: CDPSession, data: any) {
 export async function playKeyDown(client: CDPSession, data: any) {
   await client.send('Input.dispatchKeyEvent', data);
 }
-export async function getTextBySelector(page: Page, data: Selector) {
+export async function getAttributeBySelector(page: Page, data: Selector, attribute: string) {
   const result: any = [];
   if (data.iframeIndex >= 0) {
     const iframes = await page.$$('iframe');
     const targets = await iframes[data.iframeIndex].$$(data.selector);
     for (const target of targets) {
-      const text = await target.getProperty('innerText');
+      const text = await target.getProperty(attribute);
       const value = await text.jsonValue();
       result.push(value);
     }
   } else {
     const targets = await page.$$(data.selector);
     for (const target of targets) {
-      const text = await target.getProperty('innerText');
+      const text = await target.getProperty(attribute);
       const value = await text.jsonValue();
       result.push(value);
     }
   }
   return result;
 }
-export async function getSnapshotBySelector(
-  page: Page,
-  data: Selector,
-  parent: string
-) {
+export async function getSnapshotBySelector(page: Page, data: Selector, parent: string) {
   const result: any = [];
   if (data.iframeIndex >= 0) {
     const iframes = await page.$$('iframe');
@@ -92,7 +88,7 @@ export async function getSnapshotBySelector(
 export async function getCurrentScreenSnapshot(
   page: Page,
   data: CurrentScreenSnapshot,
-  parent: string
+  parent: string,
 ) {
   const uid = uuidv4();
   await page.screenshot({
@@ -114,9 +110,24 @@ export async function snapshotFullScreen(page: Page, parent: string) {
   });
   return uid;
 }
-export async function customFn(
+export async function customFn(_injectContexts: InjectContexts, _silent_exec_string: string) {
+  if (_silent_exec_string) {
+    return eval(`(async() => {${_silent_exec_string}})()`);
+  } else {
+    return Promise.resolve('');
+  }
+}
+export async function runLifeHook(
   _injectContexts: InjectContexts,
-  _silent_exec_string: string
+  customFnData: any,
+  label: string,
 ) {
-  return eval(`(async() => {${_silent_exec_string}})()`);
+  const _silent_exec_string = customFnData[label]?.functionString;
+  if (_silent_exec_string) {
+    return await customFn(_injectContexts, _silent_exec_string).catch((e: any) => {
+      console.error(`LIFE_HOOK（${label}）: ` + e?.message);
+    });
+  } else {
+    return Promise.resolve('');
+  }
 }

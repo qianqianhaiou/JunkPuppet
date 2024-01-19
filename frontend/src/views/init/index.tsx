@@ -1,18 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { selectDir, setGlobalSetting, selectFile } from "@/service";
-import { Button, Input, Modal, Space, Steps, Tag } from "antd";
-import {
-  SelectOutlined,
-  ArrowLeftOutlined,
-  ArrowDownOutlined,
-} from "@ant-design/icons";
+import { useEffect, useRef, useState } from 'react';
+import { selectDir, setGlobalSetting, selectFile } from '@/service';
+import { Button, Input, Modal, Space, Steps, Tag } from 'antd';
+import { SelectOutlined, ArrowLeftOutlined, ArrowDownOutlined } from '@ant-design/icons';
 
 function Init() {
-  const [chromePath, setChromePath] = useState("");
-  const [basePath, setBasePath] = useState("");
+  const [chromePath, setChromePath] = useState('');
+  const [basePath, setBasePath] = useState('');
 
-  const [mail, setMail] = useState("");
-  const [mailToken, setMailToken] = useState("");
+  const [mail, setMail] = useState('');
+  const [mailToken, setMailToken] = useState('');
 
   const [step, setStep] = useState(0);
   const handleSelectDir = async () => {
@@ -42,8 +38,8 @@ function Init() {
   const [modal, contextHolder] = Modal.useModal();
   const handleSubmit = async () => {
     modal.confirm({
-      title: "提示",
-      content: "请确认初始化配置，提交之后软件将重新启动",
+      title: '提示',
+      content: '请确认初始化配置，提交之后软件将重新启动',
       onOk: () => {
         setGlobalSetting({
           chrome_path: chromePath,
@@ -55,79 +51,66 @@ function Init() {
     });
   };
   return (
-    <div className="h-full">
+    <div className='h-full'>
       {contextHolder}
-      <div className="text-[22px] py-[30px] font-bold text-center">
-        初始化应用程序
-      </div>
-      <div
-        className="flex justify-center"
-        style={{ height: "calc(100% - 150px)" }}
-      >
+      <div className='text-[22px] py-[30px] font-bold text-center'>初始化应用程序</div>
+      <div className='flex justify-center' style={{ height: 'calc(100% - 150px)' }}>
         <Steps
-          className="w-[320px] flex-shrink-0"
-          direction="vertical"
+          className='w-[320px] flex-shrink-0'
+          direction='vertical'
           current={step}
           items={[
             {
-              title: "选择Chrome应用程序",
-              description: <div className="h-[100px]"></div>,
+              title: '选择Chrome应用程序',
+              description: <div className='h-[100px]'></div>,
             },
             {
-              title: "选择数据存放位置",
-              description: <div className="h-[100px]"></div>,
+              title: '选择数据存放位置',
+              description: <div className='h-[100px]'></div>,
             },
             {
-              title: "邮件服务（可选）",
-              description: <div className="h-[100px]"></div>,
+              title: '邮件服务（可选）',
+              description: <div className='h-[100px]'></div>,
             },
             {
-              title: "确认",
-              description: <div className="h-[100px]"></div>,
+              title: '确认',
+              description: <div className='h-[100px]'></div>,
             },
           ]}
         />
-        <div className="w-[600px] ml-[20px]">
+        <div className='w-[600px] ml-[20px]'>
           {step === 0 && (
-            <div className="text-center">
-              <div className="leading-[36px]">
+            <div className='text-center'>
+              <div className='leading-[36px]'>
                 <div>选择Chrome应用程序所在位置</div>
                 <div>一般该应用程序被命名为chrome.exe</div>
                 <div>一般被存放在：</div>
-                <div
-                  className="whitespace-pre-line mt-[10px]"
-                  style={{ overflowWrap: "anywhere" }}
-                >
+                <div className='whitespace-pre-line mt-[10px]' style={{ overflowWrap: 'anywhere' }}>
                   C:\\ProgramFiles\\Google\\Chrome\\Application\\chrome.exe
                 </div>
               </div>
               {chromePath && (
-                <div className="py-[30px]">
-                  <Tag
-                    className="text-[14px] px-[10px] py-[6px] whitespace-pre-wrap"
-                    color="lime"
-                  >
+                <div className='py-[30px]'>
+                  <Tag className='text-[14px] px-[10px] py-[6px] whitespace-pre-wrap' color='lime'>
                     已选： {chromePath}
                   </Tag>
                 </div>
               )}
               <Space>
                 <Button
-                  className="w-[200px] mt-[10px]"
-                  size="large"
-                  type="primary"
+                  className='w-[200px] mt-[10px]'
+                  size='large'
+                  type='primary'
                   icon={<SelectOutlined />}
-                  onClick={handleSelectFile}
-                >
-                  {chromePath ? "重新选择" : "选择"}
+                  onClick={handleSelectFile}>
+                  {chromePath ? '重新选择' : '选择'}
                 </Button>
                 {chromePath && (
                   <Button
-                    className="w-[150px] mt-[10px]"
-                    size="large"
+                    className='w-[150px] mt-[10px]'
+                    size='large'
                     icon={<ArrowDownOutlined />}
-                    onClick={handleNextStep}
-                  >
+                    onClick={handleNextStep}>
                     下一步
                   </Button>
                 )}
@@ -135,47 +118,41 @@ function Init() {
             </div>
           )}
           {step === 1 && (
-            <div className="text-center">
-              <div className="leading-[36px]">
+            <div className='text-center'>
+              <div className='leading-[36px]'>
                 <div>请选择应用程序所产生的数据存放位置</div>
                 <div>由于数据量在日常使用过程中会不断增加</div>
                 <div>建议存放在非系统盘或机械硬盘中</div>
               </div>
               {basePath && (
-                <div className="py-[30px]">
-                  <Tag
-                    className="text-[14px] px-[10px] py-[6px] whitespace-pre-wrap"
-                    color="lime"
-                  >
+                <div className='py-[30px]'>
+                  <Tag className='text-[14px] px-[10px] py-[6px] whitespace-pre-wrap' color='lime'>
                     已选： {basePath}
                   </Tag>
                 </div>
               )}
               <Space>
                 <Button
-                  className="w-[150px] mt-[10px]"
-                  size="large"
+                  className='w-[150px] mt-[10px]'
+                  size='large'
                   icon={<ArrowLeftOutlined />}
-                  onClick={handleBackStep}
-                >
+                  onClick={handleBackStep}>
                   上一步
                 </Button>
                 <Button
-                  className="w-[200px] mt-[10px]"
-                  size="large"
-                  type="primary"
+                  className='w-[200px] mt-[10px]'
+                  size='large'
+                  type='primary'
                   icon={<SelectOutlined />}
-                  onClick={handleSelectDir}
-                >
-                  {basePath ? "重新选择" : "选择"}
+                  onClick={handleSelectDir}>
+                  {basePath ? '重新选择' : '选择'}
                 </Button>
                 {basePath && (
                   <Button
-                    className="w-[150px] mt-[10px]"
-                    size="large"
+                    className='w-[150px] mt-[10px]'
+                    size='large'
                     icon={<ArrowDownOutlined />}
-                    onClick={handleNextStep}
-                  >
+                    onClick={handleNextStep}>
                     下一步
                   </Button>
                 )}
@@ -183,83 +160,72 @@ function Init() {
             </div>
           )}
           {step === 2 && (
-            <div className="text-center">
-              <div className="leading-[36px]">
+            <div className='text-center'>
+              <div className='leading-[36px]'>
                 <div>请选择应用程序所产生的数据存放位置</div>
                 <div>由于数据量在日常使用过程中会不断增加</div>
                 <div>建议存放在非系统盘或机械硬盘中</div>
               </div>
-              <div className="w-[80%] mx-[auto] mt-[20px]">
-                <Space className="w-full" direction="vertical">
+              <div className='w-[80%] mx-[auto] mt-[20px]'>
+                <Space className='w-full' direction='vertical'>
+                  <Input placeholder='mail' value={mail} onChange={handleMailChange}></Input>
                   <Input
-                    placeholder="mail"
-                    value={mail}
-                    onChange={handleMailChange}
-                  ></Input>
-                  <Input
-                    placeholder="mailToken"
+                    placeholder='mailToken'
                     value={mailToken}
-                    onChange={handleMailTokenChange}
-                  ></Input>
+                    onChange={handleMailTokenChange}></Input>
                 </Space>
               </div>
-              <Space className="mt-[10px]">
+              <Space className='mt-[10px]'>
                 <Button
-                  className="w-[150px] mt-[10px]"
-                  size="large"
+                  className='w-[150px] mt-[10px]'
+                  size='large'
                   icon={<ArrowLeftOutlined />}
-                  onClick={handleBackStep}
-                >
+                  onClick={handleBackStep}>
                   上一步
                 </Button>
                 <Button
-                  className="w-[150px] mt-[10px]"
-                  size="large"
+                  className='w-[150px] mt-[10px]'
+                  size='large'
                   icon={<ArrowDownOutlined />}
-                  onClick={handleNextStep}
-                >
+                  onClick={handleNextStep}>
                   下一步
                 </Button>
               </Space>
             </div>
           )}
           {step === 3 && (
-            <div className="text-center">
+            <div className='text-center'>
               <div>请确认初始化配置，点击提交之后软件将重新启动。</div>
               <div>
-                <div className="pt-[30px]">
+                <div className='pt-[30px]'>
                   <Tag
-                    className="w-full text-[14px] px-[10px] py-[6px] whitespace-pre-wrap"
-                    color="lime"
-                  >
+                    className='w-full text-[14px] px-[10px] py-[6px] whitespace-pre-wrap'
+                    color='lime'>
                     Chrome位置： {chromePath}
                   </Tag>
                 </div>
-                <div className="py-[20px]">
+                <div className='py-[20px]'>
                   <Tag
-                    className="w-full text-[14px] px-[10px] py-[6px] whitespace-pre-wrap"
-                    color="lime"
-                  >
+                    className='w-full text-[14px] px-[10px] py-[6px] whitespace-pre-wrap'
+                    color='lime'>
                     数据存放位置： {basePath}
                   </Tag>
                 </div>
               </div>
               <Space>
                 <Button
-                  className="w-[200px] mt-[10px]"
-                  size="large"
+                  className='w-[200px] mt-[10px]'
+                  size='large'
                   icon={<ArrowLeftOutlined />}
-                  onClick={handleBackStep}
-                >
+                  onClick={handleBackStep}>
                   上一步
                 </Button>
                 <Button
-                  className="w-[200px] mt-[10px]"
-                  size="large"
+                  className='w-[200px] mt-[10px]'
+                  size='large'
                   icon={<SelectOutlined />}
-                  type="primary"
-                  onClick={handleSubmit}
-                >
+                  type='primary'
+                  onClick={handleSubmit}>
                   确认并提交
                 </Button>
               </Space>
@@ -298,7 +264,7 @@ function App() {
   return iAgress ? (
     <Init></Init>
   ) : (
-    <Modal title="免责声明" open={true} footer={null} closable={false}>
+    <Modal title='免责声明' open={true} footer={null} closable={false}>
       <p>
         本软件是一个开源软件，遵循MIT许可证的条款，您可以自由地使用、复制、修改和分发本软件及其源代码，无需支付任何费用，也无需通知作者或版权所有者。但您必须在本软件的所有副本中保留原有的版权声明和许可证声明。
       </p>
@@ -311,9 +277,9 @@ function App() {
       <p>
         您应该遵守适用的法律法规，不得将本软件用于任何非法或不道德的目的，也不得侵犯他人的合法权益。如果您违反了本免责声明的任何条款，您的使用许可将自动终止，作者或版权所有者有权要求您停止使用本软件，并销毁本软件的所有副本。
       </p>
-      <div className="text-center">
-        <Button type="primary" disabled={Boolean(count)} onClick={handleCheck}>
-          我同意遵守以上规则 {count ? count + "s" : ""}
+      <div className='text-center'>
+        <Button type='primary' disabled={Boolean(count)} onClick={handleCheck}>
+          我同意遵守以上规则 {count ? count + 's' : ''}
         </Button>
       </div>
     </Modal>

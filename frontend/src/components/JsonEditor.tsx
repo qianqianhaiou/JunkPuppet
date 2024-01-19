@@ -1,5 +1,5 @@
-import Editor, { useMonaco } from "@monaco-editor/react";
-import { useEffect, useState } from "react";
+import Editor, { useMonaco } from '@monaco-editor/react';
+import { useEffect, useState } from 'react';
 
 function App({
   defaultValue,
@@ -16,11 +16,8 @@ function App({
   };
   const autoFormatCode = async () => {
     if (monaco?.editor) {
-      monaco.editor
-        .getEditors()[0]
-        ._actions.get("editor.action.formatDocument")
-        ._run();
-      monaco.editor.getEditors()[0]._actions.get("editor.foldLevel3")._run();
+      monaco.editor.getEditors()[0]._actions.get('editor.action.formatDocument')._run();
+      monaco.editor.getEditors()[0]._actions.get('editor.foldLevel3')._run();
     }
   };
   const jumpToTargetLine = (line: number) => {
@@ -34,14 +31,7 @@ function App({
       acceptedList.forEach((item: string): void => {
         const editorModel = monaco.editor.getModels()[0];
         if (!editorModel) return;
-        const matches: any = editorModel.findMatches(
-          item,
-          false,
-          false,
-          false,
-          null,
-          false
-        );
+        const matches: any = editorModel.findMatches(item, false, false, false, null, false);
         matches.forEach((match: any): void => {
           editorModel.deltaDecorations(
             [],
@@ -50,11 +40,11 @@ function App({
                 range: match.range,
                 options: {
                   isWholeLine: true,
-                  className: "editor-json-highlight",
-                  marginClassName: "editor-json-highlight",
+                  className: 'editor-json-highlight',
+                  marginClassName: 'editor-json-highlight',
                 },
               },
-            ]
+            ],
           );
         });
       });
@@ -67,14 +57,14 @@ function App({
   }, [monaco, defaultValue, readonly]);
   return defaultValue ? (
     <Editor
-      height="100%"
-      defaultLanguage="json"
-      theme="vs-dark"
+      height='100%'
+      defaultLanguage='json'
+      theme='vs-dark'
       value={defaultValue}
       options={{
         readOnly: readonly,
         readOnlyMessage: {
-          value: "当前为只读状态",
+          value: '当前为只读状态',
         },
       }}
       onChange={handleChange}

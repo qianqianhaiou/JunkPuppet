@@ -1,15 +1,5 @@
-import {
-  Button,
-  Drawer,
-  Input,
-  Modal,
-  Result,
-  Space,
-  Tabs,
-  Upload,
-  message,
-} from "antd";
-import { useEffect, useState } from "react";
+import { Button, Drawer, Input, Modal, Result, Space, Tabs, Upload, message } from 'antd';
+import { useEffect, useState } from 'react';
 import {
   startSetting,
   getTaskConfigDetail,
@@ -17,9 +7,9 @@ import {
   deleteTask,
   debugPlay,
   uploadJSONSetting,
-} from "@/service/index";
-import JsonEditor from "@/components/JsonEditor";
-import style from "../style.module.scss";
+} from '@/service/index';
+import JsonEditor from '@/components/JsonEditor';
+import style from '../style.module.scss';
 import {
   ToolOutlined,
   EditOutlined,
@@ -28,10 +18,10 @@ import {
   BugOutlined,
   UploadOutlined,
   AimOutlined,
-} from "@ant-design/icons";
-import JavascriptEditor from "@/components/JavascriptEditor";
-import ConfigTab from "./ConfigTab";
-import { flushSync } from "react-dom";
+} from '@ant-design/icons';
+import JavascriptEditor from '@/components/JavascriptEditor';
+import ConfigTab from './ConfigTab';
+import { flushSync } from 'react-dom';
 
 function UploadJsonConfig({
   configId,
@@ -62,7 +52,7 @@ function UploadJsonConfig({
         data: text,
       });
       if (messageApi) {
-        messageApi.success("覆盖成功");
+        messageApi.success('覆盖成功');
       }
       reFreshAll();
       return false;
@@ -89,16 +79,16 @@ function EditorBox({
   const [editable, setEditable] = useState(false);
   const defaultBuiltInData = config?.mockData?.builtInData
     ? JSON.stringify(config.mockData.builtInData)
-    : "";
+    : '';
   const [builtInData, setBuiltInData] = useState(defaultBuiltInData);
   const [customFn, setCustomFn] = useState<any>({});
-  const [activeKey, setActiveKey] = useState("JSON配置");
+  const [activeKey, setActiveKey] = useState('JSON配置');
   const [defaultCustomFnKeys, setDefaultCustomFnKeys] = useState<any>([]);
   const handleSubmit = async () => {
     try {
       JSON.parse(builtInData);
     } catch (e) {
-      messageApi.error("JSON格式错误，请检查。");
+      messageApi.error('JSON格式错误，请检查。');
       return false;
     }
     const result = await updateTaskMockData({
@@ -106,8 +96,8 @@ function EditorBox({
       builtInData: JSON.parse(builtInData),
       customFn: customFn,
     });
-    if (result === "ok") {
-      messageApi.success("修改成功");
+    if (result === 'ok') {
+      messageApi.success('修改成功');
       setEditable(false);
     }
   };
@@ -115,7 +105,7 @@ function EditorBox({
     setCustomFn((c: any) => {
       c[name] = {
         label: name,
-        functionString: "",
+        functionString: '',
       };
       return c;
     });
@@ -125,7 +115,7 @@ function EditorBox({
   };
   const handleUpdateFn = (e: string, activeKey: string) => {
     setCustomFn((c: any) => {
-      c[activeKey]["functionString"] = e;
+      c[activeKey]['functionString'] = e;
       return c;
     });
   };
@@ -154,8 +144,8 @@ function EditorBox({
     }
   }, [config]);
   return (
-    <div className="h-full">
-      <div className="flex flex-col" style={{ height: "calc(100% - 42px)" }}>
+    <div className='h-full'>
+      <div className='flex flex-col' style={{ height: 'calc(100% - 42px)' }}>
         <ConfigTab
           activeKey={activeKey}
           readonly={!editable}
@@ -163,50 +153,36 @@ function EditorBox({
           handleDeleteTabs={handleDeleteTabs}
           handleAddTab={handleAddTab}
           handleUpdateTabName={handleUpdateTabName}
-          handleUpdateActive={handleUpdateActive}
-        ></ConfigTab>
-        <div className="flex-1">
-          {activeKey === "JSON配置" ? (
+          handleUpdateActive={handleUpdateActive}></ConfigTab>
+        <div className='flex-1'>
+          {activeKey === 'JSON配置' ? (
             <JsonEditor
               defaultValue={defaultBuiltInData}
               readonly={!editable}
-              setValue={setBuiltInData}
-            ></JsonEditor>
+              setValue={setBuiltInData}></JsonEditor>
           ) : (
             <JavascriptEditor
               customFn={customFn}
               readonly={!editable}
               activeKey={activeKey}
-              updateValue={handleUpdateFn}
-            ></JavascriptEditor>
+              updateValue={handleUpdateFn}></JavascriptEditor>
           )}
         </div>
       </div>
-      <div className="flex justify-between items-center pt-[10px] px-[10px]">
+      <div className='flex justify-between items-center pt-[10px] px-[10px]'>
         <Space>
-          <Button
-            type="dashed"
-            onClick={handleStartSetting}
-            danger
-            icon={<ToolOutlined />}
-          >
+          <Button type='dashed' onClick={handleStartSetting} danger icon={<ToolOutlined />}>
             重新模拟
           </Button>
           <UploadJsonConfig
             configId={config._id}
             reFreshAll={handleUploadSuccces}
-            messageApi={messageApi}
-          >
-            <Button type="dashed" danger icon={<UploadOutlined />}>
+            messageApi={messageApi}>
+            <Button type='dashed' danger icon={<UploadOutlined />}>
               上传配置
             </Button>
           </UploadJsonConfig>
-          <Button
-            type="dashed"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={handleDeleteTask}
-          >
+          <Button type='dashed' icon={<DeleteOutlined />} danger onClick={handleDeleteTask}>
             删除
           </Button>
         </Space>
@@ -214,18 +190,14 @@ function EditorBox({
         <Space>
           {editable ? (
             <>
-              <Button type="primary" onClick={handleSubmit}>
+              <Button type='primary' onClick={handleSubmit}>
                 提交修改
               </Button>
               <Button onClick={() => setEditable(false)}>取消</Button>
             </>
           ) : (
             <>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => setEditable(true)}
-              >
+              <Button type='primary' icon={<EditOutlined />} onClick={() => setEditable(true)}>
                 编辑
               </Button>
               <Button onClick={close}>关闭</Button>
@@ -250,28 +222,19 @@ function NoTaskConfig({
 }) {
   return (
     <Result
-      className="h-full flex flex-col justify-center"
-      title="当前没有模拟数据"
+      className='h-full flex flex-col justify-center'
+      title='当前没有模拟数据'
       extra={
         <Space>
-          <Button
-            type="dashed"
-            icon={<AimOutlined />}
-            onClick={handleStartSetting}
-          >
+          <Button type='dashed' icon={<AimOutlined />} onClick={handleStartSetting}>
             开始模拟
           </Button>
           <UploadJsonConfig configId={config._id} reFreshAll={reFreshAll}>
-            <Button icon={<UploadOutlined />} type="dashed">
+            <Button icon={<UploadOutlined />} type='dashed'>
               上传文件
             </Button>
           </UploadJsonConfig>
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={handleDeleteTask}
-            type="dashed"
-            danger
-          >
+          <Button icon={<DeleteOutlined />} onClick={handleDeleteTask} type='dashed' danger>
             删除任务
           </Button>
         </Space>
@@ -308,7 +271,7 @@ function App({
   const handleStartSetting = async () => {
     await startSetting({
       ...config,
-      mockData: "",
+      mockData: '',
     });
     reFreshAll();
   };
@@ -327,12 +290,12 @@ function App({
   };
   const handleDeleteTask = () => {
     modal.confirm({
-      title: "是否要删除该任务",
+      title: '是否要删除该任务',
       icon: <ExclamationCircleFilled></ExclamationCircleFilled>,
-      content: "删除该任务后，该任务所得数据将会同步删除",
+      content: '删除该任务后，该任务所得数据将会同步删除',
       async onOk() {
         await deleteTask({ _id: config._id });
-        messageApi.success("删除成功");
+        messageApi.success('删除成功');
         reflash();
       },
       onCancel() {},
@@ -352,13 +315,13 @@ function App({
   }, [modalVisible]);
   return (
     <>
-      <Button type="link" style={{ padding: "0px" }} onClick={handleOpenDrawer}>
+      <Button type='link' style={{ padding: '0px' }} onClick={handleOpenDrawer}>
         配置
       </Button>
       <Drawer
         style={{ height: `${drwerHeight}px` }}
         title={
-          <div className="w-full flex items-center justify-between">
+          <div className='w-full flex items-center justify-between'>
             <div>任务配置</div>
             <div>
               {data.mockDataId && (
@@ -369,12 +332,11 @@ function App({
             </div>
           </div>
         }
-        placement="right"
+        placement='right'
         width={1200}
         destroyOnClose={true}
         onClose={handleClose}
-        open={modalVisible}
-      >
+        open={modalVisible}>
         {config?.mockDataId ? (
           <EditorBox
             handleStartSetting={handleStartSetting}
@@ -382,15 +344,13 @@ function App({
             config={config}
             messageApi={messageApi}
             close={handleClose}
-            reFreshAll={reFreshAll}
-          ></EditorBox>
+            reFreshAll={reFreshAll}></EditorBox>
         ) : (
           <NoTaskConfig
             config={config}
             reFreshAll={reFreshAll}
             handleStartSetting={handleStartSetting}
-            handleDeleteTask={handleDeleteTask}
-          ></NoTaskConfig>
+            handleDeleteTask={handleDeleteTask}></NoTaskConfig>
         )}
       </Drawer>
     </>

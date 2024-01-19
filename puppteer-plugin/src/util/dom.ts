@@ -3,14 +3,11 @@
  */
 export const hookA = () => {
   // 遍历A标签更改 _blank -> self
-  Array.prototype.map.call(
-    document.querySelectorAll('a'),
-    ($el: HTMLAnchorElement) => {
-      if ($el.target === '_blank') {
-        $el.target = '_self';
-      }
+  Array.prototype.map.call(document.querySelectorAll('a'), ($el: HTMLAnchorElement) => {
+    if ($el.target === '_blank') {
+      $el.target = '_self';
     }
-  );
+  });
 };
 
 /**

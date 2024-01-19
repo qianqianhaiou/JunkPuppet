@@ -7,5 +7,5 @@ export const throttle = (fn: Function, delay: number) => {
     }
     lastCall = now;
     return fn(...args);
-  }
-}
+  };
+};

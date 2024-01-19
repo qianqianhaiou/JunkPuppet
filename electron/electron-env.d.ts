@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-electron/electron-env" />
-declare module "uuid";
-declare module "nodemailer";
+declare module 'uuid';
+declare module 'nodemailer';
 declare namespace globalThis {
   var cronList: Map<string, any>;
 }
@@ -57,8 +57,8 @@ interface IRunner extends ISetting {
     {
       cookieName: string;
       cookieValue: string;
-    }
+    },
   ];
 }
 
-declare module "diskinfo";
+declare module 'diskinfo';

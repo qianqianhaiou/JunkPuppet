@@ -9,10 +9,7 @@ export const deceptionDetection = async (contexts: InjectContexts) => {
     }
   });
   if (contexts.browser) {
-    const fakeUA = (await contexts.browser.userAgent()).replace(
-      'HeadlessChrome/',
-      'Chrome/'
-    );
+    const fakeUA = (await contexts.browser.userAgent()).replace('HeadlessChrome/', 'Chrome/');
     await contexts.page.setUserAgent(fakeUA);
   }
 };
@@ -20,7 +17,7 @@ export const deceptionDetection = async (contexts: InjectContexts) => {
 export const modifyCookies = async (
   contexts: InjectContexts,
   cookies: Cookie[] | undefined,
-  targetUrl: string
+  targetUrl: string,
 ) => {
   if (cookies && cookies.length) {
     const target = cookies.map((cookie) => {
