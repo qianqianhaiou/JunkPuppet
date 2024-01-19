@@ -41,20 +41,20 @@ export async function playMouse(client: CDPSession, data: any) {
 export async function playKeyDown(client: CDPSession, data: any) {
   await client.send('Input.dispatchKeyEvent', data);
 }
-export async function getTextBySelector(page: Page, data: Selector) {
+export async function getAttributeBySelector(page: Page, data: Selector, attribute: string) {
   const result: any = [];
   if (data.iframeIndex >= 0) {
     const iframes = await page.$$('iframe');
     const targets = await iframes[data.iframeIndex].$$(data.selector);
     for (const target of targets) {
-      const text = await target.getProperty('innerText');
+      const text = await target.getProperty(attribute);
       const value = await text.jsonValue();
       result.push(value);
     }
   } else {
     const targets = await page.$$(data.selector);
     for (const target of targets) {
-      const text = await target.getProperty('innerText');
+      const text = await target.getProperty(attribute);
       const value = await text.jsonValue();
       result.push(value);
     }

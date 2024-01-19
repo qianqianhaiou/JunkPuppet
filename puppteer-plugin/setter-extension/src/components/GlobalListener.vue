@@ -82,8 +82,7 @@ const recordUserRect = async () => {
     });
   } else if (toolActive.value === 'link') {
     const rectDomElRect = rectDomEl.value.getBoundingClientRect();
-    rectDomEl.value.className =
-      rectDomEl.value.className + ` puppeteer_sunsilent_light_click_navigator`;
+    addClass(newSelector, 'puppeteer_sunsilent_light_click_navigator');
     // 通过 readystatechange 判断是否需要等待 load 事件
     // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
     emits('addUserDoData', {

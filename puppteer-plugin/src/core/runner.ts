@@ -10,7 +10,7 @@ import {
   customFn,
   getCurrentScreenSnapshot,
   getSnapshotBySelector,
-  getTextBySelector,
+  getAttributeBySelector,
   playClick,
   playKeyDown,
   playMouse,
@@ -142,7 +142,14 @@ async function startTask(props: TaskRunnerData) {
         uid,
       });
     } else if (item.type === 'getText') {
-      const data = await getTextBySelector(page, item.data);
+      const data = await getAttributeBySelector(page, item.data, 'innerText');
+      result.texts.push({
+        label: item.label || getCurrentTime(),
+        multiple: item.multiple,
+        values: data,
+      });
+    } else if (item.type === 'getAttribute') {
+      const data = await getAttributeBySelector(page, item.data, item.attribute);
       result.texts.push({
         label: item.label || getCurrentTime(),
         multiple: item.multiple,
