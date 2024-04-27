@@ -3,6 +3,7 @@ import {
   UnorderedListOutlined,
   HomeOutlined,
   InfoCircleOutlined,
+  JavaScriptOutlined,
 } from '@ant-design/icons';
 import { Menu, Tooltip, Modal } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -54,6 +55,11 @@ function App() {
       label: '任务列表',
       key: '/tasklist',
       icon: <UnorderedListOutlined />,
+    },
+    {
+      label: '手动执行',
+      key: '/manualjs',
+      icon: <JavaScriptOutlined />,
     },
     {
       label: '服务日志',

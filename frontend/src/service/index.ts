@@ -48,7 +48,9 @@ export const getRecentLogs = async () => {
 export const clearAllLogs = async () => {
   return FetchData('clearAllLogs', {});
 };
-
+export const startManualJs = async (params: any) => {
+  return FetchData('startManualJs', params);
+};
 export const startSetting = async (params: any) => {
   return FetchData('startSetting', params);
 };

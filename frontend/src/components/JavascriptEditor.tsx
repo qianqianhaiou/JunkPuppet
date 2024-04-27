@@ -3,14 +3,16 @@ import { Drawer } from 'antd';
 import { useEffect, useState } from 'react';
 
 function App({
+  defaultCode,
   customFn,
   activeKey,
   readonly,
   updateValue,
 }: {
-  customFn: any;
-  activeKey: string;
-  readonly: boolean;
+  defaultCode?: string;
+  customFn?: any;
+  activeKey?: string;
+  readonly?: boolean;
   updateValue: any;
 }) {
   const monaco: any = useMonaco();
@@ -54,8 +56,15 @@ function App({
     }
   }, [monaco]);
   useEffect(() => {
-    setDefaultValue(customFn[activeKey]['functionString'] || `// ${activeKey}`);
+    if (customFn && activeKey) {
+      setDefaultValue(customFn[activeKey]['functionString'] || `// ${activeKey}`);
+    }
   }, [activeKey]);
+  useEffect(() => {
+    if (defaultCode) {
+      setDefaultValue(defaultCode);
+    }
+  }, [defaultCode]);
   return (
     <Editor
       height='100%'

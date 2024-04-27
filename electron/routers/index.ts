@@ -14,6 +14,8 @@ import {
   uploadJSONSetting,
 } from '../service/task';
 
+import { startManualJs } from '../service/jsbox';
+
 import {
   selectDir,
   selectFile,
@@ -84,6 +86,10 @@ export const routes: Route[] = [
   {
     path: 'debugPlay',
     callBack: (_event, arg) => wrapService(debugPlay, arg),
+  },
+  {
+    path: 'startManualJs',
+    callBack: (_event, arg) => wrapService(startManualJs, arg),
   },
   {
     path: 'setGlobalSetting',
