@@ -12,7 +12,8 @@ async function startTask(props: any) {
       width: 1920,
       height: 1080,
     },
-    ignoreDefaultArgs: ['--enable-automation', '--start-maximized'],
+    ignoreDefaultArgs: ['--enable-automation'],
+    args: ['--start-maximized'],
   };
   let _injectContexts = {};
   {
