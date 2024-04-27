@@ -43,7 +43,7 @@ function UploadJsonConfig({
       reader.readAsText(file);
     });
   }
-  const props = {
+  const props: any = {
     showUploadList: false,
     beforeUpload: async (file: any) => {
       const text = await readFileAsText(file);

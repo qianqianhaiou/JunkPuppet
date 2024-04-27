@@ -55,7 +55,7 @@ async function startTask(props: TaskRunnerData) {
   const [page] = await browser.pages();
 
   // cdp session
-  const client = await page.target().createCDPSession();
+  const client = await page.createCDPSession();
 
   // 欺骗检测
   await deceptionDetection({

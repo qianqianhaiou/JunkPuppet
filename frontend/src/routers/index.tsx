@@ -6,6 +6,7 @@ import { Navigate } from 'react-router-dom';
 const InitRouter = lazy(() => import('@/views/init'));
 const SettingRouter = lazy(() => import('@/views/setting'));
 const TaskListRouter = lazy(() => import('@/views/taskList'));
+const ManualjsRouter = lazy(() => import('@/views/manualjs'));
 const LogRouter = lazy(() => import('@/views/log'));
 
 function LodingPage(props: any) {
@@ -54,6 +55,14 @@ export const optionalRouter: any[] = [
     element: (
       <LodingPage title='任务列表'>
         <TaskListRouter></TaskListRouter>
+      </LodingPage>
+    ),
+  },
+  {
+    path: '/manualjs',
+    element: (
+      <LodingPage title='代码执行'>
+        <ManualjsRouter></ManualjsRouter>
       </LodingPage>
     ),
   },
