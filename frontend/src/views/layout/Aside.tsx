@@ -57,7 +57,7 @@ function App() {
       icon: <UnorderedListOutlined />,
     },
     {
-      label: '手动执行',
+      label: '代码箱',
       key: '/manualjs',
       icon: <JavaScriptOutlined />,
     },

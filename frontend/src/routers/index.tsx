@@ -7,6 +7,7 @@ const InitRouter = lazy(() => import('@/views/init'));
 const SettingRouter = lazy(() => import('@/views/setting'));
 const TaskListRouter = lazy(() => import('@/views/taskList'));
 const ManualjsRouter = lazy(() => import('@/views/manualjs'));
+const ManualjsEditorRouter = lazy(() => import('@/views/manualjs/editor'));
 const LogRouter = lazy(() => import('@/views/log'));
 
 function LodingPage(props: any) {
@@ -61,8 +62,16 @@ export const optionalRouter: any[] = [
   {
     path: '/manualjs',
     element: (
-      <LodingPage title='代码执行'>
+      <LodingPage title='代码箱'>
         <ManualjsRouter></ManualjsRouter>
+      </LodingPage>
+    ),
+  },
+  {
+    path: '/manualjs/detail',
+    element: (
+      <LodingPage title='代码箱-编辑器'>
+        <ManualjsEditorRouter></ManualjsEditorRouter>
       </LodingPage>
     ),
   },
