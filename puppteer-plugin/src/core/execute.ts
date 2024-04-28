@@ -8,12 +8,8 @@ async function startTask(props: any) {
   const launchParams: any = {
     executablePath: props.chromePath,
     headless: false,
-    defaultViewport: {
-      width: 1920,
-      height: 1080,
-    },
+    defaultViewport: null,
     ignoreDefaultArgs: ['--enable-automation'],
-    args: ['--start-maximized'],
   };
   let _injectContexts = {};
   {
