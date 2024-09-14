@@ -1,5 +1,5 @@
 <template>
-  <FloatButtonGroup trigger="hover" type="default" :style="{ right: '36px', bottom: '36px' }">
+  <FloatButtonGroup trigger="hover" type="default" :style="{ right: '36px', bottom: '200px' }">
     <template #icon>
       <CodeSandboxOutlined />
     </template>

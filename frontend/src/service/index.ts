@@ -66,6 +66,9 @@ export const selectDir = async (params: any) => {
 export const selectFile = async (params: any) => {
   return FetchData('selectFile', params);
 };
+export const searchChromePath = async (params: any) => {
+  return FetchData('searchChromePath', params);
+};
 export const closeApp = async (params: any) => {
   return FetchData('closeApp', params);
 };

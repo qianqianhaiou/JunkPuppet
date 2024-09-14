@@ -25,7 +25,12 @@ import {
   closeApp,
 } from '../service/electron';
 
-import { getGlobalSetting, setGlobalSetting, getDataDistInfo } from '../service/system';
+import {
+  getGlobalSetting,
+  setGlobalSetting,
+  getDataDistInfo,
+  searchChromePath,
+} from '../service/system';
 
 import { getRecentLogs, clearAllLogs } from '../service/logger';
 
@@ -102,6 +107,10 @@ export const routes: Route[] = [
   {
     path: 'selectFile',
     callBack: (_event, arg) => wrapService(selectFile, arg),
+  },
+  {
+    path: 'searchChromePath',
+    callBack: (_event, arg) => wrapService(searchChromePath, arg),
   },
   {
     path: 'selectDir',

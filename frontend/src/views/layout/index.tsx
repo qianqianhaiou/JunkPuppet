@@ -35,9 +35,9 @@ function App(props: any) {
   };
   useEffect(() => {
     judgeFullScreen();
-    window.onresize = judgeFullScreen;
+    window.addEventListener('resize', judgeFullScreen);
     return () => {
-      window.onresize = null;
+      window.removeEventListener('resize', judgeFullScreen);
     };
   }, []);
   return (
@@ -55,6 +55,7 @@ function App(props: any) {
             onClick={handleOpenChrome}>
             <GlobalOutlined />
           </div>
+          <div className='h-[40%] bg-[#7b7b7b] w-[1px] mx-[3px]'></div>
           <div
             className='h-full hover:bg-[#3a3a3d] leading-[42px] px-[14px]'
             onClick={handleMinimizeWindow}>

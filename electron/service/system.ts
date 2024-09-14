@@ -3,6 +3,7 @@ import { fswriteFile, fsreadFile } from '../utils/file';
 import { relaunchElectron } from './electron';
 import { type } from 'os';
 import { getDrives } from 'diskinfo';
+import { existsSync } from 'fs';
 
 // 设置全局设置
 export const setGlobalSetting = async (params: any) => {
@@ -44,5 +45,21 @@ export const getDataDistInfo = async () => {
       data.system = type();
       res(data);
     });
+  });
+};
+
+// 自动检测chrome/edge位置
+export const searchChromePath = async () => {
+  const defaultChromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  const defaultEdgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+  const paths = [defaultChromePath, defaultEdgePath];
+  return new Promise((res, rej) => {
+    for (const item of paths) {
+      if (existsSync(item)) {
+        res(item);
+        return true;
+      }
+    }
+    res(null);
   });
 };

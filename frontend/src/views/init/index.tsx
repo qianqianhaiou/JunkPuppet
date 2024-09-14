@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { selectDir, setGlobalSetting, selectFile } from '@/service';
-import { Button, Input, Modal, Space, Steps, Tag } from 'antd';
-import { SelectOutlined, ArrowLeftOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { selectDir, setGlobalSetting, selectFile, searchChromePath } from '@/service';
+import { Button, Input, message, Modal, Space, Steps, Tag } from 'antd';
+import {
+  SelectOutlined,
+  ArrowLeftOutlined,
+  ArrowDownOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 
 function Init() {
   const [chromePath, setChromePath] = useState('');
@@ -23,6 +28,16 @@ function Init() {
     setChromePath(result);
     setStep((c) => c + 1);
   };
+
+  const handleSearchChromePath = async () => {
+    const result = await searchChromePath({});
+    if (!result) {
+      message.warning('检测失败，请手动选择');
+      return;
+    }
+    setChromePath(result);
+  };
+
   const handleMailChange = (e: any) => {
     setMail(e.target.value);
   };
@@ -86,7 +101,7 @@ function Init() {
                 <div>一般该应用程序被命名为chrome.exe</div>
                 <div>一般被存放在：</div>
                 <div className='whitespace-pre-line mt-[10px]' style={{ overflowWrap: 'anywhere' }}>
-                  C:\\ProgramFiles\\Google\\Chrome\\Application\\chrome.exe
+                  C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
                 </div>
               </div>
               {chromePath && (
@@ -103,7 +118,14 @@ function Init() {
                   type='primary'
                   icon={<SelectOutlined />}
                   onClick={handleSelectFile}>
-                  {chromePath ? '重新选择' : '选择'}
+                  {chromePath ? '重新选择' : '手动选择'}
+                </Button>
+                <Button
+                  className='w-[200px] mt-[10px]'
+                  size='large'
+                  icon={<SearchOutlined />}
+                  onClick={handleSearchChromePath}>
+                  自动检测位置
                 </Button>
                 {chromePath && (
                   <Button
