@@ -19,7 +19,7 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "puppeteer-core": "^22.7.1",
+    "puppeteer-core": "^23.4.0",
     "uuid": "^9.0.0"
   }
 }
