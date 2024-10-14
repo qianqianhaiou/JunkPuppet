@@ -94,7 +94,8 @@ function App() {
   useEffect(() => {
     fetchData();
   }, []);
-  return <div ref={diskInfoRef} style={{ width: '300px', height: '300px' }}></div>;
+  // return <div ref={diskInfoRef} style={{ width: '300px', height: '300px' }}></div>;
+  return <div>磁盘使用情况{JSON.stringify(info)}</div>;
 }
 
 export default App;

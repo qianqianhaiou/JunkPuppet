@@ -5,6 +5,7 @@ import { triggerItemCron } from './cron';
 import { taskDataDb, taskListDb } from './db';
 import { randomUUID } from 'crypto';
 import { MailerService } from './mailer';
+import { openTargetUrl } from './system';
 
 const renderTaskResultMail = (result: any, to: string, parent: string) => {
   const receiver: any = {
@@ -240,8 +241,9 @@ export const startSetting = async (params: any) => {
       params: {
         targetUrl: params.targetUrl,
         chromePath: process.env.CHROME_PATH,
-        headless: false,
+        headless: 'new',
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
+        wsEndpoint: global.wsEndpoint,
       },
     });
     return new Promise((resolve, reject) => {
@@ -263,6 +265,11 @@ export const startSetting = async (params: any) => {
           database.chain.set('updatedAt', datanow).value();
           await database.write();
           resolve(fileName);
+        } else if (msg.type === 'review') {
+          const { host } = new URL(global.wsEndpoint);
+          await openTargetUrl(
+            `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
+          );
         } else if (msg.type === 'warn') {
           console.warn(`任务: ${params.name} - 设置警告 - ` + JSON.stringify(msg.data));
         } else if (msg.type === 'error') {
@@ -321,7 +328,8 @@ export const debugPlay = async (params: any) => {
         parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
         cookies: [],
         chromePath: process.env.CHROME_PATH,
-        headless: false,
+        headless: 'new',
+        wsEndpoint: global.wsEndpoint,
         slowMo: 100,
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
         data: data,
@@ -346,6 +354,11 @@ export const debugPlay = async (params: any) => {
           database.chain.set('updatedAt', datanow).value();
           await database.write();
           resolve('sucess');
+        } else if (msg.type === 'review') {
+          const { host } = new URL(global.wsEndpoint);
+          await openTargetUrl(
+            `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
+          );
         } else if (msg.type === 'warn') {
           console.warn(`任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data));
         } else if (msg.type === 'error') {
@@ -377,6 +390,7 @@ export const startplay = async (params: any) => {
         cookies: [],
         chromePath: process.env.CHROME_PATH,
         headless: 'new',
+        wsEndpoint: global.wsEndpoint,
         slowMo: 100,
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
         data: data,

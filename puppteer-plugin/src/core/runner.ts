@@ -29,13 +29,13 @@ initLogger();
 async function startTask(props: TaskRunnerData) {
   const launchParams: any = {
     executablePath: props.chromePath,
-    headless: props.headless,
+    headless: 'new',
     defaultViewport: props.size || {
       width: 1920,
       height: 1080,
     },
+    browserWSEndpoint: props.wsEndpoint,
     slowMo: props.slowMo || 100,
-    args: ['--start-maximized'],
   };
   if (props.chromeDataPath) {
     await clearUserDataDirExitType(props.chromeDataPath);
@@ -47,12 +47,23 @@ async function startTask(props: TaskRunnerData) {
   const customFnData = mockData.customFn;
 
   // 连接浏览器
-  const browser = await puppeteer.launch(launchParams);
+  const browser = await puppeteer.connect(launchParams);
   if (!browser) {
     console.error('浏览器连接失败');
     return;
   }
-  const [page] = await browser.pages();
+
+  const page = await browser.newPage();
+  const targetId = (page.target() as any)._targetId;
+  if (targetId) {
+    process.send &&
+      process.send({
+        type: 'review',
+        data: {
+          targetId: targetId,
+        },
+      });
+  }
 
   // cdp session
   const client = await page.createCDPSession();
@@ -174,7 +185,7 @@ async function startTask(props: TaskRunnerData) {
   // lifehook -> onAfterQueue
   await runLifeHook({ page, browser, client }, customFnData, 'onAfterQueue');
 
-  await browser.close();
+  await page.close();
   return result;
 }
 

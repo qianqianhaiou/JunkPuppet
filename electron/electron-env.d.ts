@@ -3,6 +3,7 @@ declare module 'uuid';
 declare module 'nodemailer';
 declare namespace globalThis {
   var cronList: Map<string, any>;
+  var wsEndpoint: string;
 }
 
 declare namespace NodeJS {

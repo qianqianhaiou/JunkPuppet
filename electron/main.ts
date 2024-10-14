@@ -7,10 +7,12 @@ import {
   initGlobalSetting,
   initFiles,
   initCronScripts,
+  initBrowserInstance,
 } from './utils/init';
 import { initRoutes } from './routers';
 import { initLogger } from './service/logger';
 import { tranlateDate } from './utils/tools';
+import axios from 'axios';
 
 function createWindow() {
   const iconPath = join(process.env.VITE_PUBLIC, 'robot.png');
@@ -96,6 +98,8 @@ app
       await initFiles();
       // 初始化日志记录
       logger = await initLogger(join(process.env.DATA_PATH_LOG, 'system.log'));
+      // 初始化browser实例
+      await initBrowserInstance();
       // 初始化定时任务
       await initCronScripts();
     }

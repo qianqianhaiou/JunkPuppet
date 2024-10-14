@@ -21,6 +21,7 @@ interface TaskRunnerData {
   targetUrl: string;
   chromePath: string;
   headless: false | 'new';
+  wsEndpoint: string;
   slowMo: number;
   parent: string;
   data: string;
@@ -52,6 +53,7 @@ interface TaskRunnerResult {
 
 interface TaskSetterData {
   targetUrl: string;
+  wsEndpoint: string;
   chromePath: string;
   headless: boolean;
   size?: {

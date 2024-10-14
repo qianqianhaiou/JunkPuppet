@@ -30,6 +30,8 @@ import {
   setGlobalSetting,
   getDataDistInfo,
   searchChromePath,
+  getBrowserInstanceInfo,
+  openTargetUrl,
 } from '../service/system';
 
 import { getRecentLogs, clearAllLogs } from '../service/logger';
@@ -67,6 +69,14 @@ export const routes: Route[] = [
   {
     path: 'getTaskTypes',
     callBack: (_event, arg) => wrapService(getTaskTypes, arg),
+  },
+  {
+    path: 'getBrowserInstanceInfo',
+    callBack: (_event, arg) => wrapService(getBrowserInstanceInfo, arg),
+  },
+  {
+    path: 'openTargetUrl',
+    callBack: (_event, arg) => wrapService(openTargetUrl, arg),
   },
   {
     path: 'getTaskDataDetail',

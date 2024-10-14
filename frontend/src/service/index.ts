@@ -23,6 +23,11 @@ export const getTaskTypes = async (params: any) => {
   return FetchData('getTaskTypes', params);
 };
 
+// 获取browser实例当前的Tab运行情况
+export const getBrowserInstanceInfo = async (params: any) => {
+  return FetchData('getBrowserInstanceInfo', params);
+};
+
 export const getTaskDataDetail = async (params: any) => {
   return FetchData('getTaskDataDetail', params);
 };

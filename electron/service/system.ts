@@ -4,6 +4,8 @@ import { relaunchElectron } from './electron';
 import { type } from 'os';
 import { getDrives } from 'diskinfo';
 import { existsSync } from 'fs';
+import axios from 'axios';
+import { shell } from 'electron';
 
 // 设置全局设置
 export const setGlobalSetting = async (params: any) => {
@@ -46,6 +48,18 @@ export const getDataDistInfo = async () => {
       res(data);
     });
   });
+};
+
+//打开指定连接
+export const openTargetUrl = async (url: string) => {
+  shell.openExternal(url);
+};
+
+// 获取browser实例信息
+export const getBrowserInstanceInfo = async () => {
+  const { host } = new URL(global.wsEndpoint);
+  const result = await axios.get(`http://${host}/json`);
+  return result.data;
 };
 
 // 自动检测chrome/edge位置

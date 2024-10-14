@@ -36,27 +36,32 @@ const initExcScript = (page: any) => {
 
 async function init(props: TaskSetterData) {
   const launchParams: any = {
-    executablePath: props.chromePath,
-    headless: props.headless,
     defaultViewport: props.size || {
       width: 1920,
       height: 1080,
     },
-    ignoreDefaultArgs: ['--enable-automation'],
-    args: [
-      '--start-fullscreen',
-      `--disable-extensions-except=${EXTENSION_PATH}`,
-      `--load-extension=${EXTENSION_PATH}`,
-    ],
+    browserWSEndpoint: props.wsEndpoint,
+    executablePath: props.chromePath,
   };
   if (props.chromeDataPath) {
     await clearUserDataDirExitType(props.chromeDataPath);
     launchParams.userDataDir = props.chromeDataPath;
   }
-  const browser = await puppeteer.launch(launchParams);
+  const browser = await puppeteer.connect(launchParams);
   if (!browser) return;
   let userDoData: any[] = [];
-  browser.on('disconnected', (target) => {
+  const page = await browser.newPage();
+  const targetId = (page.target() as any)._targetId;
+  if (targetId) {
+    process.send &&
+      process.send({
+        type: 'review',
+        data: {
+          targetId: targetId,
+        },
+      });
+  }
+  page.on('close', (target) => {
     process.send &&
       process.send({
         type: 'finish',
@@ -67,7 +72,6 @@ async function init(props: TaskSetterData) {
       });
     process.exit();
   });
-  const [page] = await browser.pages();
   return new Promise(async (resolve, reject) => {
     try {
       await page.exposeFunction('_silentSendData', async (dataJson: any) => {
@@ -78,7 +82,7 @@ async function init(props: TaskSetterData) {
         try {
           if (dataJson.type === 'finishSetting') {
             userDoData = userDoData.concat(dataJson.data);
-            await browser.close();
+            await page.close();
             resolve('');
           } else if (dataJson.type === 'clickAndWaitNavigator') {
             const oldUrl = page.url();
