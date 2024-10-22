@@ -155,7 +155,7 @@ app
   })
   .catch((e) => {
     console.log(e);
-    new Notification({ body: e.message }).show();
+    new Notification({ body: e }).show();
   });
 
 app.on('window-all-closed', () => {

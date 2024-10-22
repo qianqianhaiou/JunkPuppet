@@ -79,7 +79,9 @@ function App(props: any) {
             <Aside></Aside>
           </div>
         )}
-        <div className='flex-1 bg-[#181818] overflow-y-auto f-beautify-scrollbar'>
+        <div
+          className='bg-[#181818] overflow-y-auto f-beautify-scrollbar'
+          style={{ width: 'calc(100% - 60px)' }}>
           {props.children}
         </div>
       </div>

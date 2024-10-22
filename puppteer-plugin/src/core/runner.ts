@@ -37,10 +37,6 @@ async function startTask(props: TaskRunnerData) {
     browserWSEndpoint: props.wsEndpoint,
     slowMo: props.slowMo || 100,
   };
-  if (props.chromeDataPath) {
-    await clearUserDataDirExitType(props.chromeDataPath);
-    launchParams.userDataDir = props.chromeDataPath;
-  }
 
   // 处理原始数据
   const mockData = JSON.parse(props.data);

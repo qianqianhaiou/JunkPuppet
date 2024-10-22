@@ -43,10 +43,6 @@ async function init(props: TaskSetterData) {
     browserWSEndpoint: props.wsEndpoint,
     executablePath: props.chromePath,
   };
-  if (props.chromeDataPath) {
-    await clearUserDataDirExitType(props.chromeDataPath);
-    launchParams.userDataDir = props.chromeDataPath;
-  }
   const browser = await puppeteer.connect(launchParams);
   if (!browser) return;
   let userDoData: any[] = [];

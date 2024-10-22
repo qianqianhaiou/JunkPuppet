@@ -6,6 +6,8 @@ import { getDrives } from 'diskinfo';
 import { existsSync } from 'fs';
 import axios from 'axios';
 import { shell } from 'electron';
+import { fork } from 'node:child_process';
+import { sortBy } from 'lodash';
 
 // 设置全局设置
 export const setGlobalSetting = async (params: any) => {
@@ -54,12 +56,75 @@ export const getDataDistInfo = async () => {
 export const openTargetUrl = async (url: string) => {
   shell.openExternal(url);
 };
+//打开Browser实例指定页面
+export const openTargetPage = async (pageId: string) => {
+  const { host } = new URL(global.wsEndpoint);
+  shell.openExternal(`http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${pageId}`);
+};
+// active指定tab
+export const activeTargetPage = async (pageId: string) => {
+  try {
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`);
+    ChildProcess.send({
+      type: 'activeTargetPage',
+      params: {
+        chromePath: process.env.CHROME_PATH,
+        wsEndpoint: global.wsEndpoint,
+        pageId,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      ChildProcess.on('message', async (msg: any) => {
+        if (msg.type === 'activeTargetPage') {
+          resolve('sucess');
+        } else if (msg.type === 'error') {
+          reject(msg.data);
+        }
+      });
+      ChildProcess.on('error', function (code) {
+        reject('browserInstance error code: ' + code);
+      });
+      ChildProcess.on('close', function (code) {
+        reject('browserInstance close code: ' + code);
+      });
+    });
+  } catch (e) {}
+};
+// 关闭指定页面
+export const closeTargetPage = async (pageId: string) => {
+  try {
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`);
+    ChildProcess.send({
+      type: 'closeTargetPage',
+      params: {
+        chromePath: process.env.CHROME_PATH,
+        wsEndpoint: global.wsEndpoint,
+        pageId,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      ChildProcess.on('message', async (msg: any) => {
+        if (msg.type === 'closeTargetPage') {
+          resolve('sucess');
+        } else if (msg.type === 'error') {
+          reject(msg.data);
+        }
+      });
+      ChildProcess.on('error', function (code) {
+        reject('browserInstance error code: ' + code);
+      });
+      ChildProcess.on('close', function (code) {
+        reject('browserInstance close code: ' + code);
+      });
+    });
+  } catch (e) {}
+};
 
 // 获取browser实例信息
 export const getBrowserInstanceInfo = async () => {
   const { host } = new URL(global.wsEndpoint);
   const result = await axios.get(`http://${host}/json`);
-  return result.data;
+  return sortBy(result.data, (item) => item.id);
 };
 
 // 自动检测chrome/edge位置

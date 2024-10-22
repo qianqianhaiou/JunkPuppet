@@ -46,7 +46,15 @@ export const getTaskConfigDetail = async (params: any) => {
 export const updateTaskMockData = async (params: any) => {
   return FetchData('updateTaskMockData', params);
 };
-
+export const openTargetPage = async (params: any) => {
+  return FetchData('openTargetPage', params);
+};
+export const activeTargetPage = async (params: any) => {
+  return FetchData('activeTargetPage', params);
+};
+export const closeTargetPage = async (params: any) => {
+  return FetchData('closeTargetPage', params);
+};
 export const getRecentLogs = async () => {
   return FetchData('getRecentLogs', {});
 };

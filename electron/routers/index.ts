@@ -31,7 +31,9 @@ import {
   getDataDistInfo,
   searchChromePath,
   getBrowserInstanceInfo,
-  openTargetUrl,
+  openTargetPage,
+  activeTargetPage,
+  closeTargetPage,
 } from '../service/system';
 
 import { getRecentLogs, clearAllLogs } from '../service/logger';
@@ -75,8 +77,16 @@ export const routes: Route[] = [
     callBack: (_event, arg) => wrapService(getBrowserInstanceInfo, arg),
   },
   {
-    path: 'openTargetUrl',
-    callBack: (_event, arg) => wrapService(openTargetUrl, arg),
+    path: 'openTargetPage',
+    callBack: (_event, arg) => wrapService(openTargetPage, arg),
+  },
+  {
+    path: 'activeTargetPage',
+    callBack: (_event, arg) => wrapService(activeTargetPage, arg),
+  },
+  {
+    path: 'closeTargetPage',
+    callBack: (_event, arg) => wrapService(closeTargetPage, arg),
   },
   {
     path: 'getTaskDataDetail',
