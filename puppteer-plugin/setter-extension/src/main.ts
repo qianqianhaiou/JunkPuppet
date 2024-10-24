@@ -39,4 +39,22 @@ function initDom() {
   NewShadowRootEl.appendChild(RealDom);
   createApp(App).mount(RealDom);
 }
-initDom();
+
+function initHack() {
+  window.open = ((url: string) => {
+    location.href = url;
+    return false;
+  }) as any;
+  // 还差一个遍历A标签更改 _blank -> self
+  Array.prototype.map.call(document.querySelectorAll('a'), ($el: HTMLAnchorElement) => {
+    if (typeof $el.target === 'string') {
+      // 过滤 svg 下的 a标签
+      $el.target = '_self';
+    }
+  });
+}
+if (window._junkpuppet_send_data) {
+  // 如果是设置模式，则初始化相关工具
+  initDom();
+}
+initHack();

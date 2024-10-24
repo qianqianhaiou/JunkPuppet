@@ -53,7 +53,7 @@ const showPopupBox = ($el: HTMLElement) => {
 };
 const globalAListener = () => {
   Array.prototype.map.call(document.querySelectorAll('a'), ($el: HTMLAnchorElement) => {
-    if (typeof $el.target === 'string') {
+    if (typeof $el.target === 'string' && $el.target !== '_self') {
       // 过滤 svg 下的 a标签
       $el.target = '_self';
     }

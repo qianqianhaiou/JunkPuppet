@@ -4,35 +4,8 @@ import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
 import { selectBySelector } from '../service/select';
 import { playClick } from '../service/emulate';
 
-const IS_DEV = process.argv[1].includes('setting.ts');
-const DEV_EXTENSION_PATH = resolve(__dirname, '../../setter-extension/setter-dist');
-const PRO_EXTENSION_PATH = resolve(__dirname, './setter-dist');
-const EXTENSION_PATH = IS_DEV ? DEV_EXTENSION_PATH : PRO_EXTENSION_PATH;
-
 // 初始化日志
 initLogger();
-
-// 初始化通信通道
-const initExcScript = (page: any) => {
-  // 当页面domcontentloaded事件触发才可以接受到postMessage，与插件run_at: document_end配合
-  page.on('domcontentloaded', async () => {
-    await page.evaluate(() => {
-      if (!window._silentListen) {
-        window._silentListen = true;
-        window.addEventListener('message', (e) => {
-          if (!e || !e.data) return;
-          const message = JSON.parse(e.data);
-          (window as any)._silentSendData(message);
-        });
-      }
-      window.open = ((url: string) => {
-        location.href = url;
-        return false;
-      }) as any;
-      // 还差一个遍历A标签更改 _blank -> self
-    });
-  });
-};
 
 async function init(props: TaskSetterData) {
   const launchParams: any = {
@@ -62,6 +35,8 @@ async function init(props: TaskSetterData) {
       process.send({
         type: 'finish',
         data: {
+          // manualData: {},
+          // apiData: {},
           builtInData: userDoData,
           customFn: {},
         },
@@ -70,11 +45,8 @@ async function init(props: TaskSetterData) {
   });
   return new Promise(async (resolve, reject) => {
     try {
-      await page.exposeFunction('_silentSendData', async (dataJson: any) => {
-        // 令牌粗筛
-        if (dataJson['author'] && dataJson['author'] !== 'qianqianhaiou') {
-          return false;
-        }
+      await page.exposeFunction('_junkpuppet_send_data', async (data: any) => {
+        const dataJson = JSON.parse(data);
         try {
           if (dataJson.type === 'finishSetting') {
             userDoData = userDoData.concat(dataJson.data);
@@ -102,7 +74,6 @@ async function init(props: TaskSetterData) {
           console.warn(e.message);
         }
       });
-      initExcScript(page);
       await page.goto(props.targetUrl);
     } catch (e) {
       reject(e);

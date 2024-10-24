@@ -1,6 +1,5 @@
 export const sendMessage = (data: any) => {
-  data['author'] = 'qianqianhaiou';
-  (window.top as Window).postMessage(JSON.stringify(data), '*');
+  window._junkpuppet_send_data(JSON.stringify(data));
 };
 
 export const sendChromeMessage = async (type: string, message?: string) => {
