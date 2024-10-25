@@ -109,19 +109,6 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, reactive, ref } from 'vue';
-import {
-  Form,
-  FormItem,
-  Input,
-  Button,
-  Textarea,
-  InputNumber,
-  Space,
-  RadioGroup,
-  RadioButton,
-} from 'ant-design-vue';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue';
-import { entries } from 'lodash';
 
 const props = defineProps({
   data: {

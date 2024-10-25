@@ -46,10 +46,7 @@
       </template>
     </div>
     <template #title>
-      <div
-        ref="modalTitleRef"
-        style="width: 100%; cursor: move; display: flex; align-items: center"
-      >
+      <div style="width: 100%; cursor: move; display: flex; align-items: center">
         <div style="padding: 0px 10px">
           <template v-if="bodyVisible">
             <UpOutlined @click="bodyVisible = false" />
@@ -80,20 +77,12 @@
         </div>
       </div>
     </template>
-    <template #modalRender="{ originVNode }">
-      <div :style="transformStyle">
-        <component :is="originVNode" />
-      </div>
-    </template>
   </Modal>
 </template>
 
 <script setup lang="ts">
-import { Button, Drawer, Collapse, CollapsePanel, Result, Modal } from 'ant-design-vue';
 import { computed, ref, CSSProperties, watch, watchEffect } from 'vue';
-import { useDraggable } from '@vueuse/core';
 import { formatOperateType } from '@/util/format';
-import { UpOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import OperateEdit from './OperateEdit.vue';
 import FnBoxModal from './FnBoxModal.vue';
 
@@ -121,53 +110,6 @@ const getModalContainer = () => {
   const el: any = document.querySelector('#puppeteer-sunsilent-shadow-root')!.shadowRoot;
   return el;
 };
-
-// 拖动
-const modalTitleRef = ref<any>(null);
-const { x, y, isDragging } = useDraggable(modalTitleRef);
-const startX = ref<number>(0);
-const startY = ref<number>(0);
-const startedDrag = ref(false);
-const transformX = ref(0);
-const transformY = ref(0);
-const preTransformX = ref(0);
-const preTransformY = ref(0);
-const dragRect = ref({ left: 0, right: 0, top: 0, bottom: 0 });
-watch([x, y], () => {
-  if (!startedDrag.value) {
-    startX.value = x.value;
-    startY.value = y.value;
-    const bodyRect = document.body.getBoundingClientRect();
-    const titleRect = modalTitleRef.value.getBoundingClientRect();
-    dragRect.value.right = bodyRect.width - titleRect.width;
-    dragRect.value.bottom = bodyRect.height - titleRect.height;
-    preTransformX.value = transformX.value;
-    preTransformY.value = transformY.value;
-  }
-  startedDrag.value = true;
-});
-watch(isDragging, () => {
-  if (!isDragging) {
-    startedDrag.value = false;
-  }
-});
-watchEffect(() => {
-  if (startedDrag.value) {
-    transformX.value =
-      preTransformX.value +
-      Math.min(Math.max(dragRect.value.left, x.value), dragRect.value.right) -
-      startX.value;
-    transformY.value =
-      preTransformY.value +
-      Math.min(Math.max(dragRect.value.top, y.value), dragRect.value.bottom) -
-      startY.value;
-  }
-});
-const transformStyle = computed<CSSProperties>(() => {
-  return {
-    transform: `translate(${transformX.value}px, ${transformY.value}px)`,
-  };
-});
 
 // 内置工具
 const fnBoxVisible = ref(false);

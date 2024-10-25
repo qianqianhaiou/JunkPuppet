@@ -1,7 +1,6 @@
 import { createApp } from 'vue';
 import style from '@/assets/styles/style.scss?inline';
 import highlight from '@/assets/styles/highlight.scss?inline';
-import antdstyle from '@/assets/styles/antd-min.css?inline';
 import App from './App.vue';
 
 function initDom() {
@@ -19,17 +18,6 @@ function initDom() {
   const CSSStyle = document.createElement('style');
   CSSStyle.appendChild(document.createTextNode(style));
   NewShadowRootEl.appendChild(CSSStyle);
-
-  // shadow内样式 antd style
-  const antdCSSStyle = document.createElement('style');
-  antdCSSStyle.appendChild(document.createTextNode(antdstyle));
-  NewShadowRootEl.appendChild(antdCSSStyle);
-
-  // const antdCSSStyleLink = document.createElement('link');
-  // antdCSSStyleLink.setAttribute('rel', 'stylesheet');
-  // antdCSSStyleLink.setAttribute('type', 'text/css');
-  // antdCSSStyleLink.setAttribute('href', '/antd-min.css');
-  // NewShadowRootEl.appendChild(antdCSSStyleLink);
 
   // shadow外样式
   const highLightStyle = document.createElement('style');
@@ -53,6 +41,7 @@ function initHack() {
     }
   });
 }
+window._junkpuppet_send_data = true;
 if (window._junkpuppet_send_data) {
   // 如果是设置模式，则初始化相关工具
   initDom();

@@ -22,7 +22,7 @@
               <span style="margin-left: 10px">截取全屏幕</span>
             </div>
             <div>
-              <Button type="link" @click="(e) => addBuiltInEvent(e, 'snapshotFullScreen')">
+              <Button type="link" @click="(e: any) => addBuiltInEvent(e, 'snapshotFullScreen')">
                 添加
               </Button>
             </div>
@@ -40,7 +40,7 @@
               <span style="margin-left: 10px">截取当前屏幕</span>
             </div>
             <div>
-              <Button type="link" @click="(e) => addBuiltInEvent(e, 'snapshotCurrentScreen')">
+              <Button type="link" @click="(e: any) => addBuiltInEvent(e, 'snapshotCurrentScreen')">
                 添加
               </Button>
             </div>
@@ -58,7 +58,7 @@
               <span style="margin-left: 10px">添 加 等 待</span>
             </div>
             <div>
-              <Button type="link" @click="(e) => addBuiltInEvent(e, 'delay')">添加</Button>
+              <Button type="link" @click="(e: any) => addBuiltInEvent(e, 'delay')">添加</Button>
             </div>
           </div>
         </template>
@@ -70,8 +70,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Button, Drawer, Space, Collapse, CollapsePanel } from 'ant-design-vue';
-import { CameraOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 const emits = defineEmits(['addUserDoData', 'handleChangeFnModalVisible']);
 
 const activeKey = ref();

@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { Ref, computed, onMounted, ref } from 'vue';
 import { addClass } from '../util/dom';
-import { throttle } from 'lodash';
+import { throttle } from '../util/tools';
 import { DomService } from '../util/selector';
 import { sendMessage } from '@/util/service';
 

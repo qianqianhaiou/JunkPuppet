@@ -1,71 +1,27 @@
 <template>
-  <FloatButtonGroup trigger="hover" type="default" :style="{ right: '36px', bottom: '200px' }">
-    <template #icon>
-      <CodeSandboxOutlined />
-    </template>
-    <FloatButton
-      :type="toolsActive === 'text' ? 'primary' : 'default'"
-      tooltip="提取文本"
-      :onClick="() => setToolsActive('text')"
-    >
-      <template #icon>
-        <FontSizeOutlined />
-      </template>
-    </FloatButton>
-    <FloatButton
-      :type="toolsActive === 'snapshot' ? 'primary' : 'default'"
-      tooltip="截图元素"
-      :onClick="() => setToolsActive('snapshot')"
-    >
-      <template #icon>
-        <CameraOutlined />
-      </template>
-    </FloatButton>
-    <FloatButton
-      :type="toolsActive === 'link' ? 'primary' : 'default'"
-      tooltip="点击跳转"
-      :onClick="() => setToolsActive('link')"
-    >
-      <template #icon>
-        <LinkOutlined />
-      </template>
-    </FloatButton>
-    <FloatButton
-      tooltip="选择相似"
-      :type="selectSimilar ? 'primary' : 'default'"
-      :onClick="handleChangeSelectSimilar"
-    >
-      <template #icon>
-        <GroupOutlined />
-      </template>
-    </FloatButton>
-    <FloatButton tooltip="操作列表" :onClick="handleOpenList">
-      <template #icon>
-        <OrderedListOutlined />
-      </template>
-    </FloatButton>
-    <FloatButton tooltip="结束" :onClick="() => emits('finishSetting')">
-      <template #icon>
-        <PoweroffOutlined />
-      </template>
-    </FloatButton>
-  </FloatButtonGroup>
+  <div class="tools" ref="toolsRef" :style="{ top: `${toolsDomTop}px`, left: `${toolsDomLeft}px` }">
+    <div class="tools-header">
+      <div class="move" @mousedown="handleStartMoving">
+        <IconMove></IconMove>
+      </div>
+      <div class="scale">
+        <IconMinimize></IconMinimize>
+      </div>
+    </div>
+    <div @click="() => setToolsActive('text')">提取文本</div>
+    <div @click="() => setToolsActive('snapshot')">截图元素</div>
+    <div @click="() => setToolsActive('link')">点击跳转</div>
+    <div @click="handleChangeSelectSimilar">选择相似</div>
+    <div @click="handleOpenList">操作列表</div>
+    <div @click="() => emits('finishSetting')">结束</div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, onBeforeMount } from 'vue';
 import { sendMessage } from '../util/service';
-import { FloatButtonGroup, FloatButton, Modal } from 'ant-design-vue';
-import {
-  CodeSandboxOutlined,
-  FontSizeOutlined,
-  CameraOutlined,
-  LinkOutlined,
-  PoweroffOutlined,
-  GroupOutlined,
-  ToolOutlined,
-  OrderedListOutlined,
-} from '@ant-design/icons-vue';
+import IconMove from './icons/Move.vue';
+import IconMinimize from './icons/Minimize.vue';
 
 const emits = defineEmits([
   'addUserDoData',
@@ -74,6 +30,19 @@ const emits = defineEmits([
   'handleUpdateTool',
   'handleChangeListVisible',
 ]);
+
+const toolsRef = ref(null);
+const toolsDomTop = ref(15);
+const toolsDomLeft = ref(window.innerWidth - 320 - 15);
+const handleMoving = (e: MouseEvent) => {
+  e.stopPropagation();
+  toolsDomTop.value = e.y - 4;
+  toolsDomLeft.value = e.x - 4;
+};
+const handleStartMoving = () => {
+  document.documentElement.style.userSelect = 'none';
+  document.documentElement.addEventListener('mousemove', handleMoving);
+};
 
 // 工具箱
 const toolsActive = ref('link');
@@ -92,4 +61,11 @@ const handleChangeSelectSimilar = () => {
   selectSimilar.value = !selectSimilar.value;
   emits('handleChangeSelectSimilar', selectSimilar.value);
 };
+
+onBeforeMount(() => {
+  document.documentElement.addEventListener('mouseup', () => {
+    document.documentElement.style.userSelect = 'unset';
+    document.documentElement.removeEventListener('mousemove', handleMoving);
+  });
+});
 </script>
