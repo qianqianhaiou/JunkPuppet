@@ -12,8 +12,8 @@ export const addClass = (selector: Selector, className: string) => {
   }
 };
 
-export const removeClass = (className: string) => {
-  const $els = document.querySelectorAll(className);
+export const removeClass = (className: string, selector?: Selector) => {
+  const $els = document.querySelectorAll(selector?.selector || className);
   if ($els.length) {
     Array.prototype.forEach.call($els, (item) => {
       item.className = item.className.replace(className, '');

@@ -1,3 +1,8 @@
+interface Selector {
+  iframeIndex: number;
+  selector: string;
+}
+
 function parentUtilBody(el: HTMLElement, parents: HTMLElement[] = []): HTMLElement[] {
   if (el.tagName === 'BODY') {
     return [];
@@ -174,5 +179,18 @@ export class DomService {
       iframeIndex: iframeIndex,
       selector: bodySelector,
     };
+  }
+  static getElementBySelector(selector: Selector): Element | null {
+    let element = null;
+    if (selector.iframeIndex >= 0) {
+      const iframes = document.querySelectorAll('iframe');
+      const frameMainElement = iframes[selector.iframeIndex]?.contentDocument?.documentElement;
+      if (frameMainElement) {
+        element = frameMainElement.querySelector(selector.selector);
+      }
+    } else {
+      element = document.querySelector(selector.selector);
+    }
+    return element;
   }
 }

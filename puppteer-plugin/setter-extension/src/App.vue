@@ -1,39 +1,38 @@
 <template>
   <div class="container" v-if="currentDocument === 'top'">
-    <Tools
+    <BoxModal
       @addUserDoData="addUserDoData"
       @handleChangeSelectSimilar="handleChangeSelectSimilar"
       @finishSetting="finishSetting"
-      @handleUpdateTool="handleUpdateTool"
-      @handleChangeListVisible="handleChangeListVisible"
-    ></Tools>
+    ></BoxModal>
   </div>
-  <GlobalListender
+  <!-- <GlobalListender
     :tool="tool"
     :selectSimilar="selectSimilar"
     :userDoDataLastType="userDoDataLastType"
     @addUserDoData="addUserDoData"
     @addHiddenData="addHiddenData"
     @clickAndWaitNavigator="clickAndWaitNavigator"
-  ></GlobalListender>
+  ></GlobalListender> -->
   <Popup :selectSimilar="selectSimilar" @addUserDoData="addUserDoData"></Popup>
-  <OperateList
+  <MouseMoveBox ref="mouseMoveBoxRef"></MouseMoveBox>
+  <!-- <OperateList
     v-if="listVisible"
     :userDoData="userDoData"
     @handleChangeListVisible="handleChangeListVisible"
     @handleDelete="handleDelete"
     @handleUpdate="handleUpdate"
     @addUserDoData="addUserDoData"
-  ></OperateList>
+  ></OperateList> -->
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted } from '@vue/runtime-core';
+import { nextTick, onMounted, provide } from '@vue/runtime-core';
 import { ref, reactive, Ref, computed } from 'vue';
 import GlobalListender from './components/GlobalListener.vue';
 import Popup from './components/Popup.vue';
-import Tools from './components/Tools.vue';
-import FnBoxModal from './components/FnBoxModal.vue';
-import OperateList from './components/OperateList.vue';
+import BoxModal from './components/BoxModal.vue';
+import MouseMoveBox from './components/MouseMoveBox.vue';
+// import OperateList from './components/OperateList.vue';
 import { sendMessage } from './util/service';
 const currentDocument = ref('top');
 
@@ -43,60 +42,37 @@ const handleChangeSelectSimilar = (similar: boolean) => {
   selectSimilar.value = similar;
 };
 
+// 全局元素选择
+const globalSelectVisible = ref(false);
+const handleChangeGlobalSelectVisible = (visible: boolean) => {
+  globalSelectVisible.value = visible;
+};
+const mouseMoveBoxRef = ref(null);
+const selectingResult = ref();
+const setSelectingResult = (data: any) => {
+  selectingResult.value = data;
+};
+
+provide('selectSimilar', selectSimilar);
+provide('handleChangeSelectSimilar', handleChangeSelectSimilar);
+provide('globalSelectVisible', globalSelectVisible);
+provide('handleChangeGlobalSelectVisible', handleChangeGlobalSelectVisible);
+provide('selectingResult', selectingResult);
+provide('setSelectingResult', setSelectingResult);
+
 // 用户操作数据
 const userDoData = ref<any>([]);
-const userDoDataLastType = computed(() =>
-  userDoData.value.length ? userDoData.value[userDoData.value.length - 1].type : '',
-);
 const addUserDoData = (item: any) => {
   userDoData.value.push(item);
-  if (item.slot) {
-    hiddenData.value.push({
-      type: 'slot',
-    });
-  }
 };
 
-// 无感知数据，比如鼠标移动
-const hiddenData = ref<any>([]);
-const addHiddenData = (item: any) => {
-  hiddenData.value.push(item);
+// 键鼠模拟数据
+const mouseKeyData = ref<any>([]);
+const addMouseKeyData = (item: any) => {
+  mouseKeyData.value.push(item);
 };
 
-// 工具箱工具
-const tool = ref('link');
-const handleUpdateTool = (ctool: string) => {
-  tool.value = ctool;
-};
-
-// 操作列表
-const listVisible = ref(false);
-const handleChangeListVisible = (visible: boolean) => {
-  listVisible.value = visible;
-};
-const handleDelete = (index: string) => {
-  userDoData.value.splice(index, 1);
-};
-const handleUpdate = (index: string, data: any) => {
-  data.map((item: any) => {
-    userDoData.value[index][item[0]] = item[1];
-  });
-};
-
-const computedUserDoData = () => {
-  const userDoDataArray = [...userDoData.value].filter((item) => item.slot);
-  const hiddenDataArray = [...hiddenData.value];
-  const length = hiddenDataArray.length;
-  // 会丢掉最后几个鼠标移动到结束按钮的数据，无所谓的，不影响
-  for (let i = 0; i < length; i++) {
-    const item = hiddenDataArray[i];
-    if (item.type === 'slot' && userDoDataArray.length) {
-      const target = userDoDataArray.shift();
-      hiddenDataArray[i] = target;
-    }
-  }
-  return hiddenDataArray;
-};
+const computedUserDoData = () => {};
 
 // 点击跳转  页面会刷新并出现数据断层，所有应该先保存之前的部分数据
 const clickAndWaitNavigator = (data: any) => {
@@ -112,7 +88,7 @@ const clickAndWaitNavigator = (data: any) => {
   // 丢弃导航后 1s 内的操作数据，为了防止Puppeteer导航模拟的事件被记录
   setTimeout(() => {
     userDoData.value = [];
-    hiddenData.value = [];
+    mouseKeyData.value = [];
   }, 1000);
 };
 

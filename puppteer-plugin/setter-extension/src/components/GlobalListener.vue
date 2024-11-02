@@ -1,9 +1,7 @@
-<template>
-  <div :class="{ 'rect-box': true, pointervisible: rectBoxPointerVisible }" ref="rectBoxRef"></div>
-</template>
+<template></template>
 
 <script setup lang="ts">
-import { Ref, computed, onMounted, ref } from 'vue';
+import { Ref, computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { addClass } from '../util/dom';
 import { throttle } from '../util/tools';
 import { DomService } from '../util/selector';
@@ -25,89 +23,6 @@ const props = defineProps({
 });
 
 const emits = defineEmits(['addUserDoData', 'addHiddenData', 'clickAndWaitNavigator']);
-
-// 鼠标跟随框
-const rectBoxRef: any = ref(null);
-const rectDomEl: any = ref();
-const rectBoxPointerVisible = ref(false);
-const rectBoxMove = () => {
-  document.body.addEventListener(
-    'mousemove',
-    (e: MouseEvent) => {
-      const el = e.target as HTMLElement;
-      rectDomEl.value = el;
-      if (el.tagName === 'A' && (el as HTMLAnchorElement).target === '_blank') {
-        (el as HTMLAnchorElement).target = '_self';
-      }
-      const rectData = el.getBoundingClientRect();
-      (rectBoxRef.value as HTMLElement).style.top = rectData.top + 'px';
-      (rectBoxRef.value as HTMLElement).style.left = rectData.left + 'px';
-      (rectBoxRef.value as HTMLElement).style.width = rectData.width + 'px';
-      (rectBoxRef.value as HTMLElement).style.height = rectData.height + 'px';
-    },
-    false,
-  );
-};
-
-const toolActive = computed(() => props.tool);
-const selectSimilar = computed(() => props.selectSimilar);
-// 跟随框事件
-const userDoDataLastType: any = computed(() => props.userDoDataLastType);
-
-const recordUserRect = async () => {
-  let newSelector = null;
-  if (selectSimilar.value && ['text', 'snapshot'].includes(toolActive.value)) {
-    newSelector = DomService.getSelectorWithClass(rectDomEl.value);
-  } else {
-    const simpleSelect = DomService.getSelectorSimple(rectDomEl.value);
-    newSelector = DomService.getSelectorWithNthUniq(simpleSelect, rectDomEl.value);
-  }
-  if (toolActive.value === 'text') {
-    addClass(newSelector, 'puppeteer_sunsilent_light_text');
-    emits('addUserDoData', {
-      type: 'getText',
-      label: '',
-      multiple: selectSimilar.value,
-      slot: true,
-      data: newSelector,
-    });
-  } else if (toolActive.value === 'snapshot') {
-    addClass(newSelector, 'puppeteer_sunsilent_light_element_snapshot');
-    emits('addUserDoData', {
-      type: 'getElementSnapshot',
-      label: '',
-      multiple: selectSimilar.value,
-      slot: true,
-      data: newSelector,
-    });
-  } else if (toolActive.value === 'link') {
-    const rectDomElRect = rectDomEl.value.getBoundingClientRect();
-    addClass(newSelector, 'puppeteer_sunsilent_light_click_navigator');
-    // 通过 readystatechange 判断是否需要等待 load 事件
-    // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
-    emits('addUserDoData', {
-      type: 'clickAndWaitNavigator',
-      slot: true,
-      urlChange: true,
-      waitForNavigation: {
-        timeout: 10 * 1000,
-        waitUntil: ['load', 'networkidle0'],
-      },
-      data: {
-        screenX: rectDomElRect.left + rectDomElRect.width / 2,
-        screenY: rectDomElRect.top + rectDomElRect.height / 2,
-        selector: newSelector,
-      },
-    });
-    // 立即恢复rect的穿透性，防止pptr点在实心遮蔽层上
-    rectBoxPointerVisible.value = false;
-    emits('clickAndWaitNavigator', {
-      selector: newSelector,
-      screenX: rectDomElRect.left + rectDomElRect.width / 2,
-      screenY: rectDomElRect.top + rectDomElRect.height / 2,
-    });
-  }
-};
 
 // 全局监听事件
 const globalMouse = () => {
@@ -160,12 +75,6 @@ const globalMouse = () => {
       data.deltaX = event.wheelDeltaX || 0;
       data.deltaY = event.wheelDeltaY || event.wheelDelta;
     }
-    // if (['mousedown'].includes(event.type)) {
-    //   emits('addUserDoData', {
-    //     type: 'click',
-    //     slot: false,
-    //   });
-    // }
     emits('addHiddenData', {
       type: 'mouse',
       data,
@@ -188,12 +97,6 @@ const globalWhell = () => {
         pageY: e.pageY,
       },
     });
-    if (userDoDataLastType.value !== 'scroll') {
-      emits('addUserDoData', {
-        type: 'scroll',
-        slot: false,
-      });
-    }
   }
   window.onwheel = scrollFunction;
   window.addEventListener('mouseWheel', scrollFunction, false);
@@ -202,24 +105,12 @@ const globalKeyDown = () => {
   const emitKeyEvent = (event: any) => {
     // 阻止原页面监听事件
     event.stopPropagation();
-    // 由于鼠标移入可能会导致样式改变，所以按住shift键之后rect变为无法穿透的遮蔽层
-    if (event.type === 'keydown' && (event.shiftKey || event.key === 'Shift')) {
-      rectBoxPointerVisible.value = true;
-    } else if (event.type === 'keyup' && (event.shiftKey || event.key === 'Shift')) {
-      rectBoxPointerVisible.value = false;
-    }
+
     // 剔除特殊键
     if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab', 'F11', 'F12'].includes(event.key)) {
       return false;
     }
-    // 自定义组合键
-    const isCombination = combinationKey(event.type, event.code, event.shiftKey);
-    if (isCombination) return;
     let type;
-    // if (event.keyCode === 8) {
-    // // Backspace
-    //   event.preventDefault();
-    // }
     switch (event.type) {
       case 'keydown':
         type = 'keyDown';
@@ -251,59 +142,20 @@ const globalKeyDown = () => {
       type: 'keyevent',
       data,
     });
-    if (userDoDataLastType.value !== 'keyevent') {
-      emits('addUserDoData', {
-        type: 'keyevent',
-        slot: false,
-      });
-    }
   };
   document.body.addEventListener('keydown', emitKeyEvent, true);
   document.body.addEventListener('keyup', emitKeyEvent, true);
   document.body.addEventListener('keypress', emitKeyEvent, true);
 };
-const globalWindow = () => {
-  window.open = (url: any): any => {
-    location.href = url;
-  };
-};
-// 自定义组合键 Shift+Q Shift+W Shift+A
-const combinationKey = (type: string, code: string, shiftKey: boolean) => {
-  if (type === 'keydown' && code === 'KeyW' && shiftKey) {
-    // loopSelectType();
-    return true;
-  } else if (code === 'KeyW' && shiftKey) {
-    return true;
-  }
-  if (type === 'keydown' && code === 'KeyQ' && shiftKey) {
-    // loopToolsActive();
-    return true;
-  } else if (code === 'KeyQ' && shiftKey) {
-    return true;
-  }
-  if (type === 'keydown' && code === 'KeyA' && shiftKey) {
-    recordUserRect();
-    return true;
-  } else if (code === 'KeyA' && shiftKey) {
-    return true;
-  }
-  if (type === 'keydown' && code === 'KeyZ' && shiftKey) {
-    // showTools();
-    return true;
-  } else if (code === 'KeyA' && shiftKey) {
-    return true;
-  }
-  return false;
-};
 
 const initGlobalListener = () => {
-  rectBoxMove();
   globalWhell();
   globalKeyDown();
   globalMouse();
-  globalWindow();
 };
-onMounted(async () => {
+onMounted(() => {
   initGlobalListener();
 });
+
+onBeforeUnmount(() => {});
 </script>
