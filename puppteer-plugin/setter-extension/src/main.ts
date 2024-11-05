@@ -40,6 +40,7 @@ function initHack() {
       $el.target = '_self';
     }
   });
+  // 有些A标签是实时生成的，得想办法处理
 }
 window._junkpuppet_send_data = true;
 if (window._junkpuppet_send_data) {

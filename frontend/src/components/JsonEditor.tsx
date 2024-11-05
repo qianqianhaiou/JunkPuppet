@@ -17,38 +17,10 @@ function App({
   const autoFormatCode = async () => {
     if (monaco?.editor) {
       monaco.editor.getEditors()[0]._actions.get('editor.action.formatDocument')._run();
-      monaco.editor.getEditors()[0]._actions.get('editor.foldLevel3')._run();
-    }
-  };
-  const jumpToTargetLine = (line: number) => {
-    if (monaco?.editor) {
-      monaco.editor.getEditors()[0].revealLineInCenter(line);
+      // monaco.editor.getEditors()[0]._actions.get('editor.foldLevel3')._run();
     }
   };
   useEffect(() => {
-    if (monaco) {
-      const acceptedList = ['"slot": true'];
-      acceptedList.forEach((item: string): void => {
-        const editorModel = monaco.editor.getModels()[0];
-        if (!editorModel) return;
-        const matches: any = editorModel.findMatches(item, false, false, false, null, false);
-        matches.forEach((match: any): void => {
-          editorModel.deltaDecorations(
-            [],
-            [
-              {
-                range: match.range,
-                options: {
-                  isWholeLine: true,
-                  className: 'editor-json-highlight',
-                  marginClassName: 'editor-json-highlight',
-                },
-              },
-            ],
-          );
-        });
-      });
-    }
     if (monaco && defaultValue) {
       setTimeout(async () => {
         await autoFormatCode();

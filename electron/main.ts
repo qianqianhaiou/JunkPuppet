@@ -27,6 +27,7 @@ function createWindow() {
     height: 800,
     titleBarStyle: 'hidden',
   });
+  win.maximize();
   // Electron窗口单例
   const gotTheLock = app.requestSingleInstanceLock();
   if (!gotTheLock) {
@@ -50,26 +51,26 @@ function createWindow() {
   const appTray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'JunkPuppet',
+      label: '拾荒木偶',
       click: function () {
         win.show();
       },
     },
     {
-      label: 'relaunch',
+      label: '重启应用',
       click: function () {
         app.relaunch();
         app.exit();
       },
     },
     {
-      label: 'devtools',
+      label: '开发者工具',
       click: function () {
         win.webContents.toggleDevTools();
       },
     },
     {
-      label: 'Exit',
+      label: '退出应用',
       click: function () {
         app.quit();
       },

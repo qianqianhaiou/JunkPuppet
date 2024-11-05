@@ -7,6 +7,30 @@ import { playClick } from '../service/emulate';
 // 初始化日志
 initLogger();
 
+// 处理原始数据
+const handleOperateListData = (data: any) => {
+  const target: any = {
+    operateListData: [],
+    customFn: {}, // 将所有的customFn全部放在这里，通过function1 2 3 4来对应
+    lifeHooks: {}, // 生命周期钩子
+  };
+  let fnCount = 0;
+  structuredClone(data).forEach((item: any) => {
+    if (item?.previousLimit?.type === 'customFn') {
+      const functionName = `function${++fnCount}`;
+      target.customFn[functionName] = item.previousLimit.customFn;
+      item.previousLimit.customFn = functionName;
+    }
+    if (item?.operateData?.type === 'customFn') {
+      const functionName = `function${++fnCount}`;
+      target.customFn[functionName] = item.operateData.customFn;
+      item.operateData.customFn = functionName;
+    }
+    target.operateListData.push(item);
+  });
+  return target;
+};
+
 async function init(props: TaskSetterData) {
   const launchParams: any = {
     defaultViewport: props.size || {
@@ -18,7 +42,7 @@ async function init(props: TaskSetterData) {
   };
   const browser = await puppeteer.connect(launchParams);
   if (!browser) return;
-  let userDoData: any[] = [];
+  let operateListData: any[] = [];
   const page = await browser.newPage();
   const targetId = (page.target() as any)._targetId;
   if (targetId) {
@@ -31,15 +55,11 @@ async function init(props: TaskSetterData) {
       });
   }
   page.on('close', (target) => {
+    console.warn(operateListData);
     process.send &&
       process.send({
         type: 'finish',
-        data: {
-          // manualData: {},
-          // apiData: {},
-          builtInData: userDoData,
-          customFn: {},
-        },
+        data: handleOperateListData(operateListData),
       });
     process.exit();
   });
@@ -49,7 +69,7 @@ async function init(props: TaskSetterData) {
         const dataJson = JSON.parse(data);
         try {
           if (dataJson.type === 'finishSetting') {
-            userDoData = userDoData.concat(dataJson.data);
+            operateListData = operateListData.concat(dataJson.operateListData);
             await page.close();
             resolve('');
           } else if (dataJson.type === 'clickAndWaitNavigator') {
@@ -60,15 +80,15 @@ async function init(props: TaskSetterData) {
             await waitTime(0.5);
             const newUrl = page.url();
             if (oldUrl === newUrl) {
-              for (let i = dataJson.userDoData.length - 1; i > 0; i++) {
-                if (dataJson.userDoData[i].type === 'clickAndWaitNavigator') {
-                  dataJson.userDoData[i]['urlChange'] = false;
+              for (let i = dataJson.operateListData.length - 1; i > 0; i++) {
+                if (dataJson.operateListData[i].type === 'clickAndWaitNavigator') {
+                  dataJson.operateListData[i]['urlChange'] = false;
                   break;
                 }
               }
             }
             // 通过 readystatechange 判断是否需要等待 load 事件
-            userDoData = userDoData.concat(dataJson.userDoData);
+            operateListData = operateListData.concat(dataJson.operateListData);
           }
         } catch (e: any) {
           console.warn(e.message);

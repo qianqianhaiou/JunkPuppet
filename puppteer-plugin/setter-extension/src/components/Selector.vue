@@ -4,7 +4,12 @@
       <selectActive v-if="selectEnable"></selectActive>
       <Select v-else></Select>
     </div>
-    <input v-model="selector.selector" placeholder="请选择元素" type="text" />
+    <input
+      v-model="selector.selector"
+      :style="{ paddingRight: similarable ? '48px' : '28px' }"
+      placeholder="请选择元素"
+      type="text"
+    />
     <div class="fast-selection">
       <div class="up">
         <ArrowsUp></ArrowsUp>
@@ -13,23 +18,31 @@
         <ArrowsDown></ArrowsDown>
       </div>
     </div>
+    <div v-if="similarable" class="select-similar" @click="handleChangeSimilar">
+      <SimilarOn v-if="similar"></SimilarOn>
+      <SimilarOff v-else></SimilarOff>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import { inject, ref, watch } from 'vue';
-import type { Ref } from 'vue';
 import Select from './icons/Select.vue';
 import SelectActive from './icons/SelectActive.vue';
 import ArrowsDown from './icons/ArrowsDown.vue';
 import ArrowsUp from './icons/ArrowsUp.vue';
+import SimilarOn from './icons/SimilarOn.vue';
+import SimilarOff from './icons/SimilarOff.vue';
 import { removeClass } from '@/util/dom';
 
 const props = defineProps({
-  selectSimilar: {
+  similarable: {
     type: Boolean,
     default: false,
   },
 });
+
+const selectSimilar: any = inject('selectSimilar');
+const handleChangeSelectSimilar: any = inject('handleChangeSelectSimilar');
 
 const emits = defineEmits(['change']);
 
@@ -40,10 +53,12 @@ const handleChangeGlobalSelectVisible: any = inject('handleChangeGlobalSelectVis
 const selector = ref({
   iframeIndex: -1,
   selector: '',
+  similar: false,
 }); // selection xpath
 
 const selectEnable = ref(false);
 const handleSelectElement = async () => {
+  handleChangeSelectSimilar(similar.value);
   if (globalSelectVisible.value) {
     if (selectEnable.value) {
       selectEnable.value = false;
@@ -52,10 +67,26 @@ const handleSelectElement = async () => {
   } else {
     selectEnable.value = true;
     handleChangeGlobalSelectVisible(true);
-    removeClass('puppeteer_sunsilent_light_selecting', selector.value);
-    selector.value = { iframeIndex: -1, selector: '' };
+    if (selector.value.selector) removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+    selector.value = { iframeIndex: -1, selector: '', similar: selectSimilar.value };
   }
 };
+
+const similar = ref(false);
+const handleChangeSimilar = () => {
+  similar.value = !similar.value;
+  handleChangeSelectSimilar(similar.value);
+};
+
+const resetFields = () => {
+  similar.value = false;
+  selector.value = { iframeIndex: -1, selector: '', similar: false };
+  selectEnable.value = false;
+  handleChangeSelectSimilar(false);
+  handleChangeGlobalSelectVisible(false);
+};
+
+defineExpose({ resetFields });
 
 watch(selectingResult, (cur: any) => {
   if (selectEnable.value) {

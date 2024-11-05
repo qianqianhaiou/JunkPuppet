@@ -25,15 +25,14 @@
             </div>
           </div>
         </div>
-        <div class="shutdown" title="结束"><IconShutdown></IconShutdown></div>
+        <div class="shutdown" title="结束" @click="emits('finishSetting')">
+          <IconShutdown></IconShutdown>
+        </div>
       </div>
     </div>
     <template v-if="activeTab === 'selector'">
       <div class="tools-selector">
-        <Selector :selectSimilar="selectSimilar" @change="mainSelectorChange"></Selector>
-        <div :class="{ similar: true, active: selectSimilar }" @click="handleChangeSimilar">
-          相似
-        </div>
+        <Selector ref="mainSelectorRef" :similarable="true" @change="mainSelectorChange"></Selector>
       </div>
       <div class="tools-setting">
         <div class="tools-tabs">
@@ -60,7 +59,11 @@
               </select>
             </div>
             <div v-if="['limit'].includes(parentLimit.type)" class="selector">
-              <Selector @change="parentLimitChange"></Selector>
+              <Selector
+                ref="parentSelectorRef"
+                :similarable="false"
+                @change="parentLimitChange"
+              ></Selector>
             </div>
 
             <div class="form-item">
@@ -73,7 +76,11 @@
               </select>
             </div>
             <div v-if="['exist', 'inexistence'].includes(previousLimit.type)" class="selector">
-              <Selector @change="previousLimitSelectChange"></Selector>
+              <Selector
+                ref="previousSelectorRef"
+                :similarable="false"
+                @change="previousLimitSelectChange"
+              ></Selector>
             </div>
             <textarea
               v-else-if="previousLimit.type === 'customFn'"
@@ -175,8 +182,23 @@
                 />
               </div>
             </template>
+            <template v-if="operateData.type === 'getText' && mainElement">
+              <div>当前文本：{{ mainElement.innerText }}</div>
+            </template>
             <template v-if="operateData.type === 'getAttribute'">
-              {{ JSON.stringify(mainElementAttr) }}
+              <div>选择要提取的属性：</div>
+              <div v-for="(item, index) in mainElementAttr" :key="item">
+                <input
+                  v-model="operateData.data.getAttribute"
+                  type="checkbox"
+                  name="getAttribute"
+                  :id="item.name"
+                  :value="item.name"
+                />
+                <label :for="item.name">
+                  属性名：{{ item.name }}； 当前属性值：{{ item.value }}
+                </label>
+              </div>
             </template>
             <div v-if="operateData.type === 'customFn'">
               <textarea
@@ -190,48 +212,47 @@
         </div>
       </div>
       <div class="tools-buttons">
-        <div v-if="recordEnable" class="record-mouse-key-on" @click="recordEnable = false">
+        <div v-if="recordEnable" class="record-mouse-key-on" @click="handleStopListener">
           <IconRecordOff></IconRecordOff>
           <div>停止录制</div>
         </div>
-        <div v-else class="record-mouse-key-off" @click="recordEnable = true">
+        <div v-else class="record-mouse-key-off" @click="handleStartListener">
           <IconRecordOn></IconRecordOn>
           <div>录制键鼠操作</div>
         </div>
-
+        <div
+          v-if="recordDataList?.length || recordList?.length"
+          class="record-tip"
+          :style="{ color: recordEnable ? '#d81e06' : '#1677ff' }"
+        >
+          已录制 {{ recordDataList?.length || recordList?.length }} 条
+        </div>
         <div class="next-step" @click="handleSaveAndJumpNext">下一步</div>
       </div>
     </template>
     <template v-else-if="activeTab === 'list'">
-      <div class="tools-list">插入操作：延迟、截取当前屏幕、截取全图、自定义函数</div>
+      <div class="tools-list">
+        <OperateListData></OperateListData>
+        插入操作：延迟、截取当前屏幕、截取全图、自定义函数
+      </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, ref, onBeforeMount, inject } from 'vue';
+import { computed, watch, ref, onBeforeMount, inject, onMounted } from 'vue';
 import Selector from './Selector.vue';
 import IconMove from './icons/Move.vue';
 import IconShutdown from './icons/Shutdown.vue';
 import IconRobot from './icons/Robot.vue';
 import IconRecordOn from './icons/RecordOn.vue';
 import IconRecordOff from './icons/RecordOff.vue';
+import OperateListData from './OperateListData.vue';
 import { DomService } from '@/util/selector';
+import { useGlobalListener } from '@/util/hooks';
+import { removeClass } from '@/util/dom';
 
-const selectSimilar: any = inject('selectSimilar');
-const handleChangeSelectSimilar: any = inject('handleChangeSelectSimilar');
-// 选择相似
-const handleChangeSimilar = () => {
-  handleChangeSelectSimilar(!selectSimilar.value);
-};
-
-const emits = defineEmits([
-  'addUserDoData',
-  'handleChangeSelectSimilar',
-  'finishSetting',
-  'handleUpdateTool',
-  'handleChangeListVisible',
-]);
+const emits = defineEmits(['addOperateListData', 'finishSetting']);
 
 // 操作设置弹窗
 const activeTab = ref('selector'); // selector list
@@ -254,9 +275,11 @@ const handleStartMoving = () => {
 const mainSelector = ref({
   iframeIndex: -1,
   selector: '',
+  similar: false,
 });
+const mainSelectorRef = ref(null);
 const mainElement = ref<any>(null);
-const mainElementAttr = ref({});
+const mainElementAttr: any = ref({});
 const getSelectElementAttrs = () => {
   const element = DomService.getElementBySelector(mainSelector.value);
   mainElement.value = element;
@@ -273,7 +296,7 @@ const getSelectElementAttrs = () => {
 };
 const mainSelectorChange = (selector: any) => {
   mainSelector.value = selector;
-  console.log('main selector change', selector);
+  console.log('main selector change', mainSelector.value);
   if (selector.selector) {
     getSelectElementAttrs();
   }
@@ -285,9 +308,11 @@ const previousLimit = ref({
   selector: {
     iframeIndex: -1,
     selector: '',
+    similar: false,
   },
   customFn: '',
 });
+const previousSelectorRef = ref(null);
 const previousLimitSelectChange = (selector: any) => {
   previousLimit.value.selector = selector;
   console.log('previous selector change', selector);
@@ -301,6 +326,7 @@ const parentLimit = ref({
     selector: '',
   },
 });
+const parentSelectorRef = ref(null);
 const parentLimitChange = (selector: any) => {
   parentLimit.value.selector = selector;
   console.log('parent selector change', selector);
@@ -308,12 +334,12 @@ const parentLimitChange = (selector: any) => {
 
 // 操作类型
 const operateData = ref({
-  type: '',
+  type: 'getText',
   data: {
     // 点击跳转 参数
     clickAndWaitNavigator: {
       timeout: 10 * 1000,
-      waitUntil: ['load', 'networkidle0', 'domcontentloaded', 'networkidle2'],
+      waitUntil: ['load', 'networkidle0'],
     },
     // 输入文字 参数
     insertText: '',
@@ -324,25 +350,98 @@ const operateData = ref({
       delay: 0,
     },
     // 提取类 参数
-    getAttribute: {
-      label: '',
-      attribute: '',
-    },
+    getAttribute: [],
     customFn: '',
   },
 });
 
 // 键鼠数据录制
 const recordEnable = ref(false);
+const recordList = ref([]);
+const { startListener, stopListener, clearEventList, recordDataList } = useGlobalListener();
+const handleStartListener = () => {
+  recordList.value = [];
+  startListener();
+  recordEnable.value = true;
+};
+const handleStopListener = () => {
+  const result = stopListener();
+  recordList.value = result;
+  console.log(recordList.value);
+  clearEventList();
+  recordEnable.value = false;
+};
 
+const selectorRefs = ref([mainSelectorRef, previousSelectorRef, parentSelectorRef]);
+const resetFields = () => {
+  activeTab.value = 'selector';
+  activeSelectTab.value = 'element';
+  mainSelector.value = { iframeIndex: -1, selector: '', similar: false };
+  mainElement.value = null;
+  mainElementAttr.value = {};
+  parentLimit.value = {
+    type: '',
+    selector: {
+      iframeIndex: -1,
+      selector: '',
+    },
+  };
+  previousLimit.value = {
+    type: '',
+    selector: {
+      iframeIndex: -1,
+      selector: '',
+      similar: false,
+    },
+    customFn: '',
+  };
+  operateData.value = {
+    type: 'getText',
+    data: {
+      // 点击跳转 参数
+      clickAndWaitNavigator: {
+        timeout: 10 * 1000,
+        waitUntil: ['load', 'networkidle0'],
+      },
+      // 输入文字 参数
+      insertText: '',
+      // 点击元素 参数
+      clickElement: {
+        button: '',
+        clickCount: 1,
+        delay: 0,
+      },
+      // 提取类 参数
+      getAttribute: [],
+      customFn: '',
+    },
+  };
+  recordList.value = [];
+  recordEnable.value = false;
+  removeClass(
+    {
+      iframeIndex: -1,
+      selector: '.puppeteer_sunsilent_light_selecting',
+    },
+    'puppeteer_sunsilent_light_selecting',
+  );
+  selectorRefs.value.forEach((selectorRef: any) => {
+    if (selectorRef.value) {
+      selectorRef.value.resetFields();
+    }
+  });
+};
 // 保存并下一步
 const handleSaveAndJumpNext = () => {
   const data = {
+    mainSelector: mainSelector.value,
     parentLimit: parentLimit.value,
     previousLimit: previousLimit.value,
     operateData: operateData.value,
+    recordList: recordList.value,
   };
-  console.log(data);
+  emits('addOperateListData', data);
+  resetFields();
 };
 
 // 约定自定义函数需返回一个对象 null [] {}

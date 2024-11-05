@@ -51,7 +51,10 @@ const getSelectorFromElement = () => {
     newSelector = DomService.getSelectorWithNthUniq(simpleSelect, rectDomEl.value);
   }
   addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
-  return newSelector;
+  return {
+    ...newSelector,
+    similar: selectSimilar.value,
+  };
 };
 
 onMounted(() => {

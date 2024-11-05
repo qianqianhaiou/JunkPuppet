@@ -3,4 +3,5 @@
 interface Window {
   SSAPI: any;
   onLog: any;
+  openUrlInIframe: any;
 }

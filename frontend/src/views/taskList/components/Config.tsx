@@ -286,6 +286,7 @@ function App({
         result.mockData = {};
       }
     }
+    console.log(result);
     setConfig(result);
   };
   const handleDeleteTask = () => {

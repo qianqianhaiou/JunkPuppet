@@ -14,6 +14,9 @@ const initSSAPI = () => {
   contextBridge.exposeInMainWorld('onLog', (callBack: any) => {
     ipcRenderer.on('onLog', callBack);
   });
+  contextBridge.exposeInMainWorld('openUrlInIframe', (callBack: any) => {
+    ipcRenderer.on('openUrlInIframe', callBack);
+  });
 };
 
 initSSAPI();

@@ -6,7 +6,15 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import { deleteTask, updateTask } from '@/service/index';
 import Config from './Config';
 import Detail from './Detail';
-import { useEffect, useState } from 'react';
+import TaskFlow from './TaskFlow';
+import { createContext, useEffect, useState } from 'react';
+
+export const TaskContext = createContext<any>({
+  data: {},
+  messageApi: null,
+  modal: null,
+  drwerHeight: 758,
+});
 
 function App({ reflash, list }: { reflash: Function; list: any[] }) {
   const [messageApi, contextHolder] = message.useMessage();
@@ -25,14 +33,20 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
   };
 
   const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42);
+  const computedDrawerHeight = () => {
+    setDrawerHeight(window.innerHeight - 42);
+  };
   useEffect(() => {
-    window.onresize = () => {
-      setDrawerHeight(window.innerHeight - 42);
-    };
+    window.addEventListener('resize', computedDrawerHeight);
     return () => {
-      window.onresize = null;
+      window.removeEventListener('resize', computedDrawerHeight);
     };
   }, []);
+
+  const handleOpenTaskFlow = (data: any) => {
+    setTaskData(data);
+    setTaskFlowVisible(true);
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -112,12 +126,20 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
                 messageApi={messageApi}
                 type='edit'
                 data={record}></Edit>
-              <Config
+              <div>
+                <Button
+                  type='link'
+                  style={{ padding: '0px' }}
+                  onClick={() => handleOpenTaskFlow(record)}>
+                  配置
+                </Button>
+              </div>
+              {/* <Config
                 modal={modal}
                 messageApi={messageApi}
                 drwerHeight={drwerHeight}
                 data={record}
-                reflash={reflash}></Config>
+                reflash={reflash}></Config> */}
               <Detail
                 modal={modal}
                 messageApi={messageApi}
@@ -129,6 +151,9 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
       },
     },
   ];
+
+  const [taskFlowVisible, setTaskFlowVisible] = useState(false);
+  const [taskData, setTaskData] = useState({});
   return (
     <div>
       {contextHolder}
@@ -140,6 +165,9 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
         rowKey='_id'
         pagination={{ pageSize: 8, showTotal: (total) => `共 ${total} 条` }}
       />
+      <TaskContext.Provider value={{ data: taskData, messageApi, modal, drwerHeight }}>
+        {taskFlowVisible ? <TaskFlow setTaskFlowVisible={setTaskFlowVisible}></TaskFlow> : null}
+      </TaskContext.Provider>
     </div>
   );
 }

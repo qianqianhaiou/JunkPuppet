@@ -84,18 +84,9 @@ $deepGreen: #13ce66;
         height: 40px;
         padding-left: 10px;
         padding-right: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .similar {
-          cursor: pointer;
-          color: #b0b0b0;
-          &.active {
-            font-weight: bold;
-            color: #1677ff;
-          }
-        }
+        padding-bottom: 8px;
+        padding-top: 4px;
+        box-sizing: border-box;
       }
       &-setting {
         padding-left: 10px;
@@ -165,6 +156,7 @@ $deepGreen: #13ce66;
         }
       }
       &-buttons {
+        position: relative;
         height: 80px;
         padding-left: 10px;
         padding-right: 10px;
@@ -202,6 +194,13 @@ $deepGreen: #13ce66;
           justify-content: center;
           align-items: center;
         }
+        .record-tip {
+          position: absolute;
+          right: 16px;
+          top: 20px;
+          font-size: 11px;
+          color: #8d8d8d;
+        }
         .next-step {
           background-color: #1677ff;
           color: #fff;
@@ -211,6 +210,56 @@ $deepGreen: #13ce66;
           padding: 5px;
           border-radius: 5px;
           cursor: pointer;
+        }
+      }
+      &-list {
+        overflow-y: auto;
+        height: calc(100% - 36px);
+        .list {
+          margin-left: 8px;
+          margin-right: 8px;
+          border-top: 1px solid #b0b0b0;
+          .list-item {
+            padding: 5px 10px;
+            border: 1px solid #b0b0b0;
+            border-top: none;
+            .item-header {
+              display: flex;
+              justify-content: space-between;
+              font-size: 13px;
+              .title {
+                display: flex;
+                .index {
+                  width: 30px;
+                  flex-shrink: 0;
+                  text-align: right;
+                }
+              }
+              .expand {
+                cursor: pointer;
+                font-size: 12px;
+                color: #1677ff;
+              }
+            }
+            .item-body {
+              word-break: break-all;
+            }
+          }
+        }
+        &::-webkit-scrollbar-track {
+          -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+          border-radius: 5px;
+          background-color: #f5f5f5;
+        }
+        &::-webkit-scrollbar {
+          width: 10px;
+          height: 10px;
+          background-color: #f5f5f5;
+        }
+        &::-webkit-scrollbar-thumb {
+          border-radius: 8px;
+          -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+          background-color: #e2e2e2;
         }
       }
       .select-input {
@@ -224,7 +273,7 @@ $deepGreen: #13ce66;
         input {
           height: 28px;
           padding-left: 28px;
-          padding-right: 28px;
+          padding-right: 48px;
           box-sizing: border-box;
           width: 100%;
         }
@@ -245,6 +294,12 @@ $deepGreen: #13ce66;
             position: absolute;
             top: 12px;
           }
+        }
+        .select-similar {
+          cursor: pointer;
+          position: absolute;
+          right: 28px;
+          top: 5px;
         }
       }
     }

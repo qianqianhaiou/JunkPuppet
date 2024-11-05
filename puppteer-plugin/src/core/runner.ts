@@ -102,7 +102,7 @@ async function startTask(props: TaskRunnerData) {
   }
 
   // 任务队列
-  await asyncFor(mockData.builtInData, async (item) => {
+  await asyncFor(mockData.operateListData, async (item) => {
     if (item.type === 'mouse') {
       await playMouse(client, item.data);
     } else if (item.type === 'keyevent') {

@@ -6,6 +6,7 @@ import { taskDataDb, taskListDb } from './db';
 import { randomUUID } from 'crypto';
 import { MailerService } from './mailer';
 import { openTargetUrl } from './system';
+import { BrowserWindow } from 'electron';
 
 const renderTaskResultMail = (result: any, to: string, parent: string) => {
   const receiver: any = {
@@ -199,13 +200,7 @@ export const getTaskConfigDetail = async (params: any) => {
 // 修改模拟数据Json文件
 export const updateTaskMockData = async (params: any) => {
   const fileName = `${params.uid}.json`;
-  await fswriteFile(
-    join(process.env.DATA_PATH_JSON, fileName),
-    JSON.stringify({
-      builtInData: params.builtInData,
-      customFn: params.customFn,
-    }),
-  );
+  await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), JSON.stringify(params.data));
   const database = await taskListDb();
   database.chain.set('updatedAt', Date.now()).value();
   await database.write();
@@ -267,9 +262,12 @@ export const startSetting = async (params: any) => {
           resolve(fileName);
         } else if (msg.type === 'review') {
           const { host } = new URL(global.wsEndpoint);
-          await openTargetUrl(
-            `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
-          );
+          const devUrl = `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`;
+          // await openTargetUrl(
+          //   `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
+          // );
+          const reuslt: any = BrowserWindow.getAllWindows();
+          reuslt.length && reuslt?.[0]?.webContents.send('openUrlInIframe', devUrl);
         } else if (msg.type === 'warn') {
           console.warn(`任务: ${params.name} - 设置警告 - ` + JSON.stringify(msg.data));
         } else if (msg.type === 'error') {
