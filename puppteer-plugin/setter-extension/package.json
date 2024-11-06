@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "watch": "vite build -w",
+    "watch": "vite build -w --mode watch",
     "build": "vite build"
   },
   "dependencies": {

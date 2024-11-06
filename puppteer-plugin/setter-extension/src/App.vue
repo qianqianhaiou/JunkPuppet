@@ -59,7 +59,7 @@ provide('selectingResult', selectingResult);
 provide('setSelectingResult', setSelectingResult);
 
 const formatOperateData = (data: any) => {
-  let params: any = { type: data.type, name: formatOperateType(data.type) };
+  let params: any = { type: data.type, label: data.label, name: formatOperateType(data.type) };
   if (data.type === 'clickAndWaitNavigator') {
     params.clickAndWaitNavigator = data.data.clickAndWaitNavigator;
   } else if (data.type === 'insertText') {
@@ -122,8 +122,7 @@ const init = () => {
   }
 };
 
-onMounted(async () => {
-  init();
+const mockData = () => {
   operateListData.value = [
     {
       mainSelector: {
@@ -651,6 +650,29 @@ onMounted(async () => {
         customFn: 'await aaaf()',
       },
     },
+    {
+      mainSelector: {
+        iframeIndex: -1,
+        selector: 'body>div>div>div>div>div>div>h3>a>div>div>p>span>span',
+        similar: false,
+      },
+      parentLimit: null,
+      previousLimit: null,
+      recordList: null,
+      operateData: {
+        type: 'clickAndWaitNavigator',
+        name: '点击跳转',
+        clickAndWaitNavigator: {
+          timeout: 10000,
+          urlChange: true,
+          waitUntil: ['load', 'networkidle0'],
+        },
+      },
+    },
   ];
+};
+
+onMounted(async () => {
+  init();
 });
 </script>

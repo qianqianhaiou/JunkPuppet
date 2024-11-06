@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { TaskContext } from './List';
 import {
   getTaskConfigDetail,
+  maxWindow,
   startSetting,
   updateTaskMockData,
   uploadJSONSetting,
@@ -214,7 +215,7 @@ const FlowChart = ({ flow }: { flow: any }) => {
     };
     option && myChart.setOption(option);
     myChart.on('click', function (params: any) {
-      if (params.data.stepIndex) {
+      if (typeof params.data.stepIndex === 'number') {
         setStepData(flow.operateListData[params.data.stepIndex]);
         setStepEditVisible(true);
       }
@@ -232,10 +233,9 @@ const FlowChart = ({ flow }: { flow: any }) => {
 };
 
 const FlowJson = ({ flow, jsonId }: { flow: any; jsonId: string }) => {
-  const [data, setData] = useState(JSON.stringify(flow));
+  const [data, setData] = useState('');
   const [editable, setEditable] = useState(false);
   const { messageApi } = useContext(TaskContext);
-
   const handleRecover = () => {
     setData(JSON.stringify(flow));
   };
@@ -259,6 +259,9 @@ const FlowJson = ({ flow, jsonId }: { flow: any; jsonId: string }) => {
       setEditable(false);
     }
   };
+  useEffect(() => {
+    setData(JSON.stringify(flow));
+  }, [flow]);
   return (
     <div className='w-full h-full'>
       <div style={{ height: 'calc(100% - 32px - 20px)' }}>
@@ -301,8 +304,9 @@ function ReSettingTask({
     fetchTaskConfigDetail();
   };
   useEffect(() => {
-    window.openUrlInIframe((_e: any, value: any) => {
+    window.openUrlInIframe(async (_e: any, value: any) => {
       if (value) {
+        await maxWindow({});
         setUrl(value);
       }
     });

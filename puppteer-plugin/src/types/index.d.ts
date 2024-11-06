@@ -11,6 +11,12 @@ interface CurrentScreenSnapshot {
 interface Selector {
   iframeIndex: number;
   selector: string;
+  similar: boolean;
+  parent?: {
+    iframeIndex: number;
+    selector: string;
+    similar: boolean;
+  };
 }
 
 interface Cookie {
@@ -35,15 +41,15 @@ interface TaskRunnerData {
 
 interface TextResult {
   label: string;
-  multiple: boolean;
-  values: [];
+  similar: boolean;
+  values: string[];
 }
 interface SnapshotResult {
   type: string;
   label: string;
   uid?: string;
   uids?: string[];
-  multiple?: boolean;
+  similar?: boolean;
 }
 interface TaskRunnerResult {
   texts: TextResult[];

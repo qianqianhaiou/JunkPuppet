@@ -42,7 +42,7 @@ function initHack() {
   });
   // 有些A标签是实时生成的，得想办法处理
 }
-window._junkpuppet_send_data = true;
+if (import.meta.env.VITE_WATCH) window._junkpuppet_send_data = true;
 if (window._junkpuppet_send_data) {
   // 如果是设置模式，则初始化相关工具
   initDom();

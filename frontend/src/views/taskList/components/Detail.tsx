@@ -12,6 +12,7 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
   const snapshotPath = (uid: string) => {
     return `file:///${DATA_PATH_SNAPSHOT}\\${taskId}\\${uid}.png`;
   };
+  console.log(data);
   return (
     <div className='h-full overflow-y-auto f-beautify-scrollbar'>
       <div>
@@ -59,20 +60,18 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                         <div>
                           <div className='text-center'>{item.label || '未命名' + (index + 1)}</div>
                           <div className='flex justify-center flex-wrap mt-[10px]'>
-                            {item.uids ? (
-                              item.uids.map((uid: string) => {
-                                return (
-                                  <Image
-                                    className='mb-[10px]'
-                                    key={uid}
-                                    width={200}
-                                    src={snapshotPath(uid)}
-                                  />
-                                );
-                              })
-                            ) : (
-                              <Image width={200} src={snapshotPath(item.uid)} />
-                            )}
+                            {item?.uids?.length
+                              ? item.uids.map((uid: string) => {
+                                  return (
+                                    <Image
+                                      className='mb-[10px]'
+                                      key={uid}
+                                      width={200}
+                                      src={snapshotPath(uid)}
+                                    />
+                                  );
+                                })
+                              : null}
                           </div>
                         </div>
                       </Card>

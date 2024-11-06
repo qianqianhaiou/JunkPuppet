@@ -53,10 +53,29 @@
           <div class="element-tab" v-if="activeSelectTab === 'element'">
             <div class="form-item">
               <div class="label">父元素范围：</div>
-              <select v-model="parentLimit.type" name="parentLimit" id="parentLimit">
+              <!-- <select v-model="parentLimit.type" name="parentLimit" id="parentLimit">
                 <option value="limit">限制父元素范围</option>
                 <option value="">不限制</option>
-              </select>
+              </select> -->
+              <div style="display: flex; flex-direction: column">
+                <!-- select 在devtools环境下有Bug，所以替换为了radio -->
+                <div
+                  v-for="item in [
+                    { label: '不限制', value: '' },
+                    { label: '限制父元素范围', value: 'limit' },
+                  ]"
+                  :key="item.value"
+                >
+                  <input
+                    v-model="parentLimit.type"
+                    type="radio"
+                    name="parentLimitType"
+                    :id="item.label"
+                    :value="item.value"
+                  />
+                  <label :for="item.label">{{ item.label }}</label>
+                </div>
+              </div>
             </div>
             <div v-if="['limit'].includes(parentLimit.type)" class="selector">
               <Selector
@@ -68,12 +87,32 @@
 
             <div class="form-item">
               <div class="label">设置前置条件：</div>
-              <select v-model="previousLimit.type" name="previousLimit" id="previousLimit">
+              <!-- <select v-model="previousLimit.type" name="previousLimit" id="previousLimit">
                 <option value="exist">当某元素存在</option>
                 <option value="inexistence">当某元素不存在</option>
                 <option value="customFn">自定义函数</option>
                 <option value="">不设置</option>
-              </select>
+              </select> -->
+              <div style="display: flex; flex-direction: column">
+                <div
+                  v-for="item in [
+                    { label: '不设置', value: '' },
+                    { label: '当某元素存在', value: 'exist' },
+                    { label: '当某元素不存在', value: 'inexistence' },
+                    { label: '自定义函数', value: 'customFn' },
+                  ]"
+                  :key="item.value"
+                >
+                  <input
+                    v-model="previousLimit.type"
+                    type="radio"
+                    name="previousLimitType"
+                    :id="item.label"
+                    :value="item.value"
+                  />
+                  <label :for="item.label">{{ item.label }}</label>
+                </div>
+              </div>
             </div>
             <div v-if="['exist', 'inexistence'].includes(previousLimit.type)" class="selector">
               <Selector
@@ -93,7 +132,7 @@
           <div class="operate-tab" v-else-if="activeSelectTab === 'operate'">
             <div class="form-item">
               <div class="label">设置操作类型：</div>
-              <select v-model="operateData.type" name="operate" id="operate">
+              <!-- <select v-model="operateData.type" name="operate" id="operate">
                 <optgroup label="操作类">
                   <option value="getElementSnapshot">截取元素</option>
                   <option value="clickAndWaitNavigator">点击跳转</option>
@@ -107,7 +146,30 @@
                 <optgroup label="自定义">
                   <option value="customFn">自定义函数</option>
                 </optgroup>
-              </select>
+              </select> -->
+              <div style="display: flex; flex-direction: column">
+                <div
+                  v-for="item in [
+                    { label: '提取文本', value: 'getText' },
+                    { label: '提取属性', value: 'getAttribute' },
+                    { label: '截取元素', value: 'getElementSnapshot' },
+                    { label: '点击跳转', value: 'clickAndWaitNavigator' },
+                    { label: '输入文字', value: 'insertText' },
+                    { label: '点击元素', value: 'clickElement' },
+                    { label: '自定义函数', value: 'customFn' },
+                  ]"
+                  :key="item.value"
+                >
+                  <input
+                    v-model="operateData.type"
+                    type="radio"
+                    name="operateDataType"
+                    :id="item.label"
+                    :value="item.value"
+                  />
+                  <label :for="item.label">{{ item.label }}</label>
+                </div>
+              </div>
             </div>
             <template v-if="operateData.type === 'clickAndWaitNavigator'">
               <div class="form-item">
@@ -335,17 +397,19 @@ const parentLimitChange = (selector: any) => {
 // 操作类型
 const operateData = ref({
   type: 'getText',
+  label: '',
   data: {
     // 点击跳转 参数
     clickAndWaitNavigator: {
       timeout: 10 * 1000,
       waitUntil: ['load', 'networkidle0'],
+      urlChange: true,
     },
     // 输入文字 参数
     insertText: '',
     // 点击元素 参数
     clickElement: {
-      button: '',
+      button: 'left',
       clickCount: 1,
       delay: 0,
     },
@@ -397,11 +461,13 @@ const resetFields = () => {
   };
   operateData.value = {
     type: 'getText',
+    label: '',
     data: {
       // 点击跳转 参数
       clickAndWaitNavigator: {
         timeout: 10 * 1000,
         waitUntil: ['load', 'networkidle0'],
+        urlChange: true,
       },
       // 输入文字 参数
       insertText: '',

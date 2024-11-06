@@ -1,8 +1,7 @@
 import { resolve } from 'path';
 import puppeteer, { ElementHandle } from 'puppeteer-core';
 import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
-import { selectBySelector } from '../service/select';
-import { playClick } from '../service/emulate';
+import { clickElement } from '../service/emulate';
 
 // 初始化日志
 initLogger();
@@ -31,7 +30,7 @@ const handleOperateListData = (data: any) => {
   return target;
 };
 
-async function init(props: TaskSetterData) {
+async function startSetting(props: TaskSetterData) {
   const launchParams: any = {
     defaultViewport: props.size || {
       width: 1920,
@@ -55,12 +54,6 @@ async function init(props: TaskSetterData) {
       });
   }
   page.on('close', (target) => {
-    console.warn(operateListData);
-    process.send &&
-      process.send({
-        type: 'finish',
-        data: handleOperateListData(operateListData),
-      });
     process.exit();
   });
   return new Promise(async (resolve, reject) => {
@@ -70,25 +63,29 @@ async function init(props: TaskSetterData) {
         try {
           if (dataJson.type === 'finishSetting') {
             operateListData = operateListData.concat(dataJson.operateListData);
+            process.send &&
+              process.send({
+                type: 'finish',
+                data: handleOperateListData(operateListData),
+              });
             await page.close();
             resolve('');
           } else if (dataJson.type === 'clickAndWaitNavigator') {
             const oldUrl = page.url();
             // click selector
-            await playClick(page, { selector: dataJson.data.selector });
-
+            await clickElement(page, dataJson.data.selector);
             await waitTime(0.5);
             const newUrl = page.url();
             if (oldUrl === newUrl) {
-              for (let i = dataJson.operateListData.length - 1; i > 0; i++) {
-                if (dataJson.operateListData[i].type === 'clickAndWaitNavigator') {
-                  dataJson.operateListData[i]['urlChange'] = false;
-                  break;
-                }
-              }
+              dataJson.operateListData[
+                dataJson.operateListData.length - 1
+              ].operateData.clickAndWaitNavigator.urlChange = false;
             }
+            // urlChange不一定需要等待load事件 所以
             // 通过 readystatechange 判断是否需要等待 load 事件
             operateListData = operateListData.concat(dataJson.operateListData);
+          } else if (dataJson.type === 'close') {
+            await page.close();
           }
         } catch (e: any) {
           console.warn(e.message);
@@ -104,7 +101,7 @@ async function init(props: TaskSetterData) {
 process.on('message', async (args: any) => {
   try {
     if (args.type === 'StartSetting') {
-      const result = await init(args.params);
+      startSetting(args.params);
     }
   } catch (e: any) {
     console.error(e?.message);
