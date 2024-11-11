@@ -12,10 +12,10 @@
     />
     <div class="fast-selection">
       <div class="up">
-        <ArrowsUp></ArrowsUp>
+        <ArrowsUp @click="handleSelectParent"></ArrowsUp>
       </div>
       <div class="down">
-        <ArrowsDown></ArrowsDown>
+        <ArrowsDown @click="handleSelectChildren"></ArrowsDown>
       </div>
     </div>
     <div v-if="similarable" class="select-similar" @click="handleChangeSimilar">
@@ -32,7 +32,8 @@ import ArrowsDown from './icons/ArrowsDown.vue';
 import ArrowsUp from './icons/ArrowsUp.vue';
 import SimilarOn from './icons/SimilarOn.vue';
 import SimilarOff from './icons/SimilarOff.vue';
-import { removeClass } from '@/util/dom';
+import { addClass, removeClass } from '@/util/dom';
+import { DomService } from '@/util/selector';
 
 const props = defineProps({
   similarable: {
@@ -84,6 +85,43 @@ const resetFields = () => {
   selectEnable.value = false;
   handleChangeSelectSimilar(false);
   handleChangeGlobalSelectVisible(false);
+};
+
+const handleSelectParent = () => {
+  if (selector.value.selector) removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+
+  const element = DomService.getElementBySelector(selector.value);
+  let newSelector: any = null;
+  if (element && element.parentElement) {
+    if (similar.value) {
+      newSelector = DomService.getSelectorWithClass(element.parentElement);
+    } else {
+      const simpleSelect = DomService.getSelectorSimple(element.parentElement);
+      newSelector = DomService.getSelectorWithNthUniq(simpleSelect, element.parentElement);
+    }
+    addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
+  }
+  selector.value.iframeIndex = newSelector.iframeIndex;
+  selector.value.selector = newSelector.selector;
+  selector.value.similar = similar.value;
+};
+const handleSelectChildren = () => {
+  if (selector.value.selector) removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+
+  const element: any = DomService.getElementBySelector(selector.value);
+  let newSelector: any = null;
+  if (element && element.firstElementChild) {
+    if (similar.value) {
+      newSelector = DomService.getSelectorWithClass(element.firstElementChild);
+    } else {
+      const simpleSelect = DomService.getSelectorSimple(element.firstElementChild);
+      newSelector = DomService.getSelectorWithNthUniq(simpleSelect, element.firstElementChild);
+    }
+    addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
+  }
+  selector.value.iframeIndex = newSelector.iframeIndex;
+  selector.value.selector = newSelector.selector;
+  selector.value.similar = similar.value;
 };
 
 defineExpose({ resetFields });

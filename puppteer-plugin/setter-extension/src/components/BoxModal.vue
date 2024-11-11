@@ -20,14 +20,15 @@
             >
               元素选择
             </div>
+            <div :class="{ tab: true, active: activeTab === 'tools' }" @click="activeTab = 'tools'">
+              内置工具
+            </div>
             <div :class="{ tab: true, active: activeTab === 'list' }" @click="activeTab = 'list'">
               操作列表
             </div>
           </div>
         </div>
-        <div class="shutdown" title="结束" @click="emits('finishSetting')">
-          <IconShutdown></IconShutdown>
-        </div>
+        <div class="shutdown" title="结束" @click="emits('finishSetting')">结束</div>
       </div>
     </div>
     <template v-if="activeTab === 'selector'">
@@ -292,10 +293,12 @@
         <div class="next-step" @click="handleSaveAndJumpNext">下一步</div>
       </div>
     </template>
+    <template v-else-if="activeTab === 'tools'">
+      <div class="built-in">插入操作：延迟、截取当前屏幕、截取全图、自定义函数</div>
+    </template>
     <template v-else-if="activeTab === 'list'">
       <div class="tools-list">
         <OperateListData></OperateListData>
-        插入操作：延迟、截取当前屏幕、截取全图、自定义函数
       </div>
     </template>
   </div>
@@ -348,9 +351,12 @@ const getSelectElementAttrs = () => {
   if (element) {
     const attrs = element.getAttributeNames() || [];
     mainElementAttr.value = attrs.map((item) => {
+      const attrMaps: any = {
+        class: 'className',
+      };
       const value = element.getAttribute(item);
       return {
-        name: item,
+        name: attrMaps[item] || item,
         value,
       };
     });

@@ -99,11 +99,11 @@ async function startTask(props: TaskRunnerData) {
         const result = await customFn(injectContexts, customFnData[item.previousLimit.customFn]);
         if (!result) return false;
       } else {
-        const isExist = await getElementHandlesBySelector(page, item.previousLimit.selector);
+        const elementHandles = await getElementHandlesBySelector(page, item.previousLimit.selector);
         if (item.previousLimit.type === 'exist') {
-          if (!isExist) return false;
+          if (!elementHandles.length) return false;
         } else {
-          if (isExist) return false;
+          if (elementHandles.length) return false;
         }
       }
     }

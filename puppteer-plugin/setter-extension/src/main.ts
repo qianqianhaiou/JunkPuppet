@@ -19,7 +19,7 @@ function initDom() {
   CSSStyle.appendChild(document.createTextNode(style));
   NewShadowRootEl.appendChild(CSSStyle);
 
-  // shadow外样式
+  // shadow外样式  在每次导航之后需重新注入，以防止原网页清除style
   const highLightStyle = document.createElement('style');
   highLightStyle.appendChild(document.createTextNode(highlight));
   document.head.appendChild(highLightStyle);

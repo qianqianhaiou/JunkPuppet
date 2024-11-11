@@ -7,7 +7,7 @@ export const getElementHandlesBySelector = async (page: Page, selector: Selector
     const parents = (await getElementHandlesBySelector(page, selector.parent)) || [];
     for (let i = 0; i < parents.length; i++) {
       const handles = await parents[i].$$(selector.selector);
-      target.concat(handles);
+      target = target.concat(handles);
     }
   } else {
     if (selector.iframeIndex >= 0) {
