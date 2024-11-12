@@ -70,7 +70,7 @@ function createWindow() {
       },
     },
     {
-      label: '退出应用',
+      label: '退出',
       click: function () {
         app.quit();
       },

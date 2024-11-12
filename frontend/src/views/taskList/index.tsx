@@ -14,7 +14,7 @@ function App() {
       setList(result);
     }
   };
-  const reflash = async () => {
+  const refresh = async () => {
     await fetchList();
   };
   useEffect(() => {
@@ -26,7 +26,7 @@ function App() {
         <Filter fetchList={fetchList}></Filter>
       </div>
       <div className='px-[20px] mt-[10px]'>
-        <List reflash={reflash} list={list}></List>
+        <List refresh={refresh} list={list}></List>
       </div>
     </div>
   );

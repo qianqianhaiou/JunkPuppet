@@ -6,33 +6,15 @@
       @finishSetting="finishSetting"
     ></BoxModal>
   </div>
-  <!-- <GlobalListender
-    :tool="tool"
-    :selectSimilar="selectSimilar"
-    :userDoDataLastType="userDoDataLastType"
-    @addUserDoData="addUserDoData"
-    @addHiddenData="addHiddenData"
-    @clickAndWaitNavigator="clickAndWaitNavigator"
-  ></GlobalListender> -->
   <Popup :selectSimilar="selectSimilar" @addOperateListData="addOperateListData"></Popup>
   <MouseMoveBox></MouseMoveBox>
-  <!-- <OperateList
-    v-if="listVisible"
-    :userDoData="userDoData"
-    @handleChangeListVisible="handleChangeListVisible"
-    @handleDelete="handleDelete"
-    @handleUpdate="handleUpdate"
-    @addUserDoData="addUserDoData"
-  ></OperateList> -->
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted, provide } from '@vue/runtime-core';
-import { ref, reactive, Ref, computed } from 'vue';
-import GlobalListender from './components/GlobalListener.vue';
+import { onMounted, provide } from '@vue/runtime-core';
+import { ref } from 'vue';
 import Popup from './components/Popup.vue';
 import BoxModal from './components/BoxModal.vue';
 import MouseMoveBox from './components/MouseMoveBox.vue';
-// import OperateList from './components/OperateList.vue';
 import { sendMessage } from './util/service';
 import { formatOperateType } from './util/format';
 const currentDocument = ref('top');
@@ -69,7 +51,16 @@ const formatOperateData = (data: any) => {
   } else if (data.type === 'getAttribute') {
     params.getAttribute = data.data.getAttribute;
   } else if (data.type === 'customFn') {
-    params.customFn = data.data.customFn;
+    params.customFn = data.data.customFn || '';
+  } else if (data.type === 'delay') {
+    params.delay = 1000;
+  } else if (data.type === 'snapshotCurrentScreen') {
+    params.snapshotCurrentScreen = {
+      scrollTop: document.documentElement.scrollTop,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+  } else if (data.type === 'snapshotFullScreen') {
   }
   console.log(params);
   return params;
@@ -82,8 +73,8 @@ provide('operateListData', operateListData);
 const addOperateListData = (data: any) => {
   operateListData.value.push({
     mainSelector: data.mainSelector,
-    parentLimit: data.parentLimit.type ? data.parentLimit : null,
-    previousLimit: data.previousLimit.type ? data.previousLimit : null,
+    parentLimit: data.parentLimit?.type ? data.parentLimit : null,
+    previousLimit: data.previousLimit?.type ? data.previousLimit : null,
     recordList: data.recordList?.length ? data.recordList : null,
     operateData: formatOperateData(data.operateData),
   });
@@ -151,6 +142,7 @@ const mockData = () => {
       recordList: null,
       operateData: {
         type: 'getText',
+        label: '',
         name: '提取文本',
       },
     },
@@ -165,6 +157,7 @@ const mockData = () => {
       recordList: null,
       operateData: {
         type: 'getElementSnapshot',
+        label: '',
         name: '截取元素',
       },
     },
@@ -181,6 +174,7 @@ const mockData = () => {
       operateData: {
         type: 'insertText',
         name: '输入文字',
+        label: '',
         insertText: '234234342',
       },
     },
@@ -196,6 +190,7 @@ const mockData = () => {
       recordList: null,
       operateData: {
         type: 'clickElement',
+        label: '',
         name: '点击元素',
         clickElement: {
           button: 'right',
@@ -216,6 +211,7 @@ const mockData = () => {
       recordList: null,
       operateData: {
         type: 'getText',
+        label: '',
         name: '提取文本',
       },
     },
@@ -231,6 +227,7 @@ const mockData = () => {
       recordList: null,
       operateData: {
         type: 'getAttribute',
+        label: '',
         name: '提取属性',
         getAttribute: ['class'],
       },
@@ -254,6 +251,7 @@ const mockData = () => {
       recordList: null,
       operateData: {
         type: 'customFn',
+        label: '',
         name: '自定义函数',
         customFn: 'await f()',
       },
@@ -647,6 +645,7 @@ const mockData = () => {
       operateData: {
         type: 'customFn',
         name: '自定义函数',
+        label: '',
         customFn: 'await aaaf()',
       },
     },
@@ -662,6 +661,7 @@ const mockData = () => {
       operateData: {
         type: 'clickAndWaitNavigator',
         name: '点击跳转',
+        label: '',
         clickAndWaitNavigator: {
           timeout: 10000,
           urlChange: true,
@@ -674,5 +674,6 @@ const mockData = () => {
 
 onMounted(async () => {
   init();
+  // mockData();
 });
 </script>

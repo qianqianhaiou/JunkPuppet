@@ -32,7 +32,6 @@ import ArrowsDown from './icons/ArrowsDown.vue';
 import ArrowsUp from './icons/ArrowsUp.vue';
 import SimilarOn from './icons/SimilarOn.vue';
 import SimilarOff from './icons/SimilarOff.vue';
-import { addClass, removeClass } from '@/util/dom';
 import { DomService } from '@/util/selector';
 
 const props = defineProps({
@@ -68,7 +67,8 @@ const handleSelectElement = async () => {
   } else {
     selectEnable.value = true;
     handleChangeGlobalSelectVisible(true);
-    if (selector.value.selector) removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+    if (selector.value.selector)
+      DomService.removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
     selector.value = { iframeIndex: -1, selector: '', similar: selectSimilar.value };
   }
 };
@@ -88,7 +88,8 @@ const resetFields = () => {
 };
 
 const handleSelectParent = () => {
-  if (selector.value.selector) removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+  if (selector.value.selector)
+    DomService.removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
 
   const element = DomService.getElementBySelector(selector.value);
   let newSelector: any = null;
@@ -99,14 +100,15 @@ const handleSelectParent = () => {
       const simpleSelect = DomService.getSelectorSimple(element.parentElement);
       newSelector = DomService.getSelectorWithNthUniq(simpleSelect, element.parentElement);
     }
-    addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
+    DomService.addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
   }
   selector.value.iframeIndex = newSelector.iframeIndex;
   selector.value.selector = newSelector.selector;
   selector.value.similar = similar.value;
 };
 const handleSelectChildren = () => {
-  if (selector.value.selector) removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+  if (selector.value.selector)
+    DomService.removeClass(selector.value, 'puppeteer_sunsilent_light_selecting');
 
   const element: any = DomService.getElementBySelector(selector.value);
   let newSelector: any = null;
@@ -117,7 +119,7 @@ const handleSelectChildren = () => {
       const simpleSelect = DomService.getSelectorSimple(element.firstElementChild);
       newSelector = DomService.getSelectorWithNthUniq(simpleSelect, element.firstElementChild);
     }
-    addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
+    DomService.addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
   }
   selector.value.iframeIndex = newSelector.iframeIndex;
   selector.value.selector = newSelector.selector;

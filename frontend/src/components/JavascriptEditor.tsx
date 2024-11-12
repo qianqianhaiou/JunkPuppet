@@ -4,21 +4,17 @@ import { useEffect, useState } from 'react';
 
 function App({
   defaultCode,
-  customFn,
-  activeKey,
   readonly,
   updateValue,
 }: {
   defaultCode?: string;
-  customFn?: any;
-  activeKey?: string;
   readonly?: boolean;
   updateValue: any;
 }) {
   const monaco: any = useMonaco();
   const [defaultValue, setDefaultValue] = useState<string>();
   const handleChange = (e: any) => {
-    updateValue(e, activeKey);
+    updateValue(e);
   };
   const autoFormatCode = async () => {
     if (monaco?.editor) {
@@ -55,11 +51,6 @@ function App({
       }, 100);
     }
   }, [monaco]);
-  useEffect(() => {
-    if (customFn && activeKey) {
-      setDefaultValue(customFn[activeKey]['functionString'] || `// ${activeKey}`);
-    }
-  }, [activeKey]);
   useEffect(() => {
     if (defaultCode) {
       setDefaultValue(defaultCode);

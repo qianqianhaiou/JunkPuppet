@@ -31,6 +31,7 @@
         <div class="shutdown" title="结束" @click="emits('finishSetting')">结束</div>
       </div>
     </div>
+    <!-- 元素选择 -->
     <template v-if="activeTab === 'selector'">
       <div class="tools-selector">
         <Selector ref="mainSelectorRef" :similarable="true" @change="mainSelectorChange"></Selector>
@@ -293,29 +294,45 @@
         <div class="next-step" @click="handleSaveAndJumpNext">下一步</div>
       </div>
     </template>
+    <!-- 内置工具 -->
     <template v-else-if="activeTab === 'tools'">
-      <div class="built-in">插入操作：延迟、截取当前屏幕、截取全图、自定义函数</div>
+      <div class="built-in">
+        <div class="built-in-item" @click="handleAddBuiltInTools('delay')">
+          {{ formatOperateType('delay') }}
+        </div>
+        <div class="built-in-item" @click="handleAddBuiltInTools('snapshotCurrentScreen')">
+          {{ formatOperateType('snapshotCurrentScreen') }}
+        </div>
+        <div class="built-in-item" @click="handleAddBuiltInTools('snapshotFullScreen')">
+          {{ formatOperateType('snapshotFullScreen') }}
+        </div>
+        <div class="built-in-item" @click="handleAddBuiltInTools('customFn')">
+          {{ formatOperateType('customFn') }}
+        </div>
+      </div>
     </template>
+    <!-- 操作列表 -->
     <template v-else-if="activeTab === 'list'">
       <div class="tools-list">
         <OperateListData></OperateListData>
       </div>
     </template>
+    <!-- 轻提示 -->
+    <div v-if="tipContent" class="message-tip">{{ tipContent }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, ref, onBeforeMount, inject, onMounted } from 'vue';
+import { computed, watch, ref, onBeforeMount, inject, onBeforeUnmount } from 'vue';
 import Selector from './Selector.vue';
 import IconMove from './icons/Move.vue';
-import IconShutdown from './icons/Shutdown.vue';
+import { formatOperateType } from '../util/format';
 import IconRobot from './icons/Robot.vue';
 import IconRecordOn from './icons/RecordOn.vue';
 import IconRecordOff from './icons/RecordOff.vue';
 import OperateListData from './OperateListData.vue';
 import { DomService } from '@/util/selector';
 import { useGlobalListener } from '@/util/hooks';
-import { removeClass } from '@/util/dom';
 
 const emits = defineEmits(['addOperateListData', 'finishSetting']);
 
@@ -441,7 +458,24 @@ const handleStopListener = () => {
   clearEventList();
   recordEnable.value = false;
 };
+// 内置工具添加
+const handleAddBuiltInTools = (type: string) => {
+  const data = {
+    mainSelector: { iframeIndex: -1, selector: '', similar: false },
+    parentLimit: null,
+    previousLimit: null,
+    operateData: {
+      type: type,
+      label: '',
+      data: {},
+    },
+    recordList: [],
+  };
+  handleTip('添加成功');
+  emits('addOperateListData', data);
+};
 
+// 清空表单
 const selectorRefs = ref([mainSelectorRef, previousSelectorRef, parentSelectorRef]);
 const resetFields = () => {
   activeTab.value = 'selector';
@@ -490,7 +524,7 @@ const resetFields = () => {
   };
   recordList.value = [];
   recordEnable.value = false;
-  removeClass(
+  DomService.removeClass(
     {
       iframeIndex: -1,
       selector: '.puppeteer_sunsilent_light_selecting',
@@ -516,6 +550,17 @@ const handleSaveAndJumpNext = () => {
   resetFields();
 };
 
+// 轻提示
+const tipContent = ref('');
+const tipTimer = ref<any>(null);
+const handleTip = (content: string) => {
+  tipContent.value = content;
+  if (tipTimer.value) clearTimeout(tipTimer.value);
+  tipTimer.value = setTimeout(() => {
+    tipContent.value = '';
+  }, 1000);
+};
+
 // 约定自定义函数需返回一个对象 null [] {}
 
 onBeforeMount(() => {
@@ -524,5 +569,9 @@ onBeforeMount(() => {
     document.documentElement.style.userSelect = 'unset';
     document.documentElement.removeEventListener('mousemove', handleMoving);
   });
+});
+
+onBeforeUnmount(() => {
+  if (tipTimer.value) clearTimeout(tipTimer.value);
 });
 </script>

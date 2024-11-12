@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { addClass } from '@/util/dom';
 import { DomService } from '@/util/selector';
 import { inject, onMounted, ref, watch } from 'vue';
 
@@ -50,7 +49,7 @@ const getSelectorFromElement = () => {
     const simpleSelect = DomService.getSelectorSimple(rectDomEl.value);
     newSelector = DomService.getSelectorWithNthUniq(simpleSelect, rectDomEl.value);
   }
-  addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
+  DomService.addClass(newSelector, 'puppeteer_sunsilent_light_selecting');
   return {
     ...newSelector,
     similar: selectSimilar.value,

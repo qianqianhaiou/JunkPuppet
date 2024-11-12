@@ -14,9 +14,10 @@ export const TaskContext = createContext<any>({
   messageApi: null,
   modal: null,
   drwerHeight: 758,
+  refresh: () => {},
 });
 
-function App({ reflash, list }: { reflash: Function; list: any[] }) {
+function App({ refresh, list }: { refresh: Function; list: any[] }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
   const [statusLoading, setStatusLoading] = useState(false);
@@ -121,7 +122,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
           <div>
             <Space>
               <Edit
-                reflash={reflash}
+                refresh={refresh}
                 modal={modal}
                 messageApi={messageApi}
                 type='edit'
@@ -139,7 +140,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
                 messageApi={messageApi}
                 drwerHeight={drwerHeight}
                 data={record}
-                reflash={reflash}></Config> */}
+                refresh={refresh}></Config> */}
               <Detail
                 modal={modal}
                 messageApi={messageApi}
@@ -165,7 +166,7 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
         rowKey='_id'
         pagination={{ pageSize: 8, showTotal: (total) => `共 ${total} 条` }}
       />
-      <TaskContext.Provider value={{ data: taskData, messageApi, modal, drwerHeight }}>
+      <TaskContext.Provider value={{ data: taskData, messageApi, modal, drwerHeight, refresh }}>
         {taskFlowVisible ? <TaskFlow setTaskFlowVisible={setTaskFlowVisible}></TaskFlow> : null}
       </TaskContext.Provider>
     </div>

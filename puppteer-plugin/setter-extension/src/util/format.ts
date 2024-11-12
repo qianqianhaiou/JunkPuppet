@@ -8,8 +8,8 @@ export const formatOperateType = (type: string): string => {
     clickElement: '点击元素',
     customFn: '自定义函数',
 
-    snapshotFullScreen: '全页截图',
-    snapshotCurrentScreen: '当前窗口截图',
+    snapshotFullScreen: '截取全图',
+    snapshotCurrentScreen: '截取当前屏幕',
     delay: '延迟',
     mouse: '鼠标事件',
     scroll: '滚动事件',

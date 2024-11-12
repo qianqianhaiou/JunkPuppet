@@ -41,7 +41,6 @@ function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
     }
     setConfig(result);
     setFlow(result.mockData);
-    console.log(result);
   };
   const handleClose = () => {
     setTaskFlowVisible(false);
@@ -76,7 +75,9 @@ function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
       open={true}>
       {config.mockDataId ? (
         <>
-          {viewType === 'flow' ? <FlowChart flow={flow}></FlowChart> : null}
+          {viewType === 'flow' ? (
+            <FlowChart flow={flow} jsonId={config?.mockDataId}></FlowChart>
+          ) : null}
           {viewType === 'json' ? (
             <FlowJson flow={flow} jsonId={config?.mockDataId}></FlowJson>
           ) : null}
@@ -147,11 +148,11 @@ function UploadJsonConfig({
   return <Upload {...props}>{children}</Upload>;
 }
 
-const FlowChart = ({ flow }: { flow: any }) => {
+const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
   const chartRef = useRef<any>(null);
   const [stepEditVisible, setStepEditVisible] = useState(false);
   const [stepData, setStepData] = useState();
-
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   function calculatePointsCoordinates(
     canvasWidth: number,
     spacing: number,
@@ -216,6 +217,7 @@ const FlowChart = ({ flow }: { flow: any }) => {
     option && myChart.setOption(option);
     myChart.on('click', function (params: any) {
       if (typeof params.data.stepIndex === 'number') {
+        setCurrentStepIndex(params.data.stepIndex);
         setStepData(flow.operateListData[params.data.stepIndex]);
         setStepEditVisible(true);
       }
@@ -226,7 +228,12 @@ const FlowChart = ({ flow }: { flow: any }) => {
     <>
       <div style={{ width: '100%', height: '100%' }} ref={chartRef}></div>
       {stepEditVisible ? (
-        <TaskStepEdit stepData={stepData} setStepEditVisible={setStepEditVisible}></TaskStepEdit>
+        <TaskStepEdit
+          stepData={stepData}
+          jsonId={jsonId}
+          flow={flow}
+          currentStepIndex={currentStepIndex}
+          setStepEditVisible={setStepEditVisible}></TaskStepEdit>
       ) : null}
     </>
   );

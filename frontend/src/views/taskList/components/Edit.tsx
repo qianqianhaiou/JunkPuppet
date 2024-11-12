@@ -35,13 +35,13 @@ function App({
   messageApi,
   modal,
   type,
-  reflash,
+  refresh,
   data,
 }: {
   messageApi: any;
   modal: any;
   type: string;
-  reflash: any;
+  refresh: any;
   data?: any;
 }) {
   const [modelVisible, setModelVisible] = useState(false);
@@ -77,7 +77,7 @@ function App({
       async onOk() {
         await deleteTask({ _id: data._id });
         messageApi.success('删除成功');
-        reflash();
+        refresh();
       },
       onCancel() {},
     });
@@ -98,7 +98,7 @@ function App({
     }
     if (result === 'ok') {
       messageApi && messageApi.success('修改成功');
-      reflash();
+      refresh();
       setModelVisible(false);
     }
   };

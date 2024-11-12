@@ -193,4 +193,20 @@ export class DomService {
     }
     return element;
   }
+  static addClass(selector: Selector, className: string) {
+    const $els = document.querySelectorAll(selector.selector);
+    if ($els.length) {
+      Array.prototype.forEach.call($els, (item) => {
+        item.className = item.className + ` ${className}`;
+      });
+    }
+  }
+  static removeClass(selector: Selector, className: string) {
+    const $els = document.querySelectorAll(selector.selector);
+    if ($els.length) {
+      Array.prototype.forEach.call($els, (item) => {
+        item.className = item.className.replace(className, '');
+      });
+    }
+  }
 }

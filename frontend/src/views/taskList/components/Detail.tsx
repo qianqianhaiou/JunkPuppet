@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { deleteTaskDataDb, getTaskDataDetail, startPlay } from '@/service/index';
 import { translateDate } from '@/utils/translator';
 import style from '../style.module.scss';
-import { formatSnapshotType } from '@/utils/format';
+import { formatOperateType } from '@/utils/format';
 import { useSettingStore } from '@/views/stores';
 import { DeleteOutlined, ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons';
 
@@ -56,7 +56,7 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                 {data.snapshots.map((item: any, index: number) => {
                   return (
                     <Col span={8} key={index}>
-                      <Card title={<div>{formatSnapshotType(item.type)}</div>} bordered={false}>
+                      <Card title={<div>{formatOperateType(item.type)}</div>} bordered={false}>
                         <div>
                           <div className='text-center'>{item.label || '未命名' + (index + 1)}</div>
                           <div className='flex justify-center flex-wrap mt-[10px]'>

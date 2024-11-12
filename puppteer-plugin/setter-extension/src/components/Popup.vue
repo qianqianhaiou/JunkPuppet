@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { addClass } from '@/util/dom';
 import { DomService } from '@/util/selector';
 import { computed, nextTick, onMounted, ref } from 'vue';
 
@@ -136,7 +135,7 @@ const handleGetLink = () => {
     newSelector = DomService.getSelectorWithNthUniq(simpleSelect, targetRef.value);
   }
 
-  addClass(newSelector, 'puppeteer_sunsilent_light_attribute');
+  DomService.addClass(newSelector, 'puppeteer_sunsilent_light_attribute');
 
   emits('addUserDoData', {
     type: 'getAttribute',
