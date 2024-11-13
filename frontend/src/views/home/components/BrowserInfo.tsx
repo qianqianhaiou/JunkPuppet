@@ -53,6 +53,7 @@ function App() {
     activeTabRef.current = id;
   };
   useEffect(() => {
+    fetchData();
     timer.current = setInterval(() => {
       fetchData();
     }, 1000);

@@ -5,7 +5,7 @@ import { triggerItemCron } from './cron';
 import { taskDataDb, taskListDb } from './db';
 import { randomUUID } from 'crypto';
 import { MailerService } from './mailer';
-import { openTargetUrl } from './system';
+import { closeTargetPage, openTargetUrl } from './system';
 import { BrowserWindow } from 'electron';
 
 const renderTaskResultMail = (result: any, to: string, parent: string) => {
@@ -230,7 +230,8 @@ export const deleteTaskDataDb = async (params: any) => {
 // 开始设置模拟数据
 export const startSetting = async (params: any) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/setting.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/setting.js`, { stdio: 'inherit' });
+    globalThis.setterProcess = ChildProcess;
     ChildProcess.send({
       type: 'StartSetting',
       params: {
@@ -285,6 +286,10 @@ export const startSetting = async (params: any) => {
     console.log(`setter start error：${error.message}`);
   }
 };
+export const killSetterProcess = async (params: any) => {
+  globalThis.setterProcess?.kill();
+  await closeTargetPage(params.pageId);
+};
 // 上传JSON模拟数据
 export const uploadJSONSetting = async (params: any) => {
   const database = await taskListDb();
@@ -317,7 +322,7 @@ export const uploadJSONSetting = async (params: any) => {
 // 调试任务操作运行，放慢速度，可视化
 export const debugPlay = async (params: any) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`, { stdio: 'inherit' });
     const data = await fsreadFile(join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`));
     ChildProcess.send({
       type: 'StartRunning',
@@ -377,7 +382,7 @@ export const debugPlay = async (params: any) => {
 // 开始模拟操作运行
 export const startplay = async (params: any) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`, { stdio: 'inherit' });
     const data = await fsreadFile(join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`));
     console.log('任务：' + params.name + ' - 开始执行');
     ChildProcess.send({

@@ -4,6 +4,8 @@ declare module 'nodemailer';
 declare namespace globalThis {
   var cronList: Map<string, any>;
   var wsEndpoint: string;
+  var setterProcess: ChildProcess | null;
+  var runnerProcess: ChildProcess | null;
 }
 
 declare namespace NodeJS {

@@ -254,7 +254,7 @@
               <div v-for="(item, index) in mainElementAttr" :key="item">
                 <input
                   v-model="operateData.data.getAttribute"
-                  type="checkbox"
+                  type="radio"
                   name="getAttribute"
                   :id="item.name"
                   :value="item.name"
@@ -437,7 +437,7 @@ const operateData = ref({
       delay: 0,
     },
     // 提取类 参数
-    getAttribute: [],
+    getAttribute: '',
     customFn: '',
   },
 });
@@ -518,7 +518,7 @@ const resetFields = () => {
         delay: 0,
       },
       // 提取类 参数
-      getAttribute: [],
+      getAttribute: '',
       customFn: '',
     },
   };

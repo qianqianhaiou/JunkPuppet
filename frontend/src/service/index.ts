@@ -70,6 +70,9 @@ export const startSetting = async (params: any) => {
 export const startPlay = async (params: any) => {
   return FetchData('startplay', params);
 };
+export const killSetterProcess = async (params: any) => {
+  return FetchData('killSetterProcess', params);
+};
 export const debugPlay = async (params: any) => {
   return FetchData('debugPlay', params);
 };

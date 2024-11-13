@@ -64,7 +64,7 @@ export const openTargetPage = async (pageId: string) => {
 // active指定tab
 export const activeTargetPage = async (pageId: string) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
     ChildProcess.send({
       type: 'activeTargetPage',
       params: {
@@ -93,7 +93,7 @@ export const activeTargetPage = async (pageId: string) => {
 // 关闭指定页面
 export const closeTargetPage = async (pageId: string) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
     ChildProcess.send({
       type: 'closeTargetPage',
       params: {

@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { TaskContext } from './List';
 import {
   getTaskConfigDetail,
+  killSetterProcess,
   maxWindow,
   startSetting,
   updateTaskMockData,
@@ -15,11 +16,16 @@ import { CanvasRenderer } from 'echarts/renderers';
 import TaskStepEdit from './TaskStepEdit';
 import { SwapOutlined, RedoOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import JsonEditor from '@/components/JsonEditor';
+import { GlobalContext } from '@/App';
+import { Menu, Item, Separator, Submenu, useContextMenu } from 'react-contexify';
+import 'react-contexify/dist/ReactContexify.css';
 
 echarts.use([TitleComponent, TooltipComponent, GraphChart, CanvasRenderer]);
 
 function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
-  const { data, drwerHeight } = useContext(TaskContext);
+  const { data } = useContext(TaskContext);
+  const { drwerHeight } = useContext(GlobalContext);
+
   const [config, setConfig] = useState<any>({});
   const [viewType, setViewType] = useState('flow');
   const [flow, setFlow] = useState<any>({});
@@ -149,10 +155,16 @@ function UploadJsonConfig({
 }
 
 const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
+  const { messageApi } = useContext(GlobalContext);
+
   const chartRef = useRef<any>(null);
   const [stepEditVisible, setStepEditVisible] = useState(false);
   const [stepData, setStepData] = useState();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const MENU_ID = 'flow-chart-menu';
+  const { show } = useContextMenu({
+    id: MENU_ID,
+  });
   function calculatePointsCoordinates(
     canvasWidth: number,
     spacing: number,
@@ -172,6 +184,11 @@ const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
     }
     return points;
   }
+
+  const menuVisible = useRef(false);
+  const handlePlanItemClick = () => {
+    messageApi.info('开发中，尽请期待');
+  };
 
   useEffect(() => {
     const chartDom = chartRef.current;
@@ -222,11 +239,27 @@ const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
         setStepEditVisible(true);
       }
     });
+    myChart.on('contextmenu', function (params: any) {
+      if (typeof params.data.stepIndex === 'number') {
+        menuVisible.current = true;
+        setCurrentStepIndex(params.data.stepIndex);
+        setStepData(flow.operateListData[params.data.stepIndex]);
+      }
+    });
   }, [flow]);
 
   return (
     <>
-      <div style={{ width: '100%', height: '100%' }} ref={chartRef}></div>
+      <div
+        style={{ width: '100%', height: '100%' }}
+        ref={chartRef}
+        onContextMenu={(e) => {
+          if (menuVisible.current) {
+            show({
+              event: e,
+            });
+          }
+        }}></div>
       {stepEditVisible ? (
         <TaskStepEdit
           stepData={stepData}
@@ -235,6 +268,25 @@ const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
           currentStepIndex={currentStepIndex}
           setStepEditVisible={setStepEditVisible}></TaskStepEdit>
       ) : null}
+      <Menu
+        id={MENU_ID}
+        theme='dark'
+        onVisibilityChange={(e) => {
+          menuVisible.current = false;
+        }}>
+        <Item onClick={handlePlanItemClick}>复制</Item>
+        <Separator />
+        <Item onClick={handlePlanItemClick}>粘贴</Item>
+        <Separator />
+        <Submenu label='节点后添加'>
+          <Item onClick={handlePlanItemClick}>延迟</Item>
+          <Item onClick={handlePlanItemClick}>截取当前屏幕</Item>
+          <Item onClick={handlePlanItemClick}>截取全图</Item>
+          <Item onClick={handlePlanItemClick}>自定义函数</Item>
+        </Submenu>
+        <Separator />
+        <Item onClick={handlePlanItemClick}>删除该节点</Item>
+      </Menu>
     </>
   );
 };
@@ -242,7 +294,7 @@ const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
 const FlowJson = ({ flow, jsonId }: { flow: any; jsonId: string }) => {
   const [data, setData] = useState('');
   const [editable, setEditable] = useState(false);
-  const { messageApi } = useContext(TaskContext);
+  const { messageApi } = useContext(GlobalContext);
   const handleRecover = () => {
     setData(JSON.stringify(flow));
   };
@@ -310,6 +362,12 @@ function ReSettingTask({
     setUrl('');
     fetchTaskConfigDetail();
   };
+  const handleCancel = async () => {
+    const urlSplit = url.split('/');
+    killSetterProcess({
+      pageId: urlSplit[urlSplit.length - 1],
+    });
+  };
   useEffect(() => {
     window.openUrlInIframe(async (_e: any, value: any) => {
       if (value) {
@@ -324,10 +382,18 @@ function ReSettingTask({
         重新设置
       </Button>
       {url ? (
-        <iframe
-          className='fixed z-[1000000000] w-full h-full left-0 top-0'
-          style={{ border: 'none' }}
-          src={url}></iframe>
+        <>
+          <iframe
+            className='fixed z-[2147483646] w-full left-0 top-[42px]'
+            style={{ border: 'none', height: 'calc(100% - 42px)' }}
+            src={url}></iframe>
+          <div className='fixed flex items-center justify-between px-[20px] box-border z-[2147483647] w-full h-[42px] left-0 top-0 bg-[#282828]'>
+            <div>任务流设置</div>
+            <Button variant='solid' color='danger' onClick={handleCancel}>
+              取消并废弃
+            </Button>
+          </div>
+        </>
       ) : null}
     </>
   );

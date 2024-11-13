@@ -12,6 +12,7 @@ import {
   debugPlay,
   startplay,
   uploadJSONSetting,
+  killSetterProcess,
 } from '../service/task';
 
 import { startManualJs } from '../service/jsbox';
@@ -107,6 +108,10 @@ export const routes: Route[] = [
   {
     path: 'startplay',
     callBack: (_event, arg) => wrapService(startplay, arg),
+  },
+  {
+    path: 'killSetterProcess',
+    callBack: (_event, arg) => wrapService(killSetterProcess, arg),
   },
   {
     path: 'debugPlay',

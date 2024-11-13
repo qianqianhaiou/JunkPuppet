@@ -1,11 +1,30 @@
-import { Button, Drawer, Tabs, Image, Row, Card, Col, Alert, Spin, Result, Space } from 'antd';
-import { useEffect, useState } from 'react';
+import {
+  Button,
+  Drawer,
+  Tabs,
+  Image,
+  Row,
+  Card,
+  Col,
+  Alert,
+  Spin,
+  Result,
+  Space,
+  Dropdown,
+} from 'antd';
+import { useContext, useEffect, useState } from 'react';
 import { deleteTaskDataDb, getTaskDataDetail, startPlay } from '@/service/index';
 import { translateDate } from '@/utils/translator';
 import style from '../style.module.scss';
 import { formatOperateType } from '@/utils/format';
 import { useSettingStore } from '@/views/stores';
-import { DeleteOutlined, ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  ExclamationCircleFilled,
+  ReloadOutlined,
+  ExportOutlined,
+} from '@ant-design/icons';
+import { GlobalContext } from '@/App';
 
 function ListItem({ data, taskId }: { data: any; taskId: string }) {
   const DATA_PATH_SNAPSHOT = useSettingStore((state) => state.DATA_PATH_SNAPSHOT);
@@ -109,18 +128,9 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
   );
 }
 
-function App({
-  modal,
-  messageApi,
-  data,
-  drwerHeight,
-}: {
-  modal: any;
-  messageApi: any;
-  data: any;
-  drwerHeight: number;
-}) {
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+function App({ data, setDetailVisible }: { data: any; setDetailVisible: any }) {
+  const { messageApi, modal, drwerHeight } = useContext(GlobalContext);
+
   const [list, setList] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const handlePlay = async () => {
@@ -146,7 +156,7 @@ function App({
           taskId: data._id,
         });
         messageApi.success('删除成功');
-        setModalVisible(false);
+        setDetailVisible(false);
       },
       onCancel() {},
     });
@@ -155,83 +165,95 @@ function App({
     const result = await getTaskDataDetail({ _id: data._id });
     setList(result);
   };
-  const handleOpenDrawer = () => {
-    setModalVisible(true);
+
+  const handleExportDetail = async () => {
+    messageApi.info('开发中，尽请期待');
   };
   const handleClose = () => {
-    setModalVisible(false);
+    setDetailVisible(false);
   };
   useEffect(() => {
-    if (modalVisible) {
-      fetchList();
-    }
-  }, [modalVisible]);
+    fetchList();
+  }, []);
 
   return (
-    <>
-      <Button type='link' style={{ padding: '0px' }} onClick={handleOpenDrawer}>
-        详情
-      </Button>
-      <Drawer
-        className={loading ? style.Drawer : style.DrawerScroll}
-        style={{ height: `${drwerHeight}px` }}
-        title={
-          <div className='w-full flex items-center justify-between'>
-            <div>
-              <span>任务详情</span>
-              <span>（共 {list.length} 条）</span>
-            </div>
-            <div>
-              {data.mockDataId && (
-                <Space>
-                  {list.length ? (
-                    <Button
-                      type='dashed'
-                      danger
-                      loading={loading}
-                      icon={<DeleteOutlined />}
-                      onClick={handleDeleteAllTaskData}>
-                      删除全部数据
-                    </Button>
-                  ) : null}
-                  <Button onClick={handlePlay} loading={loading} icon={<ReloadOutlined />}>
-                    运行脚本
-                  </Button>
-                </Space>
-              )}
-            </div>
+    <Drawer
+      className={loading ? style.Drawer : style.DrawerScroll}
+      style={{ height: `${drwerHeight}px` }}
+      title={
+        <div className='w-full flex items-center justify-between'>
+          <div className='flex items-center'>
+            <div>任务详情</div>
+            <div>（共 {list.length} 条）</div>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: '1',
+                    label: <div className='flex justify-center'>导出Excel</div>,
+                  },
+                  { key: '2', label: <div className='flex justify-center'>导出JSON</div> },
+                ],
+              }}>
+              <Button type='text' icon={<ExportOutlined />} onClick={handleExportDetail}>
+                导出全部数据
+              </Button>
+            </Dropdown>
           </div>
-        }
-        placement='right'
-        width={1200}
-        destroyOnClose={true}
-        onClose={handleClose}
-        open={modalVisible}>
-        <Spin
-          size='large'
-          tip={<div className='mt-[16px] font-bold text-[20px]'>运行中...</div>}
-          spinning={loading}>
-          {list.length ? (
-            <Tabs
-              className={style.Tabs + ' h-full'}
-              defaultActiveKey='0'
-              tabPosition='top'
-              destroyInactiveTabPane={true}
-              items={list.map((item: any, index: number) => {
-                const id = String(index);
-                return {
-                  label: translateDate(item.createdAt, 'YYYY-MM-DD HH:mm:ss'),
-                  key: id,
-                  children: <ListItem data={item} taskId={data._id}></ListItem>,
-                };
-              })}
-            />
-          ) : (
-            <Result className='h-full flex flex-col justify-center' title='暂无数据' />
-          )}
-        </Spin>
-      </Drawer>
-    </>
+          <div>
+            {data.mockDataId && (
+              <Space>
+                {list.length ? (
+                  <Button
+                    type='dashed'
+                    danger
+                    loading={loading}
+                    icon={<DeleteOutlined />}
+                    onClick={handleDeleteAllTaskData}>
+                    清空全部数据
+                  </Button>
+                ) : null}
+                <Button
+                  onClick={handlePlay}
+                  loading={loading}
+                  type='primary'
+                  icon={<ReloadOutlined />}>
+                  运行脚本
+                </Button>
+              </Space>
+            )}
+          </div>
+        </div>
+      }
+      placement='right'
+      width={1200}
+      destroyOnClose={true}
+      onClose={handleClose}
+      open={true}>
+      <Spin
+        size='large'
+        tip={<div className='mt-[16px] font-bold text-[20px]'>运行中...</div>}
+        spinning={loading}>
+        {list.length ? (
+          <Tabs
+            className={style.Tabs + ' h-full'}
+            defaultActiveKey='0'
+            tabPosition='top'
+            destroyInactiveTabPane={true}
+            items={list.map((item: any, index: number) => {
+              const id = String(index);
+              return {
+                label: translateDate(item.createdAt, 'YYYY-MM-DD HH:mm:ss'),
+                key: id,
+                children: <ListItem data={item} taskId={data._id}></ListItem>,
+              };
+            })}
+          />
+        ) : (
+          <Result className='h-full flex flex-col justify-center' title='暂无数据' />
+        )}
+      </Spin>
+    </Drawer>
   );
 }
 

@@ -62,7 +62,6 @@ const formatOperateData = (data: any) => {
     };
   } else if (data.type === 'snapshotFullScreen') {
   }
-  console.log(params);
   return params;
 };
 

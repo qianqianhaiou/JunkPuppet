@@ -6,6 +6,8 @@ import { formatOperateType, formatPreviousLimitType } from '@/utils/format';
 import { MOUSEKEY_EVENTS, NAVIGATOR_WAITUTIL } from '@/utils/const';
 import JSModal from './JSModal';
 import { updateTaskMockData } from '@/service';
+import { GlobalContext } from '@/App';
+import { TaskListContext } from '..';
 
 function TaskStepEdit({
   stepData,
@@ -20,7 +22,9 @@ function TaskStepEdit({
   currentStepIndex: any;
   setStepEditVisible: any;
 }) {
-  const { drwerHeight, messageApi, refresh } = useContext(TaskContext);
+  const { messageApi, drwerHeight } = useContext(GlobalContext);
+  const { refresh } = useContext(TaskListContext);
+
   const [step, setStep] = useState(stepData);
   const [editJsVisible, setEditJsVisible] = useState(false);
   const handleMainSelectorChange = (e: any) => {
@@ -102,15 +106,6 @@ function TaskStepEdit({
           ...step.operateData.clickElement,
           delay: e,
         },
-      },
-    });
-  };
-  const handleAttrsChange = (e: any) => {
-    setStep({
-      ...step,
-      operateData: {
-        ...step.operateData,
-        getAttribute: e,
       },
     });
   };
@@ -314,11 +309,7 @@ function TaskStepEdit({
                 </div>
                 <div className='flex items-center'>
                   <div className='flex-shrink-0'>提取属性：</div>
-                  <Checkbox.Group
-                    options={step.operateData.getAttribute}
-                    defaultValue={step.operateData.getAttribute}
-                    onChange={handleAttrsChange}
-                  />
+                  <Tag color='volcano'>{step.operateData.getAttribute}</Tag>
                 </div>
               </>
             ) : null}
@@ -470,6 +461,12 @@ function TaskStepEdit({
                     });
                   }}></InputNumber>{' '}
                 <div className='ml-[10px] text-[12px] text-[#b0b0b0]'>*单位ms</div>
+              </div>
+            ) : null}
+            {step?.operateData?.type === 'snapshotFullScreen' ? (
+              <div className='flex items-center'>
+                <div className='flex-shrink-0'>截图标题：</div>
+                <Input defaultValue={step?.operateData?.label} onChange={handleLabelChange}></Input>
               </div>
             ) : null}
             {step?.operateData?.type === 'snapshotCurrentScreen' ? (

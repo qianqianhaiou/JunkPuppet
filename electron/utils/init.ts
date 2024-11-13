@@ -8,7 +8,7 @@ import { fork } from 'node:child_process';
 
 export const initBrowserInstance = async () => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
     ChildProcess.send({
       type: 'initBrowser',
       params: {
@@ -20,6 +20,7 @@ export const initBrowserInstance = async () => {
       ChildProcess.on('message', async (msg: any) => {
         if (msg.type === 'wsEndpoint') {
           global.wsEndpoint = msg.data;
+          console.log(global.wsEndpoint);
           resolve('sucess');
         }
       });

@@ -18,7 +18,7 @@ function App() {
           <div></div>
           <div>
             <Button type='text' icon={<SwapOutlined />} onClick={toggleViewType}>
-              切换视图
+              切换
             </Button>
           </div>
         </div>

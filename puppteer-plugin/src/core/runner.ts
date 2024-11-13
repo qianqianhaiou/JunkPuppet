@@ -24,7 +24,7 @@ import { LIFE_HOOKS } from '../util/const';
 import { getElementHandlesBySelector } from '../service/select';
 
 // 初始化日志
-initLogger();
+// initLogger();
 
 async function startTask(props: TaskRunnerData) {
   const launchParams: any = {
@@ -115,7 +115,7 @@ async function startTask(props: TaskRunnerData) {
     };
 
     if (item.operateData.type === 'getText') {
-      const data = await getAttributeBySelector(page, mainSelector, ['innerText']);
+      const data = await getAttributeBySelector(page, mainSelector, 'innerText');
       result.texts.push({
         label: item.operateData.label || getCurrentTime(),
         similar: mainSelector.similar,
@@ -189,7 +189,6 @@ async function startTask(props: TaskRunnerData) {
   await page.close();
   return result;
 }
-
 process.on('message', async (args: any) => {
   try {
     if (args.type === 'StartRunning') {

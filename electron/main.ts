@@ -111,7 +111,11 @@ app
     // 建立日志通道
     if (logger) {
       let loggerCount = 0;
+      const log = console.log;
+      const warn = console.log;
+      const error = console.log;
       console.log = (...data) => {
+        log(data);
         loggerCount++;
         const string = data.join(' ');
         logger!.info(string);
@@ -124,6 +128,7 @@ app
         });
       };
       console.warn = (...data) => {
+        warn(data);
         loggerCount++;
         const string = data.join(' ');
         logger!.warn(string);
@@ -136,6 +141,7 @@ app
         });
       };
       console.error = (...data) => {
+        error(data);
         loggerCount++;
         const string = data.join(' ');
         logger!.error(string);

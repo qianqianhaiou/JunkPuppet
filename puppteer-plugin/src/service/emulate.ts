@@ -63,17 +63,14 @@ export async function clickElement(page: Page, selector: Selector) {
     await waitTime(0.5);
   }
 }
-export async function getAttributeBySelector(page: Page, data: Selector, attributes: string[]) {
+export async function getAttributeBySelector(page: Page, data: Selector, attribute: string) {
   const result: string[] = [];
   const elementHandles = await getElementHandlesBySelector(page, data);
   for (let i = 0; i < elementHandles.length; i++) {
     const elementHandle = elementHandles[i];
-    for (let j = 0; j < attributes.length; j++) {
-      const attribute = attributes[j];
-      const attr: any = await elementHandle.getProperty(attribute);
-      const value = (await attr.jsonValue()) || '';
-      result.push(value);
-    }
+    const attr: any = await elementHandle.getProperty(attribute);
+    const value = (await attr.jsonValue()) || '';
+    result.push(value);
   }
   return result;
 }

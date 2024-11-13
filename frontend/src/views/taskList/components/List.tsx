@@ -2,24 +2,19 @@ import { Button, Space, Table, Modal, message, Tag, Switch } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { translateDate } from '@/utils/translator';
 import Edit from './Edit';
-import { ExclamationCircleFilled } from '@ant-design/icons';
 import { deleteTask, updateTask } from '@/service/index';
-import Config from './Config';
 import Detail from './Detail';
 import TaskFlow from './TaskFlow';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '@/App';
+import { TaskListContext } from '..';
 
-export const TaskContext = createContext<any>({
+export const TaskContext = createContext<{ data: any }>({
   data: {},
-  messageApi: null,
-  modal: null,
-  drwerHeight: 758,
-  refresh: () => {},
 });
 
-function App({ refresh, list }: { refresh: Function; list: any[] }) {
-  const [messageApi, contextHolder] = message.useMessage();
-  const [modal, modalContextHolder] = Modal.useModal();
+function App({ list }: { list: any[] }) {
+  const { messageApi } = useContext(GlobalContext);
   const [statusLoading, setStatusLoading] = useState(false);
   const handleTaskStatusChange = async (status: boolean, recard: any) => {
     if (status && !recard.cron) {
@@ -31,22 +26,6 @@ function App({ refresh, list }: { refresh: Function; list: any[] }) {
     recard.auto = status;
     await updateTask(recard);
     setStatusLoading(false);
-  };
-
-  const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42);
-  const computedDrawerHeight = () => {
-    setDrawerHeight(window.innerHeight - 42);
-  };
-  useEffect(() => {
-    window.addEventListener('resize', computedDrawerHeight);
-    return () => {
-      window.removeEventListener('resize', computedDrawerHeight);
-    };
-  }, []);
-
-  const handleOpenTaskFlow = (data: any) => {
-    setTaskData(data);
-    setTaskFlowVisible(true);
   };
 
   const columns: ColumnsType<any> = [
@@ -121,31 +100,39 @@ function App({ refresh, list }: { refresh: Function; list: any[] }) {
         return (
           <div>
             <Space>
-              <Edit
-                refresh={refresh}
-                modal={modal}
-                messageApi={messageApi}
-                type='edit'
-                data={record}></Edit>
+              <div>
+                <Button
+                  type='link'
+                  onClick={() => {
+                    setEditData(record);
+                    setEditVisible(true);
+                  }}
+                  style={{ paddingLeft: '0px', paddingRight: '0px' }}>
+                  编辑
+                </Button>
+              </div>
               <div>
                 <Button
                   type='link'
                   style={{ padding: '0px' }}
-                  onClick={() => handleOpenTaskFlow(record)}>
+                  onClick={() => {
+                    setTaskData(record);
+                    setTaskFlowVisible(true);
+                  }}>
                   配置
                 </Button>
               </div>
-              {/* <Config
-                modal={modal}
-                messageApi={messageApi}
-                drwerHeight={drwerHeight}
-                data={record}
-                refresh={refresh}></Config> */}
-              <Detail
-                modal={modal}
-                messageApi={messageApi}
-                drwerHeight={drwerHeight}
-                data={record}></Detail>
+              <div>
+                <Button
+                  type='link'
+                  style={{ padding: '0px' }}
+                  onClick={() => {
+                    setDetailData(record);
+                    setDetailVisible(true);
+                  }}>
+                  详情
+                </Button>
+              </div>
             </Space>
           </div>
         );
@@ -155,10 +142,14 @@ function App({ refresh, list }: { refresh: Function; list: any[] }) {
 
   const [taskFlowVisible, setTaskFlowVisible] = useState(false);
   const [taskData, setTaskData] = useState({});
+
+  const [editVisible, setEditVisible] = useState(false);
+  const [editData, setEditData] = useState({});
+
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [detailData, setDetailData] = useState([]);
   return (
     <div>
-      {contextHolder}
-      {modalContextHolder}
       <Table
         columns={columns}
         tableLayout='fixed'
@@ -166,8 +157,14 @@ function App({ refresh, list }: { refresh: Function; list: any[] }) {
         rowKey='_id'
         pagination={{ pageSize: 8, showTotal: (total) => `共 ${total} 条` }}
       />
-      <TaskContext.Provider value={{ data: taskData, messageApi, modal, drwerHeight, refresh }}>
+      <TaskContext.Provider value={{ data: taskData }}>
         {taskFlowVisible ? <TaskFlow setTaskFlowVisible={setTaskFlowVisible}></TaskFlow> : null}
+        {editVisible ? (
+          <Edit type='edit' data={editData} setEditVisible={setEditVisible}></Edit>
+        ) : null}
+        {detailVisible ? (
+          <Detail data={detailData} setDetailVisible={setDetailVisible}></Detail>
+        ) : null}
       </TaskContext.Provider>
     </div>
   );

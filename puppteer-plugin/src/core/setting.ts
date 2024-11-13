@@ -4,7 +4,7 @@ import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
 import { clickElement } from '../service/emulate';
 
 // 初始化日志
-initLogger();
+// initLogger();
 
 // 处理原始数据
 const handleOperateListData = (data: any) => {
