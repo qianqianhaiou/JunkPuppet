@@ -24,7 +24,7 @@ import { LIFE_HOOKS } from '../util/const';
 import { getElementHandlesBySelector } from '../service/select';
 
 // 初始化日志
-// initLogger();
+initLogger();
 
 async function startTask(props: TaskRunnerData) {
   const launchParams: any = {

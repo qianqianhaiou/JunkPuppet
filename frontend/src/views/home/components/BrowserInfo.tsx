@@ -45,7 +45,10 @@ function App() {
     });
   };
   const onTabClick = async (id: string) => {
-    // 去electron active当前tab
+    // 在Electron中激活当前tab
+
+    // 每次任务进行之后过一段时间再激活这个tab，不然会出现 Argument should belong to the same JavaScript world as target object
+    // 好像是调用active的问题
     await activeTargetPage(id);
     const { host } = new URL(info[0].webSocketDebuggerUrl);
     setActiveUrl(`http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${id}`);

@@ -57,7 +57,7 @@ function createWindow() {
       },
     },
     {
-      label: '重启应用',
+      label: '重启',
       click: function () {
         app.relaunch();
         app.exit();
@@ -115,7 +115,7 @@ app
       const warn = console.log;
       const error = console.log;
       console.log = (...data) => {
-        log(data);
+        log(...data);
         loggerCount++;
         const string = data.join(' ');
         logger!.info(string);
@@ -128,7 +128,7 @@ app
         });
       };
       console.warn = (...data) => {
-        warn(data);
+        warn(...data);
         loggerCount++;
         const string = data.join(' ');
         logger!.warn(string);
@@ -141,7 +141,7 @@ app
         });
       };
       console.error = (...data) => {
-        error(data);
+        error(...data);
         loggerCount++;
         const string = data.join(' ');
         logger!.error(string);
