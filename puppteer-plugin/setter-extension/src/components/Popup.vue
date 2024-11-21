@@ -14,7 +14,7 @@
 import { DomService } from '@/util/selector';
 import { computed, nextTick, onMounted, ref } from 'vue';
 
-const emits = defineEmits(['addUserDoData', 'clickAndWaitNavigator']);
+const emits = defineEmits(['addOperateListData', 'clickAndWaitNavigator']);
 
 const props = defineProps({
   selectSimilar: {
@@ -84,7 +84,7 @@ const handleClickNavigate = () => {
     targetRef.value.className + ` puppeteer_sunsilent_light_click_navigator`;
   // 通过 readystatechange 判断是否需要等待 load 事件
   // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
-  emits('addUserDoData', {
+  emits('addOperateListData', {
     mainSelector: {
       iframeIndex: -1,
       selector: newSelector,
@@ -97,10 +97,12 @@ const handleClickNavigate = () => {
       type: 'clickAndWaitNavigator',
       name: '点击跳转',
       label: '',
-      clickAndWaitNavigator: {
-        timeout: 10000,
-        urlChange: true,
-        waitUntil: ['load', 'networkidle0'],
+      data: {
+        clickAndWaitNavigator: {
+          timeout: 10000,
+          urlChange: true,
+          waitUntil: ['load', 'networkidle0'],
+        },
       },
     },
   });
@@ -112,7 +114,7 @@ const handleClickElement = () => {
   targetRef.value.className =
     targetRef.value.className + ` puppeteer_sunsilent_light_click_element`;
   targetRef.value.click();
-  emits('addUserDoData', {
+  emits('addOperateListData', {
     mainSelector: {
       iframeIndex: -1,
       selector: newSelector,
@@ -125,10 +127,12 @@ const handleClickElement = () => {
       type: 'clickElement',
       label: '',
       name: '点击元素',
-      clickElement: {
-        button: 'right',
-        clickCount: 1,
-        delay: 0,
+      data: {
+        clickElement: {
+          button: 'right',
+          clickCount: 1,
+          delay: 0,
+        },
       },
     },
   });
@@ -143,7 +147,7 @@ const handleGetLink = () => {
     newSelector = DomService.getSelectorWithNthUniq(simpleSelect, targetRef.value);
   }
   DomService.addClass(newSelector, 'puppeteer_sunsilent_light_attribute');
-  emits('addUserDoData', {
+  emits('addOperateListData', {
     mainSelector: {
       iframeIndex: -1,
       selector: newSelector,
@@ -156,7 +160,9 @@ const handleGetLink = () => {
       type: 'getAttribute',
       label: '',
       name: '提取属性',
-      getAttribute: ['href'],
+      data: {
+        getAttribute: ['href'],
+      },
     },
   });
 };
