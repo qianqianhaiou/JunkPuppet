@@ -17,6 +17,8 @@ import BoxModal from './components/BoxModal.vue';
 import MouseMoveBox from './components/MouseMoveBox.vue';
 import { sendMessage } from './util/service';
 import { formatOperateType } from './util/format';
+import { DomService } from './util/selector';
+import { waitTime } from './util/tools';
 const currentDocument = ref('top');
 
 // 选择相似项
@@ -69,7 +71,7 @@ const formatOperateData = (data: any) => {
 const operateListData = ref<any>([]);
 provide('operateListData', operateListData);
 
-const addOperateListData = (data: any) => {
+const addOperateListData = async (data: any) => {
   operateListData.value.push({
     mainSelector: data.mainSelector,
     parentLimit: data.parentLimit?.type ? data.parentLimit : null,
@@ -80,6 +82,11 @@ const addOperateListData = (data: any) => {
   if (data.operateData.type === 'clickAndWaitNavigator') {
     clickAndWaitNavigator({
       selector: data.mainSelector,
+    });
+  } else if (data.operateData.type === 'clickElement') {
+    clickElement({
+      selector: data.mainSelector,
+      clickElement: data.operateData.data.clickElement,
     });
   }
 };
@@ -92,6 +99,14 @@ const clickAndWaitNavigator = (data: any) => {
       ...data,
     },
     operateListData: operateListData.value,
+  });
+};
+const clickElement = (data: any) => {
+  sendMessage({
+    type: 'clickElement',
+    data: {
+      ...data,
+    },
   });
 };
 

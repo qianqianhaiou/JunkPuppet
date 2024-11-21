@@ -9,7 +9,7 @@ import {
   updateTaskMockData,
   getTaskDataDetail,
   deleteTaskDataDb,
-  debugPlay,
+  // debugPlay,
   startplay,
   uploadJSONSetting,
   killSetterProcess,
@@ -113,10 +113,10 @@ export const routes: Route[] = [
     path: 'killSetterProcess',
     callBack: (_event, arg) => wrapService(killSetterProcess, arg),
   },
-  {
-    path: 'debugPlay',
-    callBack: (_event, arg) => wrapService(debugPlay, arg),
-  },
+  // {
+  //   path: 'debugPlay',
+  //   callBack: (_event, arg) => wrapService(debugPlay, arg),
+  // },
   {
     path: 'startManualJs',
     callBack: (_event, arg) => wrapService(startManualJs, arg),

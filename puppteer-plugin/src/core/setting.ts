@@ -1,7 +1,8 @@
 import { resolve } from 'path';
 import puppeteer, { ElementHandle } from 'puppeteer-core';
 import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
-import { clickElement } from '../service/emulate';
+import { clickElement, emulateClick } from '../service/emulate';
+import { deceptionDetection } from '../service/modify';
 
 // 初始化日志
 initLogger();
@@ -53,6 +54,12 @@ async function startSetting(props: TaskSetterData) {
         },
       });
   }
+  // 欺骗检测
+  await deceptionDetection({
+    page,
+    browser,
+  });
+
   page.on('close', (target) => {
     process.exit();
   });
@@ -84,6 +91,8 @@ async function startSetting(props: TaskSetterData) {
             // urlChange不一定需要等待load事件 所以
             // 通过 readystatechange 判断是否需要等待 load 事件
             operateListData = operateListData.concat(dataJson.operateListData);
+          } else if (dataJson.type === 'clickElement') {
+            await emulateClick(page, dataJson.data.selector, dataJson.data.clickElement);
           } else if (dataJson.type === 'close') {
             await page.close();
           }

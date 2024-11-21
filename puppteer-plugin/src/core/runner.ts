@@ -26,6 +26,27 @@ import { getElementHandlesBySelector } from '../service/select';
 // 初始化日志
 initLogger();
 
+// 发送electron通知
+const notification = (text: string) => {
+  process.send &&
+    process.send({
+      type: 'notification',
+      data: text,
+    });
+};
+// 发送邮件通知
+const sendMail = (to: string, subject: string, html: string) => {
+  process.send &&
+    process.send({
+      type: 'sendMail',
+      to: to,
+      data: {
+        subject,
+        html,
+      },
+    });
+};
+
 async function startTask(props: TaskRunnerData) {
   const launchParams: any = {
     executablePath: props.chromePath,
@@ -85,9 +106,11 @@ async function startTask(props: TaskRunnerData) {
   // 初始化截图文件夹
   await initDir(props.parent);
 
-  const injectContexts = { page, browser, client };
+  const injectContexts = { page, browser, client, notification, sendMail };
   // 任务队列
   await asyncFor(operateListData, async (item) => {
+    await runLifeHook({ page, browser, client }, lifeHooks, 'onBeforeEachStep');
+
     if (item.recordList) {
       await emulateMouseKeyData(client, item.recordList);
     }
@@ -161,7 +184,7 @@ async function startTask(props: TaskRunnerData) {
       }
     } else if (item.operateData.type === 'customFn') {
       const functionString = customFnData[item.operateData.customFn];
-      const customFnResult = await customFn({ page, browser, client }, functionString);
+      const customFnResult = await customFn(injectContexts, functionString);
       if (customFnResult) {
         result.customResult.push(customFnResult);
       }

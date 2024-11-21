@@ -5,7 +5,7 @@ import { type } from 'os';
 import { getDrives } from 'diskinfo';
 import { existsSync } from 'fs';
 import axios from 'axios';
-import { shell } from 'electron';
+import { app, shell } from 'electron';
 import { fork } from 'node:child_process';
 import { sortBy } from 'lodash';
 
@@ -64,7 +64,7 @@ export const openTargetPage = async (pageId: string) => {
 // active指定tab
 export const activeTargetPage = async (pageId: string) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
+    const ChildProcess = global.managerProcess;
     ChildProcess.send({
       type: 'activeTargetPage',
       params: {
@@ -81,10 +81,10 @@ export const activeTargetPage = async (pageId: string) => {
           reject(msg.data);
         }
       });
-      ChildProcess.on('error', function (code) {
+      ChildProcess.on('error', function (code: any) {
         reject('browserInstance error code: ' + code);
       });
-      ChildProcess.on('close', function (code) {
+      ChildProcess.on('close', function (code: any) {
         reject('browserInstance close code: ' + code);
       });
     });
@@ -93,7 +93,7 @@ export const activeTargetPage = async (pageId: string) => {
 // 关闭指定页面
 export const closeTargetPage = async (pageId: string) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
+    const ChildProcess = global.managerProcess;
     ChildProcess.send({
       type: 'closeTargetPage',
       params: {
@@ -110,10 +110,10 @@ export const closeTargetPage = async (pageId: string) => {
           reject(msg.data);
         }
       });
-      ChildProcess.on('error', function (code) {
+      ChildProcess.on('error', function (code: any) {
         reject('browserInstance error code: ' + code);
       });
-      ChildProcess.on('close', function (code) {
+      ChildProcess.on('close', function (code: any) {
         reject('browserInstance close code: ' + code);
       });
     });
@@ -141,4 +141,10 @@ export const searchChromePath = async () => {
     }
     res(null);
   });
+};
+
+export const quitApplication = () => {
+  globalThis?.setterProcess?.kill();
+  globalThis?.managerProcess?.kill();
+  app.quit();
 };

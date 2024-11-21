@@ -29,3 +29,13 @@ export const formatPreviousLimitType = (type: string): string => {
   };
   return map[type];
 };
+
+export const formatLifeHookType = (type: string): string => {
+  const map: { [key: string]: string } = {
+    onBeforeFirstNavigate: '任务第一次导航前',
+    onBeforeEachClickNavigate: '任务过程中每次导航前',
+    onBeforeEachStep: '任务流每个步骤执行前',
+    onAfterQueue: '所有任务流执行完成之后',
+  };
+  return map[type];
+};

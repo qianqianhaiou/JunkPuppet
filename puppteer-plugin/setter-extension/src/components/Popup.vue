@@ -80,48 +80,56 @@ const globalContextListener = () => {
 const handleClickNavigate = () => {
   const simpleSelect = DomService.getSelectorSimple(targetRef.value);
   const newSelector = DomService.getSelectorWithNthUniq(simpleSelect, targetRef.value);
-  const rectDomElRect = targetRef.value.getBoundingClientRect();
   targetRef.value.className =
     targetRef.value.className + ` puppeteer_sunsilent_light_click_navigator`;
   // 通过 readystatechange 判断是否需要等待 load 事件
   // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
   emits('addUserDoData', {
-    type: 'clickAndWaitNavigator',
-    slot: true,
-    urlChange: true,
-    waitForNavigation: {
-      timeout: 10 * 1000,
-      waitUntil: ['load', 'networkidle0'],
-    },
-    data: {
-      screenX: rectDomElRect.left + rectDomElRect.width / 2,
-      screenY: rectDomElRect.top + rectDomElRect.height / 2,
+    mainSelector: {
+      iframeIndex: -1,
       selector: newSelector,
+      similar: false,
     },
-  });
-  emits('clickAndWaitNavigator', {
-    selector: newSelector,
-    screenX: rectDomElRect.left + rectDomElRect.width / 2,
-    screenY: rectDomElRect.top + rectDomElRect.height / 2,
+    parentLimit: null,
+    previousLimit: null,
+    recordList: null,
+    operateData: {
+      type: 'clickAndWaitNavigator',
+      name: '点击跳转',
+      label: '',
+      clickAndWaitNavigator: {
+        timeout: 10000,
+        urlChange: true,
+        waitUntil: ['load', 'networkidle0'],
+      },
+    },
   });
 };
 
 const handleClickElement = () => {
-  const rectDomElRect = targetRef.value.getBoundingClientRect();
   const simpleSelect = DomService.getSelectorSimple(targetRef.value);
   const newSelector = DomService.getSelectorWithNthUniq(simpleSelect, targetRef.value);
   targetRef.value.className =
     targetRef.value.className + ` puppeteer_sunsilent_light_click_element`;
   targetRef.value.click();
   emits('addUserDoData', {
-    type: 'clickElement',
-    label: '',
-    multiple: selectSimilar.value,
-    slot: true,
-    data: {
+    mainSelector: {
+      iframeIndex: -1,
       selector: newSelector,
-      screenX: rectDomElRect.left + rectDomElRect.width / 2,
-      screenY: rectDomElRect.top + rectDomElRect.height / 2,
+      similar: false,
+    },
+    parentLimit: null,
+    previousLimit: null,
+    recordList: null,
+    operateData: {
+      type: 'clickElement',
+      label: '',
+      name: '点击元素',
+      clickElement: {
+        button: 'right',
+        clickCount: 1,
+        delay: 0,
+      },
     },
   });
 };
@@ -134,17 +142,22 @@ const handleGetLink = () => {
     const simpleSelect = DomService.getSelectorSimple(targetRef.value);
     newSelector = DomService.getSelectorWithNthUniq(simpleSelect, targetRef.value);
   }
-
   DomService.addClass(newSelector, 'puppeteer_sunsilent_light_attribute');
-
   emits('addUserDoData', {
-    type: 'getAttribute',
-    label: '',
-    multiple: selectSimilar.value,
-    attributes: targetRef.value.getAttributeNames(),
-    attribute: 'href',
-    slot: true,
-    data: newSelector,
+    mainSelector: {
+      iframeIndex: -1,
+      selector: newSelector,
+      similar: false,
+    },
+    parentLimit: null,
+    previousLimit: null,
+    recordList: null,
+    operateData: {
+      type: 'getAttribute',
+      label: '',
+      name: '提取属性',
+      getAttribute: ['href'],
+    },
   });
 };
 

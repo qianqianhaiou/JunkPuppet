@@ -6,6 +6,7 @@ declare namespace globalThis {
   var wsEndpoint: string;
   var setterProcess: ChildProcess | null;
   var runnerProcess: ChildProcess | null;
+  var managerProcess: ChildProcess | null;
 }
 
 declare namespace NodeJS {

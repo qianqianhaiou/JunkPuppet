@@ -454,7 +454,6 @@ const handleStartListener = () => {
 const handleStopListener = () => {
   const result = stopListener();
   recordList.value = result;
-  console.log(recordList.value);
   clearEventList();
   recordEnable.value = false;
 };
@@ -513,7 +512,7 @@ const resetFields = () => {
       insertText: '',
       // 点击元素 参数
       clickElement: {
-        button: '',
+        button: 'left',
         clickCount: 1,
         delay: 0,
       },
@@ -539,6 +538,7 @@ const resetFields = () => {
 };
 // 保存并下一步
 const handleSaveAndJumpNext = () => {
+  if (recordEnable.value) handleStopListener();
   const data = {
     mainSelector: mainSelector.value,
     parentLimit: parentLimit.value,

@@ -115,7 +115,6 @@ function Init() {
                 <Button
                   className='w-[200px] mt-[10px]'
                   size='large'
-                  type='primary'
                   icon={<SelectOutlined />}
                   onClick={handleSelectFile}>
                   {chromePath ? '重新选择' : '手动选择'}
@@ -131,6 +130,7 @@ function Init() {
                   <Button
                     className='w-[150px] mt-[10px]'
                     size='large'
+                    type='primary'
                     icon={<ArrowDownOutlined />}
                     onClick={handleNextStep}>
                     下一步
@@ -173,6 +173,7 @@ function Init() {
                   <Button
                     className='w-[150px] mt-[10px]'
                     size='large'
+                    type='primary'
                     icon={<ArrowDownOutlined />}
                     onClick={handleNextStep}>
                     下一步
@@ -184,9 +185,7 @@ function Init() {
           {step === 2 && (
             <div className='text-center'>
               <div className='leading-[36px]'>
-                <div>请选择应用程序所产生的数据存放位置</div>
-                <div>由于数据量在日常使用过程中会不断增加</div>
-                <div>建议存放在非系统盘或机械硬盘中</div>
+                <div>填写邮件服务Token（可选）</div>
               </div>
               <div className='w-[80%] mx-[auto] mt-[20px]'>
                 <Space className='w-full' direction='vertical'>
@@ -208,6 +207,7 @@ function Init() {
                 <Button
                   className='w-[150px] mt-[10px]'
                   size='large'
+                  type='primary'
                   icon={<ArrowDownOutlined />}
                   onClick={handleNextStep}>
                   下一步

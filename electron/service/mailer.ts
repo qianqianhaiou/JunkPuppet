@@ -47,7 +47,7 @@ class Mailer {
 export const MailerService = (() => {
   let instance: Mailer | null = null;
   return () => {
-    if (!instance && process.env.MAIL && process.env.MAIL) {
+    if (!instance && process.env.MAIL && process.env.MAIL_TOKEN) {
       const options = {
         mail: process.env.MAIL,
         mailToken: process.env.MAIL_TOKEN,

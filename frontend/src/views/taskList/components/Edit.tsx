@@ -34,8 +34,9 @@ const mailStringValid = (rule: any, value: string) => {
   }
 };
 
-function App({ type, data, setEditVisible }: { type: string; data?: any; setEditVisible: any }) {
+function App({ type, setEditVisible }: { type: string; setEditVisible: any }) {
   const { refresh } = useContext(TaskListContext);
+  const { data } = useContext(TaskContext);
   const { messageApi, modal } = useContext(GlobalContext);
   const [autoTask, setAutoTask] = useState(false);
   const [autoMail, setAutoMail] = useState(false);

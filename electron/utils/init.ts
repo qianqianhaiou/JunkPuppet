@@ -9,6 +9,7 @@ import { fork } from 'node:child_process';
 export const initBrowserInstance = async () => {
   try {
     const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
+    global.managerProcess = ChildProcess;
     ChildProcess.send({
       type: 'initBrowser',
       params: {

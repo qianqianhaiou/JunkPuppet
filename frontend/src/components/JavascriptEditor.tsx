@@ -31,7 +31,8 @@ function App({
               {
                 label: 'injectContext',
                 kind: monaco.languages.CompletionItemKind.Constant,
-                insertText: 'const { page, browser, client } = _injectContexts;',
+                insertText:
+                  'const { page, browser, client, notification, sendMail } = _injectContexts;',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 detail: 'Puppet Context',
               },

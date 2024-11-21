@@ -9,6 +9,8 @@
       :style="{ paddingRight: similarable ? '48px' : '28px' }"
       placeholder="请选择元素"
       type="text"
+      @blur="handleInputChange"
+      @keydown.enter="handleInputChange"
     />
     <div class="fast-selection">
       <div class="up">
@@ -124,6 +126,15 @@ const handleSelectChildren = () => {
   selector.value.iframeIndex = newSelector.iframeIndex;
   selector.value.selector = newSelector.selector;
   selector.value.similar = similar.value;
+};
+
+const handleInputChange = () => {
+  DomService.removeClass(
+    { iframeIndex: -1, selector: '.puppeteer_sunsilent_light_selecting' },
+    'puppeteer_sunsilent_light_selecting',
+  );
+  DomService.addClass(selector.value, 'puppeteer_sunsilent_light_selecting');
+  emits('change', selector.value);
 };
 
 defineExpose({ resetFields });

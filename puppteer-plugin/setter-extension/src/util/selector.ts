@@ -193,6 +193,19 @@ export class DomService {
     }
     return element;
   }
+  static getElementsBySelector(selector: Selector): HTMLElement[] {
+    let elements: any = [];
+    if (selector.iframeIndex >= 0) {
+      const iframes = document.querySelectorAll('iframe');
+      const frameMainElement: any = iframes[selector.iframeIndex]?.contentDocument?.documentElement;
+      if (frameMainElement) {
+        elements = elements.concat(...frameMainElement.querySelectorAll(selector.selector));
+      }
+    } else {
+      elements = elements.concat(...(document as any).querySelectorAll(selector.selector));
+    }
+    return elements;
+  }
   static addClass(selector: Selector, className: string) {
     const $els = document.querySelectorAll(selector.selector);
     if ($els.length) {

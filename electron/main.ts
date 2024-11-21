@@ -13,6 +13,7 @@ import { initRoutes } from './routers';
 import { initLogger } from './service/logger';
 import { tranlateDate } from './utils/tools';
 import axios from 'axios';
+import { quitApplication } from './service/system';
 
 function createWindow() {
   const iconPath = join(process.env.VITE_PUBLIC, 'robot.png');
@@ -60,7 +61,7 @@ function createWindow() {
       label: '重启',
       click: function () {
         app.relaunch();
-        app.exit();
+        quitApplication();
       },
     },
     {
@@ -72,7 +73,7 @@ function createWindow() {
     {
       label: '退出',
       click: function () {
-        app.quit();
+        quitApplication();
       },
     },
   ]);

@@ -1,4 +1,4 @@
-import { Button, Drawer, Modal, Radio, Result, Space, Upload } from 'antd';
+import { Button, Drawer, Dropdown, Modal, Radio, Result, Space, Upload } from 'antd';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { TaskContext } from './List';
 import {
@@ -14,13 +14,38 @@ import { TitleComponent, TooltipComponent } from 'echarts/components';
 import { GraphChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import TaskStepEdit from './TaskStepEdit';
-import { SwapOutlined, RedoOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+  SwapOutlined,
+  RedoOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+  DownOutlined,
+  CodeSandboxOutlined,
+} from '@ant-design/icons';
 import JsonEditor from '@/components/JsonEditor';
 import { GlobalContext } from '@/App';
 import { Menu, Item, Separator, Submenu, useContextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
+import { formatLifeHookType, formatOperateType } from '@/utils/format';
+import JSModal from './JSModal';
+import { TaskListContext } from '..';
 
 echarts.use([TitleComponent, TooltipComponent, GraphChart, CanvasRenderer]);
+
+const ViewTypes = [
+  {
+    label: '任务流',
+    value: 'flow',
+  },
+  {
+    label: 'HOOKS',
+    value: 'lifeHooks',
+  },
+  {
+    label: '原始数据',
+    value: 'json',
+  },
+];
 
 function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
   const { data } = useContext(TaskContext);
@@ -29,10 +54,6 @@ function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
   const [config, setConfig] = useState<any>({});
   const [viewType, setViewType] = useState('flow');
   const [flow, setFlow] = useState<any>({});
-
-  const toggleViewType = () => {
-    setViewType(viewType === 'flow' ? 'json' : 'flow');
-  };
 
   const fetchTaskConfigDetail = async () => {
     const result = await getTaskConfigDetail({ _id: data._id });
@@ -61,16 +82,23 @@ function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
       push={false}
       title={
         <div className='w-full flex items-center justify-between'>
-          <div>{viewType === 'flow' ? '任务流' : '原始数据'}</div>
+          <Radio.Group
+            block
+            buttonStyle='solid'
+            options={ViewTypes}
+            style={{ width: '300px' }}
+            defaultValue='flow'
+            optionType='button'
+            onChange={(c) => {
+              setViewType(c.target.value);
+            }}
+          />
           <Space>
             {config.mockDataId ? (
               <ReSettingTask
                 config={config}
                 fetchTaskConfigDetail={fetchTaskConfigDetail}></ReSettingTask>
             ) : null}
-            <Button type='text' icon={<SwapOutlined />} onClick={toggleViewType}>
-              切换视图
-            </Button>
           </Space>
         </div>
       }
@@ -82,10 +110,16 @@ function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
       {config.mockDataId ? (
         <>
           {viewType === 'flow' ? (
-            <FlowChart flow={flow} jsonId={config?.mockDataId}></FlowChart>
+            <FlowChart
+              flow={flow}
+              jsonId={config?.mockDataId}
+              fetchTaskConfigDetail={fetchTaskConfigDetail}></FlowChart>
           ) : null}
           {viewType === 'json' ? (
             <FlowJson flow={flow} jsonId={config?.mockDataId}></FlowJson>
+          ) : null}
+          {viewType === 'lifeHooks' ? (
+            <LifeCycleHooks flow={flow} jsonId={config?.mockDataId}></LifeCycleHooks>
           ) : null}
         </>
       ) : (
@@ -94,6 +128,81 @@ function TaskFlow({ setTaskFlowVisible }: { setTaskFlowVisible: any }) {
     </Drawer>
   ) : null;
 }
+
+const LifeCycleHooks = ({ flow, jsonId }: { flow: any; jsonId: string }) => {
+  const { messageApi } = useContext(GlobalContext);
+  const { refresh } = useContext(TaskListContext);
+  const editFunction = useRef('');
+  const [editJsVisible, setEditJsVisible] = useState(false);
+  const [defaultJsCode, setDefaultJsCode] = useState('');
+  const handleEditJs = (functionString: string) => {
+    editFunction.current = functionString;
+    setDefaultJsCode(flow.lifeHooks[editFunction.current]);
+    setEditJsVisible(true);
+  };
+  const handleEditSave = async (code: string) => {
+    flow.lifeHooks[editFunction.current] = code;
+    const result = await updateTaskMockData({
+      uid: jsonId,
+      data: flow,
+    });
+    if (result === 'ok') {
+      messageApi.success('保存成功');
+      setEditJsVisible(false);
+      refresh();
+    }
+  };
+  const handleCloseEditModal = () => {
+    setEditJsVisible(false);
+  };
+  return (
+    <div>
+      <div className='mb-[10px]'>HOOKS为任务运行时的生命周期钩子</div>
+      <div className='flex items-center mb-[10px]'>
+        <Button
+          style={{ width: '220px' }}
+          type='primary'
+          icon={<CodeSandboxOutlined />}
+          onClick={() => handleEditJs('onBeforeFirstNavigate')}>
+          {formatLifeHookType('onBeforeFirstNavigate')}
+        </Button>
+      </div>
+      <div className='flex items-center mb-[10px]'>
+        <Button
+          style={{ width: '220px' }}
+          type='primary'
+          icon={<CodeSandboxOutlined />}
+          onClick={() => handleEditJs('onBeforeEachClickNavigate')}>
+          {formatLifeHookType('onBeforeEachClickNavigate')}
+        </Button>
+      </div>
+      <div className='flex items-center mb-[10px]'>
+        <Button
+          style={{ width: '220px' }}
+          type='primary'
+          icon={<CodeSandboxOutlined />}
+          onClick={() => handleEditJs('onBeforeEachStep')}>
+          {formatLifeHookType('onBeforeEachStep')}
+        </Button>
+      </div>
+      <div className='flex items-center mb-[10px]'>
+        <Button
+          style={{ width: '220px' }}
+          type='primary'
+          icon={<CodeSandboxOutlined />}
+          onClick={() => handleEditJs('onAfterQueue')}>
+          {formatLifeHookType('onAfterQueue')}
+        </Button>
+      </div>
+      {editJsVisible ? (
+        <JSModal
+          defaultJsCode={defaultJsCode}
+          handleCloseEditModal={handleCloseEditModal}
+          handleEditSave={handleEditSave}></JSModal>
+      ) : null}
+    </div>
+  );
+};
 
 function NoFlow({ config, fetchTaskConfigDetail }: { config: any; fetchTaskConfigDetail: any }) {
   return (
@@ -154,7 +263,15 @@ function UploadJsonConfig({
   return <Upload {...props}>{children}</Upload>;
 }
 
-const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
+const FlowChart = ({
+  flow,
+  jsonId,
+  fetchTaskConfigDetail,
+}: {
+  flow: any;
+  jsonId: any;
+  fetchTaskConfigDetail: any;
+}) => {
   const { messageApi } = useContext(GlobalContext);
 
   const chartRef = useRef<any>(null);
@@ -186,8 +303,83 @@ const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
   }
 
   const menuVisible = useRef(false);
-  const handlePlanItemClick = () => {
-    messageApi.info('开发中，尽请期待');
+  const handleDeleteStep = async () => {
+    const newFlow = structuredClone(flow);
+    const deleteItem = newFlow.operateListData.splice(currentStepIndex, 1);
+    if (deleteItem.operateData?.type === 'customFn') {
+      delete newFlow.customFn[deleteItem.operateData.customFn];
+    }
+    if (deleteItem?.previousLimit?.type === 'customFn') {
+      delete newFlow.customFn[deleteItem.previousLimit.customFn];
+    }
+    const result = await updateTaskMockData({
+      uid: jsonId,
+      data: newFlow,
+    });
+    if (result === 'ok') {
+      messageApi.success('操作成功');
+      fetchTaskConfigDetail();
+    }
+  };
+  const handleAddStep = async (type: string) => {
+    const newFlow = structuredClone(flow);
+    let params: any = {
+      mainSelector: {
+        iframeIndex: -1,
+        selector: '',
+        similar: true,
+      },
+      operateData: { type: type, label: '', name: formatOperateType(type) },
+      parentLimit: null,
+      previousLimit: null,
+      recordList: null,
+    };
+    if (type === 'delay') {
+      params.operateData.delay = 1000;
+    } else if (type === 'snapshotCurrentScreen') {
+      params.operateData.snapshotCurrentScreen = {
+        scrollTop: 0,
+        width: 1920,
+        height: 1080,
+      };
+    } else if (type === 'snapshotFullScreen') {
+    } else if (type === 'customFn') {
+      const functionName = 'function' + (Object.keys(newFlow.customFn).length + 1);
+      params.operateData.customFn = functionName;
+      newFlow.customFn[functionName] = '';
+    }
+    newFlow.operateListData.splice(currentStepIndex + 1, 0, params);
+    const result = await updateTaskMockData({
+      uid: jsonId,
+      data: newFlow,
+    });
+    if (result === 'ok') {
+      messageApi.success('操作成功');
+      fetchTaskConfigDetail();
+    }
+  };
+  const [copyData, setCopyData] = useState(null);
+  const handleCopyStep = async () => {
+    const copyItem = flow.operateListData[currentStepIndex];
+    setCopyData(copyItem);
+  };
+  const handlePasteData = async () => {
+    const newFlow = structuredClone(flow);
+    const pasteItem: any = structuredClone(copyData);
+    newFlow.operateListData.splice(currentStepIndex + 1, 0, pasteItem);
+    if (pasteItem?.operateData?.type === 'customFn') {
+      const functionName = 'function' + (Object.keys(newFlow.customFn).length + 1);
+      pasteItem.operateData.customFn = functionName;
+      newFlow.customFn[functionName] = '';
+    }
+    const result = await updateTaskMockData({
+      uid: jsonId,
+      data: newFlow,
+    });
+    if (result === 'ok') {
+      messageApi.success('操作成功');
+      fetchTaskConfigDetail();
+    }
   };
 
   useEffect(() => {
@@ -274,18 +466,22 @@ const FlowChart = ({ flow, jsonId }: { flow: any; jsonId: any }) => {
         onVisibilityChange={(e) => {
           menuVisible.current = false;
         }}>
-        <Item onClick={handlePlanItemClick}>复制</Item>
+        <Item onClick={handleCopyStep}>复制</Item>
         <Separator />
-        <Item onClick={handlePlanItemClick}>粘贴</Item>
-        <Separator />
+        {copyData ? (
+          <>
+            <Item onClick={handlePasteData}>粘贴</Item>
+            <Separator />
+          </>
+        ) : null}
         <Submenu label='节点后添加'>
-          <Item onClick={handlePlanItemClick}>延迟</Item>
-          <Item onClick={handlePlanItemClick}>截取当前屏幕</Item>
-          <Item onClick={handlePlanItemClick}>截取全图</Item>
-          <Item onClick={handlePlanItemClick}>自定义函数</Item>
+          <Item onClick={() => handleAddStep('delay')}>延迟</Item>
+          <Item onClick={() => handleAddStep('snapshotCurrentScreen')}>截取当前屏幕</Item>
+          <Item onClick={() => handleAddStep('snapshotFullScreen')}>截取全图</Item>
+          <Item onClick={() => handleAddStep('customFn')}>自定义函数</Item>
         </Submenu>
         <Separator />
-        <Item onClick={handlePlanItemClick}>删除该节点</Item>
+        <Item onClick={handleDeleteStep}>删除该节点</Item>
       </Menu>
     </>
   );
@@ -353,6 +549,7 @@ function ReSettingTask({
   config: any;
   fetchTaskConfigDetail: any;
 }) {
+  const { refresh } = useContext(TaskListContext);
   const [url, setUrl] = useState('');
   const handleStartSetting = async () => {
     const result = await startSetting({
@@ -361,6 +558,7 @@ function ReSettingTask({
     });
     setUrl('');
     fetchTaskConfigDetail();
+    refresh();
   };
   const handleCancel = async () => {
     const urlSplit = url.split('/');

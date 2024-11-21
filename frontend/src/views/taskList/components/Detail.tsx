@@ -25,6 +25,7 @@ import {
   ExportOutlined,
 } from '@ant-design/icons';
 import { GlobalContext } from '@/App';
+import { TaskContext } from './List';
 
 function ListItem({ data, taskId }: { data: any; taskId: string }) {
   const DATA_PATH_SNAPSHOT = useSettingStore((state) => state.DATA_PATH_SNAPSHOT);
@@ -46,7 +47,12 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                   return (
                     <Col span={8} key={index}>
                       <Card
-                        title={<div>{item.label || '未命名' + (index + 1)}</div>}
+                        title={
+                          <div>
+                            {item.label || '未命名' + (index + 1)}{' '}
+                            <span className='text-[#b0b0b0]'>（{item?.values?.length}条）</span>
+                          </div>
+                        }
                         bordered={false}>
                         <div>
                           {item.values.map((textItem: string, index: number) => {
@@ -77,7 +83,10 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
                     <Col span={8} key={index}>
                       <Card title={<div>{formatOperateType(item.type)}</div>} bordered={false}>
                         <div>
-                          <div className='text-center'>{item.label || '未命名' + (index + 1)}</div>
+                          <div className='text-center'>
+                            {item.label || '未命名' + (index + 1)}{' '}
+                            <span className='text-[#b0b0b0]'>（{item?.uids?.length}条）</span>
+                          </div>
                           <div className='flex justify-center flex-wrap mt-[10px]'>
                             {item?.uids?.length
                               ? item.uids.map((uid: string) => {
@@ -128,8 +137,9 @@ function ListItem({ data, taskId }: { data: any; taskId: string }) {
   );
 }
 
-function App({ data, setDetailVisible }: { data: any; setDetailVisible: any }) {
+function App({ setDetailVisible }: { setDetailVisible: any }) {
   const { messageApi, modal, drwerHeight } = useContext(GlobalContext);
+  const { data } = useContext(TaskContext);
 
   const [list, setList] = useState<any>([]);
   const [loading, setLoading] = useState(false);

@@ -104,7 +104,7 @@ function App({ list }: { list: any[] }) {
                 <Button
                   type='link'
                   onClick={() => {
-                    setEditData(record);
+                    setTaskData(record);
                     setEditVisible(true);
                   }}
                   style={{ paddingLeft: '0px', paddingRight: '0px' }}>
@@ -127,7 +127,7 @@ function App({ list }: { list: any[] }) {
                   type='link'
                   style={{ padding: '0px' }}
                   onClick={() => {
-                    setDetailData(record);
+                    setTaskData(record);
                     setDetailVisible(true);
                   }}>
                   详情
@@ -144,10 +144,8 @@ function App({ list }: { list: any[] }) {
   const [taskData, setTaskData] = useState({});
 
   const [editVisible, setEditVisible] = useState(false);
-  const [editData, setEditData] = useState({});
 
   const [detailVisible, setDetailVisible] = useState(false);
-  const [detailData, setDetailData] = useState([]);
   return (
     <div>
       <Table
@@ -159,12 +157,8 @@ function App({ list }: { list: any[] }) {
       />
       <TaskContext.Provider value={{ data: taskData }}>
         {taskFlowVisible ? <TaskFlow setTaskFlowVisible={setTaskFlowVisible}></TaskFlow> : null}
-        {editVisible ? (
-          <Edit type='edit' data={editData} setEditVisible={setEditVisible}></Edit>
-        ) : null}
-        {detailVisible ? (
-          <Detail data={detailData} setDetailVisible={setDetailVisible}></Detail>
-        ) : null}
+        {editVisible ? <Edit type='edit' setEditVisible={setEditVisible}></Edit> : null}
+        {detailVisible ? <Detail setDetailVisible={setDetailVisible}></Detail> : null}
       </TaskContext.Provider>
     </div>
   );
