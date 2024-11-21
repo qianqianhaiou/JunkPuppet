@@ -236,6 +236,7 @@ function UploadJsonConfig({
   children: any;
   messageApi?: any;
 }) {
+  const { refresh } = useContext(TaskListContext);
   async function readFileAsText(file: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -257,6 +258,7 @@ function UploadJsonConfig({
         messageApi.success('覆盖成功');
       }
       fetchTaskConfigDetail();
+      refresh();
       return false;
     },
   };

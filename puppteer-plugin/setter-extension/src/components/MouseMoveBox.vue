@@ -66,7 +66,7 @@ const bodyClickStopPropagation = (e: any) => {
   selector.value = getSelectorFromElement();
   setTimeout(() => {
     globalSelectOff();
-  }, 200);
+  }, 500);
 };
 const globalSelectOn = () => {
   selector.value = null;

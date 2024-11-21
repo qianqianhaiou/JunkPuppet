@@ -127,7 +127,7 @@ const handleClickElement = () => {
       name: '点击元素',
       data: {
         clickElement: {
-          button: 'right',
+          button: 'left',
           clickCount: 1,
           delay: 0,
         },
