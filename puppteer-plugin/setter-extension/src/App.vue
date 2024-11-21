@@ -100,6 +100,7 @@ const clickAndWaitNavigator = (data: any) => {
     },
     operateListData: operateListData.value,
   });
+  operateListData.value = [];
 };
 const clickElement = (data: any) => {
   sendMessage({

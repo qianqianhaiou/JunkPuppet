@@ -86,8 +86,7 @@ const handleClickNavigate = () => {
   // 有些网站会有不断的http请求，这时可以只需要等待 load 事件，不需要等待 networkidle0
   emits('addOperateListData', {
     mainSelector: {
-      iframeIndex: -1,
-      selector: newSelector,
+      ...newSelector,
       similar: false,
     },
     parentLimit: null,
@@ -116,8 +115,7 @@ const handleClickElement = () => {
   targetRef.value.click();
   emits('addOperateListData', {
     mainSelector: {
-      iframeIndex: -1,
-      selector: newSelector,
+      ...newSelector,
       similar: false,
     },
     parentLimit: null,
