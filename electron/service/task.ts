@@ -5,6 +5,8 @@ import { triggerItemCron } from './cron';
 import { taskDataDb, taskListDb } from './db';
 import { randomUUID } from 'crypto';
 import { MailerService } from './mailer';
+import { closeTargetPage, openTargetUrl } from './system';
+import { BrowserWindow, Notification } from 'electron';
 
 const renderTaskResultMail = (result: any, to: string, parent: string) => {
   const receiver: any = {
@@ -198,13 +200,7 @@ export const getTaskConfigDetail = async (params: any) => {
 // 修改模拟数据Json文件
 export const updateTaskMockData = async (params: any) => {
   const fileName = `${params.uid}.json`;
-  await fswriteFile(
-    join(process.env.DATA_PATH_JSON, fileName),
-    JSON.stringify({
-      builtInData: params.builtInData,
-      customFn: params.customFn,
-    }),
-  );
+  await fswriteFile(join(process.env.DATA_PATH_JSON, fileName), JSON.stringify(params.data));
   const database = await taskListDb();
   database.chain.set('updatedAt', Date.now()).value();
   await database.write();
@@ -234,18 +230,20 @@ export const deleteTaskDataDb = async (params: any) => {
 // 开始设置模拟数据
 export const startSetting = async (params: any) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/setting.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/setting.js`, { stdio: 'inherit' });
+    globalThis.setterProcess = ChildProcess;
     ChildProcess.send({
       type: 'StartSetting',
       params: {
         targetUrl: params.targetUrl,
         chromePath: process.env.CHROME_PATH,
-        headless: false,
+        headless: 'new',
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
+        wsEndpoint: global.wsEndpoint,
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      const messageHandle = async (msg: any) => {
         if (msg.type === 'finish') {
           const uid = params?.mockDataId || randomUUID();
           const fileName = `${uid}.json`;
@@ -262,23 +260,37 @@ export const startSetting = async (params: any) => {
             .value();
           database.chain.set('updatedAt', datanow).value();
           await database.write();
+          ChildProcess.off('message', messageHandle);
           resolve(fileName);
+        } else if (msg.type === 'review') {
+          const { host } = new URL(global.wsEndpoint);
+          const devUrl = `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`;
+          // await openTargetUrl(
+          //   `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
+          // );
+          const reuslt: any = BrowserWindow.getAllWindows();
+          reuslt.length && reuslt?.[0]?.webContents.send('openUrlInIframe', devUrl);
         } else if (msg.type === 'warn') {
           console.warn(`任务: ${params.name} - 设置警告 - ` + JSON.stringify(msg.data));
         } else if (msg.type === 'error') {
           console.error(`任务: ${params.name} - 设置出错 - ` + JSON.stringify(msg.data));
         }
-      });
-      ChildProcess.on('error', function (code) {
+      };
+      ChildProcess.on('message', messageHandle);
+      ChildProcess.once('error', function (code: any) {
         reject('exit error code: ' + code);
       });
-      ChildProcess.on('close', function (code) {
+      ChildProcess.once('close', function (code: any) {
         resolve('exit close code: ' + code);
       });
     });
   } catch (error: any) {
     console.log(`setter start error：${error.message}`);
   }
+};
+export const killSetterProcess = async (params: any) => {
+  globalThis.setterProcess?.kill();
+  await closeTargetPage(params.pageId);
 };
 // 上传JSON模拟数据
 export const uploadJSONSetting = async (params: any) => {
@@ -309,64 +321,70 @@ export const uploadJSONSetting = async (params: any) => {
   await database.write();
   return 'success';
 };
-// 调试任务操作运行，放慢速度，可视化
-export const debugPlay = async (params: any) => {
-  try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
-    const data = await fsreadFile(join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`));
-    ChildProcess.send({
-      type: 'StartRunning',
-      params: {
-        targetUrl: params.targetUrl,
-        parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
-        cookies: [],
-        chromePath: process.env.CHROME_PATH,
-        headless: false,
-        slowMo: 100,
-        chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
-        data: data,
-      },
-    });
-    return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
-        if (msg.type === 'result') {
-          const database = await taskDataDb();
-          const datanow = Date.now();
-          const uid = randomUUID();
-          database.chain
-            .get('list')
-            .unshift({
-              ...msg.data,
-              taskId: params._id,
-              taskMockId: params.mockDataId,
-              _id: uid,
-              createdAt: datanow,
-            })
-            .value();
-          database.chain.set('updatedAt', datanow).value();
-          await database.write();
-          resolve('sucess');
-        } else if (msg.type === 'warn') {
-          console.warn(`任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data));
-        } else if (msg.type === 'error') {
-          console.error(`任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data));
-        }
-      });
-      ChildProcess.on('error', function (code) {
-        reject('exit error code: ' + code);
-      });
-      ChildProcess.on('close', function (code) {
-        resolve('exit close code: ' + code);
-      });
-    });
-  } catch (error: any) {
-    console.log(`runner start error：${error.message}`);
-  }
-};
+// // 调试任务操作运行，放慢速度，可视化
+// export const debugPlay = async (params: any) => {
+//   try {
+//     const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`, { stdio: 'inherit' });
+//     const data = await fsreadFile(join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`));
+//     ChildProcess.send({
+//       type: 'StartRunning',
+//       params: {
+//         targetUrl: params.targetUrl,
+//         parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
+//         cookies: [],
+//         chromePath: process.env.CHROME_PATH,
+//         headless: 'new',
+//         wsEndpoint: global.wsEndpoint,
+//         slowMo: 100,
+//         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
+//         data: data,
+//       },
+//     });
+//     return new Promise((resolve, reject) => {
+//       ChildProcess.on('message', async (msg: any) => {
+//         if (msg.type === 'result') {
+//           const database = await taskDataDb();
+//           const datanow = Date.now();
+//           const uid = randomUUID();
+//           database.chain
+//             .get('list')
+//             .unshift({
+//               ...msg.data,
+//               taskId: params._id,
+//               taskMockId: params.mockDataId,
+//               _id: uid,
+//               createdAt: datanow,
+//             })
+//             .value();
+//           database.chain.set('updatedAt', datanow).value();
+//           await database.write();
+//           resolve('sucess');
+//         } else if (msg.type === 'review') {
+//           const { host } = new URL(global.wsEndpoint);
+//           await openTargetUrl(
+//             `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
+//           );
+//         } else if (msg.type === 'warn') {
+//           console.warn(`任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data));
+//         } else if (msg.type === 'error') {
+//           console.error(`任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data));
+//         }
+//       });
+//       ChildProcess.on('error', function (code) {
+//         reject('exit error code: ' + code);
+//       });
+//       ChildProcess.on('close', function (code) {
+//         resolve('exit close code: ' + code);
+//       });
+//     });
+//   } catch (error: any) {
+//     console.log(`runner start error：${error.message}`);
+//   }
+// };
 // 开始模拟操作运行
 export const startplay = async (params: any) => {
   try {
-    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`);
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`, { stdio: 'inherit' });
     const data = await fsreadFile(join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`));
     console.log('任务：' + params.name + ' - 开始执行');
     ChildProcess.send({
@@ -377,13 +395,14 @@ export const startplay = async (params: any) => {
         cookies: [],
         chromePath: process.env.CHROME_PATH,
         headless: 'new',
+        wsEndpoint: global.wsEndpoint,
         slowMo: 100,
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
         data: data,
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      const messageHandle = async (msg: any) => {
         if (msg.type === 'result') {
           const database = await taskDataDb();
           const datanow = Date.now();
@@ -420,18 +439,44 @@ export const startplay = async (params: any) => {
               console.log('任务：' + params.name + ' - 邮件配置错误');
             }
           }
+          ChildProcess.off('message', messageHandle);
           resolve('sucess');
+        } else if (msg.type === 'notification') {
+          new Notification({ body: msg.data }).show();
+        } else if (msg.type === 'sendMail') {
+          const instance = MailerService();
+          if (instance) {
+            console.log('任务：' + params.name + ' - 正在发送邮件');
+            if (instance) {
+              const message = {
+                from: `"拾荒木偶"<${process.env.MAIL}>`,
+                subject: msg.data.subject,
+                to: msg.to,
+                html: msg.data.html,
+                attachments: [],
+              };
+              try {
+                await instance.sendMail(message);
+                console.log('任务：' + params.name + ' - 邮件发送成功');
+              } catch (e: any) {
+                console.log('任务：' + params.name + ' - 邮件发送错误 - ' + e?.message);
+              }
+            } else {
+              console.log('任务：' + params.name + ' - 邮件配置错误');
+            }
+          }
         } else if (msg.type === 'warn') {
           console.warn(`任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data));
         } else if (msg.type === 'error') {
           console.error(`任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data));
         }
-      });
-      ChildProcess.on('error', function (code) {
+      };
+      ChildProcess.on('message', messageHandle);
+      ChildProcess.once('error', function (code) {
         console.error(`任务: ${params.name} - 执行出错， 退出码：` + code);
         reject('exit error code: ' + code);
       });
-      ChildProcess.on('close', function (code) {
+      ChildProcess.once('close', function (code) {
         console.info(`任务: ${params.name} - 结束并退出， 退出码：` + code);
         resolve('exit close code: ' + code);
       });

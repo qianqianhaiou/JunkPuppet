@@ -1,8 +1,12 @@
 import { Button, Input } from 'antd';
 import Edit from './Edit';
-import { useState } from 'react';
-function App({ fetchList }: { fetchList: any }) {
+import { useContext, useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import { TaskListContext } from '..';
+function App() {
+  const { fetchList } = useContext(TaskListContext);
   const [text, setText] = useState('');
+  const [editVisible, setEditVisible] = useState(false);
   const handleKeyPressEnter = (value: string) => {
     fetchList(value);
   };
@@ -20,7 +24,15 @@ function App({ fetchList }: { fetchList: any }) {
             onSearch={handleKeyPressEnter}></Input.Search>
         </div>
       </div>
-      <Edit reflash={fetchList} type='create'></Edit>
+      <Button
+        type='primary'
+        icon={<PlusOutlined />}
+        onClick={() => {
+          setEditVisible(true);
+        }}>
+        新建任务
+      </Button>
+      {editVisible ? <Edit setEditVisible={setEditVisible} type='create'></Edit> : null}
     </div>
   );
 }

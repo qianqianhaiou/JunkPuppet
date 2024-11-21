@@ -19,4 +19,8 @@
     background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     box-shadow: 0 0 5px #ff0000 !important;
   }
+  &_light_selecting {
+    background-image: linear-gradient(to right, #fa709a 0%, #fee140 100%);
+    box-shadow: 0 0 5px #ff0000 !important;
+  }
 }

@@ -7,10 +7,13 @@ import {
   initGlobalSetting,
   initFiles,
   initCronScripts,
+  initBrowserInstance,
 } from './utils/init';
 import { initRoutes } from './routers';
 import { initLogger } from './service/logger';
 import { tranlateDate } from './utils/tools';
+import axios from 'axios';
+import { quitApplication } from './service/system';
 
 function createWindow() {
   const iconPath = join(process.env.VITE_PUBLIC, 'robot.png');
@@ -25,6 +28,7 @@ function createWindow() {
     height: 800,
     titleBarStyle: 'hidden',
   });
+  win.maximize();
   // Electron窗口单例
   const gotTheLock = app.requestSingleInstanceLock();
   if (!gotTheLock) {
@@ -48,28 +52,28 @@ function createWindow() {
   const appTray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'JunkPuppet',
+      label: '拾荒木偶',
       click: function () {
         win.show();
       },
     },
     {
-      label: 'relaunch',
+      label: '重启',
       click: function () {
         app.relaunch();
-        app.exit();
+        quitApplication();
       },
     },
     {
-      label: 'devtools',
+      label: '开发者工具',
       click: function () {
         win.webContents.toggleDevTools();
       },
     },
     {
-      label: 'Exit',
+      label: '退出',
       click: function () {
-        app.quit();
+        quitApplication();
       },
     },
   ]);
@@ -96,6 +100,8 @@ app
       await initFiles();
       // 初始化日志记录
       logger = await initLogger(join(process.env.DATA_PATH_LOG, 'system.log'));
+      // 初始化browser实例
+      await initBrowserInstance();
       // 初始化定时任务
       await initCronScripts();
     }
@@ -106,7 +112,11 @@ app
     // 建立日志通道
     if (logger) {
       let loggerCount = 0;
+      const log = console.log;
+      const warn = console.log;
+      const error = console.log;
       console.log = (...data) => {
+        log(...data);
         loggerCount++;
         const string = data.join(' ');
         logger!.info(string);
@@ -119,6 +129,7 @@ app
         });
       };
       console.warn = (...data) => {
+        warn(...data);
         loggerCount++;
         const string = data.join(' ');
         logger!.warn(string);
@@ -131,6 +142,7 @@ app
         });
       };
       console.error = (...data) => {
+        error(...data);
         loggerCount++;
         const string = data.join(' ');
         logger!.error(string);
@@ -151,7 +163,7 @@ app
   })
   .catch((e) => {
     console.log(e);
-    new Notification({ body: e.message }).show();
+    new Notification({ body: e }).show();
   });
 
 app.on('window-all-closed', () => {

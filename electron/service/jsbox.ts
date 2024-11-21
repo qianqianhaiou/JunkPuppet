@@ -11,19 +11,21 @@ export const startManualJs = async (params: { code: string }) => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      const messageHandle = async (msg: any) => {
         if (msg.type === 'result') {
+          ChildProcess.off('message', messageHandle);
           resolve(msg.data);
         } else if (msg.type === 'warn') {
           console.warn(`JS任务执行警告 - ` + JSON.stringify(msg.data));
         } else if (msg.type === 'error') {
           console.error(`JS任务执行出错 - ` + JSON.stringify(msg.data));
         }
-      });
-      ChildProcess.on('error', function (code) {
+      };
+      ChildProcess.on('message', messageHandle);
+      ChildProcess.once('error', function (code) {
         reject('exit error code: ' + code);
       });
-      ChildProcess.on('close', function (code) {
+      ChildProcess.once('close', function (code) {
         resolve('exit close code: ' + code);
       });
     });

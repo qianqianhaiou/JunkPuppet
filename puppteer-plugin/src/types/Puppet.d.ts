@@ -4,4 +4,6 @@ export interface InjectContexts {
   page: Page;
   browser?: Browser;
   client?: CDPSession;
+  notification?: any;
+  sendMail?: any;
 }

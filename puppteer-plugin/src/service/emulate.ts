@@ -2,31 +2,28 @@ import path from 'path';
 import { Page, CDPSession, ElementHandle } from 'puppeteer-core';
 import { v4 as uuidv4 } from 'uuid';
 import { hookA } from '../util/dom';
-import { selectBySelector } from './select';
+import { getElementHandlesBySelector } from './select';
 import { injectFunction } from './inject';
 import { InjectContexts } from '../types/Puppet';
+import { waitTime } from '../util/tools';
 
-export async function playClick(
+export async function emulateClick(
   page: Page,
-  data: {
-    selector: Selector;
-    screenX?: number;
-    screenY?: number;
-  },
+  selector: Selector,
+  options?: { button: 'left'; clickCount: 1; delay: 0 },
 ) {
   await injectFunction({ page }, hookA);
-  const target = await selectBySelector({ page }, data.selector);
-  if (target) {
-    await target.click();
-  } else {
+  const elementHandles = await getElementHandlesBySelector(page, selector);
+  if (!elementHandles.length) {
     throw new Error('没有找到点击跳转元素');
   }
-  // await page.mouse.click(
-  //   data.screenX,
-  //   data.screenY
-  // );
+  for (const elementHandle of elementHandles) {
+    // 此方法将元素滚动到视野中，然后使用 page.mouse 单击元素的中心。 如果该元素从 DOM 中分离，则该方法将引发错误。
+    await elementHandle.click(options);
+    await waitTime(0.5);
+  }
 }
-export async function playScroll(client: CDPSession, data: ScrollData) {
+async function emulateScroll(client: CDPSession, data: ScrollData) {
   await client.send('Input.dispatchMouseEvent', {
     type: 'mouseWheel',
     x: data.pageX,
@@ -35,53 +32,58 @@ export async function playScroll(client: CDPSession, data: ScrollData) {
     deltaX: 0,
   });
 }
-export async function playMouse(client: CDPSession, data: any) {
+async function emulateMouse(client: CDPSession, data: any) {
   await client.send('Input.emulateTouchFromMouseEvent', data);
 }
-export async function playKeyDown(client: CDPSession, data: any) {
+async function emulateKeyDown(client: CDPSession, data: any) {
   await client.send('Input.dispatchKeyEvent', data);
 }
+export async function emulateMouseKeyData(client: CDPSession, data: any) {
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+    if (item.type === 'mouse') {
+      await emulateMouse(client, item.data);
+    } else if (item.type === 'keyevent') {
+      await emulateKeyDown(client, item.data);
+    } else if (item.type === 'scroll') {
+      await emulateScroll(client, item.data);
+      await waitTime(0.2);
+    }
+  }
+}
+
+export async function clickElement(page: Page, selector: Selector) {
+  await injectFunction({ page }, hookA);
+  const elementHandles = await getElementHandlesBySelector(page, selector);
+  if (!elementHandles.length) {
+    throw new Error('没有找到点击跳转元素');
+  }
+  for (const elementHandle of elementHandles) {
+    await elementHandle.click();
+    await waitTime(0.5);
+  }
+}
 export async function getAttributeBySelector(page: Page, data: Selector, attribute: string) {
-  const result: any = [];
-  if (data.iframeIndex >= 0) {
-    const iframes = await page.$$('iframe');
-    const targets = await iframes[data.iframeIndex].$$(data.selector);
-    for (const target of targets) {
-      const text = await target.getProperty(attribute);
-      const value = await text.jsonValue();
-      result.push(value);
-    }
-  } else {
-    const targets = await page.$$(data.selector);
-    for (const target of targets) {
-      const text = await target.getProperty(attribute);
-      const value = await text.jsonValue();
-      result.push(value);
-    }
+  const result: string[] = [];
+  const elementHandles = await getElementHandlesBySelector(page, data);
+  for (let i = 0; i < elementHandles.length; i++) {
+    const elementHandle = elementHandles[i];
+    const attr: any = await elementHandle.getProperty(attribute);
+    const value = (await attr.jsonValue()) || '';
+    result.push(value);
   }
   return result;
 }
 export async function getSnapshotBySelector(page: Page, data: Selector, parent: string) {
-  const result: any = [];
-  if (data.iframeIndex >= 0) {
-    const iframes = await page.$$('iframe');
-    const targets = await iframes[data.iframeIndex].$$(data.selector);
-    for (const target of targets) {
-      const uid = uuidv4();
-      await target.screenshot({
-        path: path.join(parent, `${uid}.png`),
-      });
-      result.push(uid);
-    }
-  } else {
-    const targets = await page.$$(data.selector);
-    for (const target of targets) {
-      const uid = uuidv4();
-      await target.screenshot({
-        path: path.join(parent, `${uid}.png`),
-      });
-      result.push(uid);
-    }
+  const result: string[] = [];
+  const elementHandles = await getElementHandlesBySelector(page, data);
+  for (let i = 0; i < elementHandles.length; i++) {
+    const elementHandle = elementHandles[i];
+    const uid = uuidv4();
+    await elementHandle.screenshot({
+      path: path.join(parent, `${uid}.png`),
+    });
+    result.push(uid);
   }
   return result;
 }

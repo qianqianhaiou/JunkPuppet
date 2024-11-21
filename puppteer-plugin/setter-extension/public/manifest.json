@@ -1,14 +1,15 @@
 {
-  "name": "vue-extension",
-  "description": "",
+  "name": "junkpuppet-extension",
+  "description": "An extension for JunkPuppet",
   "manifest_version": 3,
   "version": "1.0",
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["http://*/*", "https://*/*", "<all_urls>"],
       "js": ["index.js"],
-      "run_at": "document_end",
-      "all_frames": true
+      "run_at": "document_idle",
+      "all_frames": true,
+      "world": "MAIN"
     }
   ]
 }

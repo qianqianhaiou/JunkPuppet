@@ -1,13 +1,21 @@
-import { ElementHandle } from 'puppeteer-core';
+import { ElementHandle, Page } from 'puppeteer-core';
 import { InjectContexts } from '../types/Puppet';
 
-export const selectBySelector = async (contexts: InjectContexts, selector: Selector) => {
-  let target: ElementHandle<Element> | null = null;
-  if (selector.iframeIndex >= 0) {
-    const iframes = await contexts.page.$$('iframe');
-    target = await iframes[selector.iframeIndex].$(selector.selector);
+export const getElementHandlesBySelector = async (page: Page, selector: Selector) => {
+  let target: ElementHandle<Element>[] = [];
+  if (selector.parent) {
+    const parents = (await getElementHandlesBySelector(page, selector.parent)) || [];
+    for (let i = 0; i < parents.length; i++) {
+      const handles = await parents[i].$$(selector.selector);
+      target = target.concat(handles);
+    }
   } else {
-    target = await contexts.page.$(selector.selector);
+    if (selector.iframeIndex >= 0) {
+      const iframes = await page.$$('iframe');
+      target = (await iframes[selector.iframeIndex].$$(selector.selector)) || [];
+    } else {
+      target = (await page.$$(selector.selector)) || [];
+    }
   }
   return target;
 };

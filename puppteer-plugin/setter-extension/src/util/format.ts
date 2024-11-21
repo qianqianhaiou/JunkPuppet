@@ -1,12 +1,15 @@
 export const formatOperateType = (type: string): string => {
   const map: { [key: string]: string } = {
-    getText: '获取文本',
+    getText: '提取文本',
+    getAttribute: '提取属性',
     getElementSnapshot: '截取元素',
     clickAndWaitNavigator: '点击跳转',
+    insertText: '输入文字',
     clickElement: '点击元素',
-    getAttribute: '提取属性',
-    snapshotFullScreen: '全页截图',
-    snapshotCurrentScreen: '当前窗口截图',
+    customFn: '自定义函数',
+
+    snapshotFullScreen: '截取全图',
+    snapshotCurrentScreen: '截取当前屏幕',
     delay: '延迟',
     mouse: '鼠标事件',
     scroll: '滚动事件',

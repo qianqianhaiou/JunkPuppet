@@ -4,7 +4,36 @@ import { fsCheckFile, fsreadFile, initDir } from './file';
 import { hasGlobalSetting } from './tools';
 import { taskListDb } from '../service/db';
 import { turnOnCron } from '../service/cron';
+import { fork } from 'node:child_process';
 
+export const initBrowserInstance = async () => {
+  try {
+    const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/manager.js`, { stdio: 'inherit' });
+    global.managerProcess = ChildProcess;
+    ChildProcess.send({
+      type: 'initBrowser',
+      params: {
+        chromePath: process.env.CHROME_PATH,
+        chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      ChildProcess.once('message', async (msg: any) => {
+        if (msg.type === 'wsEndpoint') {
+          global.wsEndpoint = msg.data;
+          console.log(global.wsEndpoint);
+          resolve('sucess');
+        }
+      });
+      ChildProcess.on('error', function (code) {
+        reject('browserInstance error code: ' + code);
+      });
+      ChildProcess.on('close', function (code) {
+        reject('browserInstance close code: ' + code);
+      });
+    });
+  } catch (e) {}
+};
 export const initGlobalSetting = async () => {
   if (hasGlobalSetting()) {
     process.env.IS_SET = 'set';

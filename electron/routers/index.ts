@@ -9,9 +9,10 @@ import {
   updateTaskMockData,
   getTaskDataDetail,
   deleteTaskDataDb,
-  debugPlay,
+  // debugPlay,
   startplay,
   uploadJSONSetting,
+  killSetterProcess,
 } from '../service/task';
 
 import { startManualJs } from '../service/jsbox';
@@ -30,6 +31,10 @@ import {
   setGlobalSetting,
   getDataDistInfo,
   searchChromePath,
+  getBrowserInstanceInfo,
+  openTargetPage,
+  activeTargetPage,
+  closeTargetPage,
 } from '../service/system';
 
 import { getRecentLogs, clearAllLogs } from '../service/logger';
@@ -69,6 +74,22 @@ export const routes: Route[] = [
     callBack: (_event, arg) => wrapService(getTaskTypes, arg),
   },
   {
+    path: 'getBrowserInstanceInfo',
+    callBack: (_event, arg) => wrapService(getBrowserInstanceInfo, arg),
+  },
+  {
+    path: 'openTargetPage',
+    callBack: (_event, arg) => wrapService(openTargetPage, arg),
+  },
+  {
+    path: 'activeTargetPage',
+    callBack: (_event, arg) => wrapService(activeTargetPage, arg),
+  },
+  {
+    path: 'closeTargetPage',
+    callBack: (_event, arg) => wrapService(closeTargetPage, arg),
+  },
+  {
     path: 'getTaskDataDetail',
     callBack: (_event, arg) => wrapService(getTaskDataDetail, arg),
   },
@@ -89,9 +110,13 @@ export const routes: Route[] = [
     callBack: (_event, arg) => wrapService(startplay, arg),
   },
   {
-    path: 'debugPlay',
-    callBack: (_event, arg) => wrapService(debugPlay, arg),
+    path: 'killSetterProcess',
+    callBack: (_event, arg) => wrapService(killSetterProcess, arg),
   },
+  // {
+  //   path: 'debugPlay',
+  //   callBack: (_event, arg) => wrapService(debugPlay, arg),
+  // },
   {
     path: 'startManualJs',
     callBack: (_event, arg) => wrapService(startManualJs, arg),

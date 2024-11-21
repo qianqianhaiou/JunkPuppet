@@ -2,15 +2,19 @@ import { Button, Space, Table, Modal, message, Tag, Switch } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { translateDate } from '@/utils/translator';
 import Edit from './Edit';
-import { ExclamationCircleFilled } from '@ant-design/icons';
 import { deleteTask, updateTask } from '@/service/index';
-import Config from './Config';
 import Detail from './Detail';
-import { useEffect, useState } from 'react';
+import TaskFlow from './TaskFlow';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '@/App';
+import { TaskListContext } from '..';
 
-function App({ reflash, list }: { reflash: Function; list: any[] }) {
-  const [messageApi, contextHolder] = message.useMessage();
-  const [modal, modalContextHolder] = Modal.useModal();
+export const TaskContext = createContext<{ data: any }>({
+  data: {},
+});
+
+function App({ list }: { list: any[] }) {
+  const { messageApi } = useContext(GlobalContext);
   const [statusLoading, setStatusLoading] = useState(false);
   const handleTaskStatusChange = async (status: boolean, recard: any) => {
     if (status && !recard.cron) {
@@ -23,16 +27,6 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
     await updateTask(recard);
     setStatusLoading(false);
   };
-
-  const [drwerHeight, setDrawerHeight] = useState(window.innerHeight - 42);
-  useEffect(() => {
-    window.onresize = () => {
-      setDrawerHeight(window.innerHeight - 42);
-    };
-    return () => {
-      window.onresize = null;
-    };
-  }, []);
 
   const columns: ColumnsType<any> = [
     {
@@ -106,33 +100,54 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
         return (
           <div>
             <Space>
-              <Edit
-                reflash={reflash}
-                modal={modal}
-                messageApi={messageApi}
-                type='edit'
-                data={record}></Edit>
-              <Config
-                modal={modal}
-                messageApi={messageApi}
-                drwerHeight={drwerHeight}
-                data={record}
-                reflash={reflash}></Config>
-              <Detail
-                modal={modal}
-                messageApi={messageApi}
-                drwerHeight={drwerHeight}
-                data={record}></Detail>
+              <div>
+                <Button
+                  type='link'
+                  onClick={() => {
+                    setTaskData(record);
+                    setEditVisible(true);
+                  }}
+                  style={{ paddingLeft: '0px', paddingRight: '0px' }}>
+                  编辑
+                </Button>
+              </div>
+              <div>
+                <Button
+                  type='link'
+                  style={{ padding: '0px' }}
+                  onClick={() => {
+                    setTaskData(record);
+                    setTaskFlowVisible(true);
+                  }}>
+                  配置
+                </Button>
+              </div>
+              <div>
+                <Button
+                  type='link'
+                  style={{ padding: '0px' }}
+                  onClick={() => {
+                    setTaskData(record);
+                    setDetailVisible(true);
+                  }}>
+                  详情
+                </Button>
+              </div>
             </Space>
           </div>
         );
       },
     },
   ];
+
+  const [taskFlowVisible, setTaskFlowVisible] = useState(false);
+  const [taskData, setTaskData] = useState({});
+
+  const [editVisible, setEditVisible] = useState(false);
+
+  const [detailVisible, setDetailVisible] = useState(false);
   return (
     <div>
-      {contextHolder}
-      {modalContextHolder}
       <Table
         columns={columns}
         tableLayout='fixed'
@@ -140,6 +155,11 @@ function App({ reflash, list }: { reflash: Function; list: any[] }) {
         rowKey='_id'
         pagination={{ pageSize: 8, showTotal: (total) => `共 ${total} 条` }}
       />
+      <TaskContext.Provider value={{ data: taskData }}>
+        {taskFlowVisible ? <TaskFlow setTaskFlowVisible={setTaskFlowVisible}></TaskFlow> : null}
+        {editVisible ? <Edit type='edit' setEditVisible={setEditVisible}></Edit> : null}
+        {detailVisible ? <Detail setDetailVisible={setDetailVisible}></Detail> : null}
+      </TaskContext.Provider>
     </div>
   );
 }

@@ -9,3 +9,6 @@ export const throttle = (fn: Function, delay: number) => {
     return fn(...args);
   };
 };
+export const waitTime = async (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};

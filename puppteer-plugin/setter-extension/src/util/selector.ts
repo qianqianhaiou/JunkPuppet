@@ -1,3 +1,8 @@
+interface Selector {
+  iframeIndex: number;
+  selector: string;
+}
+
 function parentUtilBody(el: HTMLElement, parents: HTMLElement[] = []): HTMLElement[] {
   if (el.tagName === 'BODY') {
     return [];
@@ -174,5 +179,47 @@ export class DomService {
       iframeIndex: iframeIndex,
       selector: bodySelector,
     };
+  }
+  static getElementBySelector(selector: Selector): Element | null {
+    let element = null;
+    if (selector.iframeIndex >= 0) {
+      const iframes = document.querySelectorAll('iframe');
+      const frameMainElement = iframes[selector.iframeIndex]?.contentDocument?.documentElement;
+      if (frameMainElement) {
+        element = frameMainElement.querySelector(selector.selector);
+      }
+    } else {
+      element = document.querySelector(selector.selector);
+    }
+    return element;
+  }
+  static getElementsBySelector(selector: Selector): HTMLElement[] {
+    let elements: any = [];
+    if (selector.iframeIndex >= 0) {
+      const iframes = document.querySelectorAll('iframe');
+      const frameMainElement: any = iframes[selector.iframeIndex]?.contentDocument?.documentElement;
+      if (frameMainElement) {
+        elements = elements.concat(...frameMainElement.querySelectorAll(selector.selector));
+      }
+    } else {
+      elements = elements.concat(...(document as any).querySelectorAll(selector.selector));
+    }
+    return elements;
+  }
+  static addClass(selector: Selector, className: string) {
+    const $els = document.querySelectorAll(selector.selector);
+    if ($els.length) {
+      Array.prototype.forEach.call($els, (item) => {
+        item.className = item.className + ` ${className}`;
+      });
+    }
+  }
+  static removeClass(selector: Selector, className: string) {
+    const $els = document.querySelectorAll(selector.selector);
+    if ($els.length) {
+      Array.prototype.forEach.call($els, (item) => {
+        item.className = item.className.replace(className, '');
+      });
+    }
   }
 }

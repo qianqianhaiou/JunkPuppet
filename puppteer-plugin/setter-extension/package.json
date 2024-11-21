@@ -5,13 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "watch": "vite build -w",
+    "watch": "vite build -w --mode watch",
     "build": "vite build"
   },
   "dependencies": {
-    "@ant-design/icons-vue": "^7.0.1",
-    "@vueuse/core": "^10.6.1",
-    "ant-design-vue": "^4.0.7",
     "vue": "^3.2.47"
   },
   "devDependencies": {

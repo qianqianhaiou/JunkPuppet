@@ -23,6 +23,11 @@ export const getTaskTypes = async (params: any) => {
   return FetchData('getTaskTypes', params);
 };
 
+// 获取browser实例当前的Tab运行情况
+export const getBrowserInstanceInfo = async (params: any) => {
+  return FetchData('getBrowserInstanceInfo', params);
+};
+
 export const getTaskDataDetail = async (params: any) => {
   return FetchData('getTaskDataDetail', params);
 };
@@ -41,7 +46,15 @@ export const getTaskConfigDetail = async (params: any) => {
 export const updateTaskMockData = async (params: any) => {
   return FetchData('updateTaskMockData', params);
 };
-
+export const openTargetPage = async (params: any) => {
+  return FetchData('openTargetPage', params);
+};
+export const activeTargetPage = async (params: any) => {
+  return FetchData('activeTargetPage', params);
+};
+export const closeTargetPage = async (params: any) => {
+  return FetchData('closeTargetPage', params);
+};
 export const getRecentLogs = async () => {
   return FetchData('getRecentLogs', {});
 };
@@ -56,6 +69,9 @@ export const startSetting = async (params: any) => {
 };
 export const startPlay = async (params: any) => {
   return FetchData('startplay', params);
+};
+export const killSetterProcess = async (params: any) => {
+  return FetchData('killSetterProcess', params);
 };
 export const debugPlay = async (params: any) => {
   return FetchData('debugPlay', params);
