@@ -74,18 +74,10 @@ export const activeTargetPage = async (pageId: string) => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      ChildProcess.once('message', async (msg: any) => {
         if (msg.type === 'activeTargetPage') {
           resolve('sucess');
-        } else if (msg.type === 'error') {
-          reject(msg.data);
         }
-      });
-      ChildProcess.on('error', function (code: any) {
-        reject('browserInstance error code: ' + code);
-      });
-      ChildProcess.on('close', function (code: any) {
-        reject('browserInstance close code: ' + code);
       });
     });
   } catch (e) {}
@@ -103,18 +95,10 @@ export const closeTargetPage = async (pageId: string) => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      ChildProcess.once('message', async (msg: any) => {
         if (msg.type === 'closeTargetPage') {
           resolve('sucess');
-        } else if (msg.type === 'error') {
-          reject(msg.data);
         }
-      });
-      ChildProcess.on('error', function (code: any) {
-        reject('browserInstance error code: ' + code);
-      });
-      ChildProcess.on('close', function (code: any) {
-        reject('browserInstance close code: ' + code);
       });
     });
   } catch (e) {}

@@ -18,7 +18,7 @@ export const initBrowserInstance = async () => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      ChildProcess.once('message', async (msg: any) => {
         if (msg.type === 'wsEndpoint') {
           global.wsEndpoint = msg.data;
           console.log(global.wsEndpoint);

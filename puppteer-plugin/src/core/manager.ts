@@ -105,11 +105,7 @@ process.on('message', async (args: any) => {
         });
     }
   } catch (e: any) {
-    process.send &&
-      process.send({
-        type: 'error',
-        data: e.message,
-      });
+    console.error(e?.message);
     process.exit();
   }
 });

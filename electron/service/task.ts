@@ -243,7 +243,7 @@ export const startSetting = async (params: any) => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      const messageHandle = async (msg: any) => {
         if (msg.type === 'finish') {
           const uid = params?.mockDataId || randomUUID();
           const fileName = `${uid}.json`;
@@ -260,6 +260,7 @@ export const startSetting = async (params: any) => {
             .value();
           database.chain.set('updatedAt', datanow).value();
           await database.write();
+          ChildProcess.off('message', messageHandle);
           resolve(fileName);
         } else if (msg.type === 'review') {
           const { host } = new URL(global.wsEndpoint);
@@ -274,11 +275,12 @@ export const startSetting = async (params: any) => {
         } else if (msg.type === 'error') {
           console.error(`任务: ${params.name} - 设置出错 - ` + JSON.stringify(msg.data));
         }
-      });
-      ChildProcess.on('error', function (code: any) {
+      };
+      ChildProcess.on('message', messageHandle);
+      ChildProcess.once('error', function (code: any) {
         reject('exit error code: ' + code);
       });
-      ChildProcess.on('close', function (code: any) {
+      ChildProcess.once('close', function (code: any) {
         resolve('exit close code: ' + code);
       });
     });
@@ -400,7 +402,7 @@ export const startplay = async (params: any) => {
       },
     });
     return new Promise((resolve, reject) => {
-      ChildProcess.on('message', async (msg: any) => {
+      const messageHandle = async (msg: any) => {
         if (msg.type === 'result') {
           const database = await taskDataDb();
           const datanow = Date.now();
@@ -437,6 +439,7 @@ export const startplay = async (params: any) => {
               console.log('任务：' + params.name + ' - 邮件配置错误');
             }
           }
+          ChildProcess.off('message', messageHandle);
           resolve('sucess');
         } else if (msg.type === 'notification') {
           new Notification({ body: msg.data }).show();
@@ -467,12 +470,13 @@ export const startplay = async (params: any) => {
         } else if (msg.type === 'error') {
           console.error(`任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data));
         }
-      });
-      ChildProcess.on('error', function (code) {
+      };
+      ChildProcess.on('message', messageHandle);
+      ChildProcess.once('error', function (code) {
         console.error(`任务: ${params.name} - 执行出错， 退出码：` + code);
         reject('exit error code: ' + code);
       });
-      ChildProcess.on('close', function (code) {
+      ChildProcess.once('close', function (code) {
         console.info(`任务: ${params.name} - 结束并退出， 退出码：` + code);
         resolve('exit close code: ' + code);
       });
