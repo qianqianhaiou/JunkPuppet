@@ -6,6 +6,7 @@ import { validCronString, validateMail } from '@/utils/valid';
 import { TaskContext } from './List';
 import { GlobalContext } from '@/App';
 import { TaskListContext } from '..';
+import TextArea from 'antd/es/input/TextArea';
 
 const cronStringValid = (rule: any, value: string) => {
   try {
@@ -75,6 +76,16 @@ function App({ type, setEditVisible }: { type: string; setEditVisible: any }) {
   };
   const onFinish = async (values: any) => {
     let result = '';
+    if (values.cookies) {
+      try {
+        const cookies = JSON.parse(values.cookies);
+        if (!Array.isArray(cookies)) {
+          throw new Error('请输入数组格式');
+        }
+      } catch (error: any) {
+        return messageApi.error(`Cookies格式错误:${error?.message || '请检查'}`);
+      }
+    }
     if (type === 'create') {
       result = await addTask({
         ...values,
@@ -97,6 +108,7 @@ function App({ type, setEditVisible }: { type: string; setEditVisible: any }) {
     if (type === 'edit') {
       formRef.current.setFieldValue('name', data.name);
       formRef.current.setFieldValue('targetUrl', data.targetUrl);
+      if (data.cookies) formRef.current.setFieldValue('cookies', JSON.stringify(data.cookies));
       formRef.current.setFieldValue('cron', data.cron);
       formRef.current.setFieldValue('auto', data.auto);
       formRef.current.setFieldValue('autoMail', data.autoMail);
@@ -125,6 +137,9 @@ function App({ type, setEditVisible }: { type: string; setEditVisible: any }) {
         </Form.Item>
         <Form.Item name='targetUrl' label='网站地址' rules={[{ required: true }]}>
           <Input placeholder='请输入网站地址' />
+        </Form.Item>
+        <Form.Item name='cookies' label='Cookies'>
+          <TextArea placeholder='请输入Cookies（JSON数组格式）' rows={4} maxLength={8} />
         </Form.Item>
         {type === 'edit' && (
           <>

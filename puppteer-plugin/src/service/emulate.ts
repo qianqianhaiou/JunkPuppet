@@ -124,7 +124,7 @@ export async function runLifeHook(
   customFnData: any,
   label: string,
 ) {
-  const _silent_exec_string = customFnData[label]?.functionString;
+  const _silent_exec_string = customFnData[label];
   if (_silent_exec_string) {
     return await customFn(_injectContexts, _silent_exec_string).catch((e: any) => {
       console.error(`LIFE_HOOK（${label}）: ` + e?.message);

@@ -13,6 +13,7 @@ interface TaskDetail {
   targetUrl: string;
   auto: boolean;
   cron: string;
+  cookies: any[];
   createdAt: number;
   updatedAt: number;
   autoMail: boolean;

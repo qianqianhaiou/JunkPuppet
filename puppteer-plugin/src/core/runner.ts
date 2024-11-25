@@ -84,7 +84,7 @@ async function startTask(props: TaskRunnerData) {
   injectHookWindowOpen(page);
 
   // 修改cookies
-  await modifyCookies({ page }, props.cookies, props.targetUrl);
+  await modifyCookies({ page }, props.cookies);
 
   // lifehook -> onBeforeFirstNavigate
   await runLifeHook({ page, browser, client }, lifeHooks, 'onBeforeFirstNavigate');

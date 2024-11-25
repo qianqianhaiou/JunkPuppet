@@ -14,19 +14,8 @@ export const deceptionDetection = async (contexts: InjectContexts) => {
   }
 };
 
-export const modifyCookies = async (
-  contexts: InjectContexts,
-  cookies: Cookie[] | undefined,
-  targetUrl: string,
-) => {
+export const modifyCookies = async (contexts: InjectContexts, cookies: any[]) => {
   if (cookies && cookies.length) {
-    const target = cookies.map((cookie) => {
-      return {
-        name: cookie.cookieName,
-        value: cookie.cookieValue,
-        url: targetUrl,
-      };
-    });
-    await contexts.page.setCookie(...target);
+    await contexts.page.setCookie(...cookies);
   }
 };

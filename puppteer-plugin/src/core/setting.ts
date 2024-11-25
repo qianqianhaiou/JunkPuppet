@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import puppeteer, { ElementHandle } from 'puppeteer-core';
 import { clearUserDataDirExitType, initLogger, waitTime } from '../util/tools';
 import { clickElement, emulateClick } from '../service/emulate';
-import { deceptionDetection } from '../service/modify';
+import { deceptionDetection, modifyCookies } from '../service/modify';
 
 // 初始化日志
 initLogger();
@@ -59,6 +59,8 @@ async function startSetting(props: TaskSetterData) {
     page,
     browser,
   });
+  // 修改cookies
+  await modifyCookies({ page }, props.cookies);
 
   page.on('close', (target) => {
     process.exit();

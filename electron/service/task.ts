@@ -105,6 +105,9 @@ export const addTask = async (params: any) => {
   if (database.chain.get('list').find({ name: params.name }).value()) {
     throw new Error('名称重复');
   }
+  if (params.cookies) {
+    params.cookies = JSON.parse(params.cookies);
+  }
   const datanow = Date.now();
   const uid = randomUUID();
   database.chain
@@ -126,6 +129,9 @@ export const updateTask = async (params: any) => {
   const database = await taskListDb();
   if (!params._id) {
     throw new Error('缺少任务ID');
+  }
+  if (params.cookies) {
+    params.cookies = JSON.parse(params.cookies);
   }
   triggerItemCron(params);
   const datanow = Date.now();
@@ -236,6 +242,7 @@ export const startSetting = async (params: any) => {
       type: 'StartSetting',
       params: {
         targetUrl: params.targetUrl,
+        cookies: params.cookies,
         chromePath: process.env.CHROME_PATH,
         headless: 'new',
         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
@@ -321,66 +328,6 @@ export const uploadJSONSetting = async (params: any) => {
   await database.write();
   return 'success';
 };
-// // 调试任务操作运行，放慢速度，可视化
-// export const debugPlay = async (params: any) => {
-//   try {
-//     const ChildProcess = fork(`${process.env.SCRIPTS_PATH}/runner.js`, { stdio: 'inherit' });
-//     const data = await fsreadFile(join(process.env.DATA_PATH_JSON, `${params.mockDataId}.json`));
-//     ChildProcess.send({
-//       type: 'StartRunning',
-//       params: {
-//         targetUrl: params.targetUrl,
-//         parent: join(process.env.DATA_PATH_SNAPSHOT, params._id),
-//         cookies: [],
-//         chromePath: process.env.CHROME_PATH,
-//         headless: 'new',
-//         wsEndpoint: global.wsEndpoint,
-//         slowMo: 100,
-//         chromeDataPath: process.env.DATA_PATH_CHROME_DATA,
-//         data: data,
-//       },
-//     });
-//     return new Promise((resolve, reject) => {
-//       ChildProcess.on('message', async (msg: any) => {
-//         if (msg.type === 'result') {
-//           const database = await taskDataDb();
-//           const datanow = Date.now();
-//           const uid = randomUUID();
-//           database.chain
-//             .get('list')
-//             .unshift({
-//               ...msg.data,
-//               taskId: params._id,
-//               taskMockId: params.mockDataId,
-//               _id: uid,
-//               createdAt: datanow,
-//             })
-//             .value();
-//           database.chain.set('updatedAt', datanow).value();
-//           await database.write();
-//           resolve('sucess');
-//         } else if (msg.type === 'review') {
-//           const { host } = new URL(global.wsEndpoint);
-//           await openTargetUrl(
-//             `http://${host}/devtools/inspector.html?ws=${host}/devtools/page/${msg.data.targetId}`,
-//           );
-//         } else if (msg.type === 'warn') {
-//           console.warn(`任务: ${params.name} - 执行警告 - ` + JSON.stringify(msg.data));
-//         } else if (msg.type === 'error') {
-//           console.error(`任务: ${params.name} - 执行出错 - ` + JSON.stringify(msg.data));
-//         }
-//       });
-//       ChildProcess.on('error', function (code) {
-//         reject('exit error code: ' + code);
-//       });
-//       ChildProcess.on('close', function (code) {
-//         resolve('exit close code: ' + code);
-//       });
-//     });
-//   } catch (error: any) {
-//     console.log(`runner start error：${error.message}`);
-//   }
-// };
 // 开始模拟操作运行
 export const startplay = async (params: any) => {
   try {

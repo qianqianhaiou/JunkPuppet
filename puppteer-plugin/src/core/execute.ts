@@ -40,7 +40,5 @@ process.on('message', async (args: any) => {
     }
   } catch (e: any) {
     console.error(e?.message);
-  } finally {
-    process.exit();
   }
 });

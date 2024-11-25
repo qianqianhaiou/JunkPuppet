@@ -18,11 +18,6 @@ interface Selector {
     similar: boolean;
   };
 }
-
-interface Cookie {
-  cookieName: string;
-  cookieValue: string;
-}
 interface TaskRunnerData {
   targetUrl: string;
   chromePath: string;
@@ -31,7 +26,7 @@ interface TaskRunnerData {
   slowMo: number;
   parent: string;
   data: string;
-  cookies?: Array<Cookie>;
+  cookies: any[];
   size?: {
     width: number;
     height: number;
@@ -62,6 +57,7 @@ interface TaskSetterData {
   wsEndpoint: string;
   chromePath: string;
   headless: boolean;
+  cookies: any[];
   size?: {
     width: number;
     height: number;
